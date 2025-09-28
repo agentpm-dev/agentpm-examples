@@ -1,5 +1,4 @@
-import { load } from "cheerio";
-import { request } from "undici";
+import OpenAI from "openai";
 
 class ToolError extends Error {
     code: string;
@@ -11,42 +10,17 @@ class ToolError extends Error {
     }
 }
 
-/**
- * Pure function the AgentPM SDK will call.
- */
-export async function scrape({ url }: { url: string }) {
-    const res = await request(url, {
-        headers: {
-            "User-Agent": "AgentPM-WikipediaScrape/0.1 (+https://agentpackagemanager.com; contact: zack@example.com)",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-        },
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+export async function translate({ text, target_language }: { text: string; target_language: string }) {
+    const sys = `You translate succinctly into the requested language. Keep meaning; preserve names; no explanations.`;
+    const msg = `Translate into ${target_language}:\n\n${text}`;
+    const resp = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "system", content: sys }, { role: "user", content: msg }],
+        temperature: 0.2
     });
-    if (res.statusCode >= 400) {
-        throw new ToolError("HTTP_ERROR", `HTTP ${res.statusCode} from target`, {
-            status: res.statusCode,
-        });
-    }
-    const html = await res.body.text();
-
-    const $ = load(html);
-    const title = $("#firstHeading").text().trim() || $("title").text().trim();
-    const text = $("#mw-content-text")
-        .find("p")
-        .map((_, el) => $(el).text().trim())
-        .get()
-        .filter(Boolean)
-        .join("\n\n")
-        .slice(0, 50_000); // cap to keep memory sane
-
-    const images = $("#mw-content-text img")
-        .map((_, el) => $(el).attr("src"))
-        .get()
-        .filter(Boolean)
-        .map((src) => (src!.startsWith("//") ? `https:${src}` : src!.startsWith("http") ? src! : new URL(src!, url).toString()))
-        .slice(0, 20);
-
-    return { title, text, images };
+    return { translated: resp.choices[0]?.message?.content ?? "" };
 }
 
 async function readStdin(): Promise<string> {
@@ -59,7 +33,7 @@ async function runFromStdio() {
     try {
         const raw = await readStdin();
         const input = raw.trim() ? JSON.parse(raw) : {};
-        const out = await scrape(input);
+        const out = await translate(input);
         process.stdout.write(JSON.stringify({ ok: true, ...out }));
     } catch (e: any) {
         if (e instanceof ToolError) {

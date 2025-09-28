@@ -1,0 +1,56 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "translate-text",
+  "version": "0.1.0",
+  "description": "Translate text into a target language using LLM.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": ["dist/index.js"],
+    "timeout_ms": 120000
+  },
+  "runtime": { "type": "node", "version": "20" },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "text": { "type": "string", "description": "The text to be translated" },
+      "target_language": { "type": "string", "description": "The language to translate the text into" }
+    },
+    "required": ["text", "target_language"],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": true },
+          "translated": { "type": "string", "description": "The translated text" }
+        },
+        "required": ["ok", "translated"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": false },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string", "description": "Stable machine-readable error code (e.g. INPUT_INVALID, FETCH_FAILED)" },
+              "message": { "type": "string", "description": "Human-readable error message" },
+              "details": { "type": "object", "description": "Optional structured context" }
+            },
+            "required": ["message"],
+            "additionalProperties": true
+          }
+        },
+        "required": ["ok", "error"],
+        "additionalProperties": false
+      }
+    ]
+  }
+}
