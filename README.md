@@ -10,9 +10,12 @@ pnpm -C tools-node/translate-text add -D dotenv-cli
 
 pnpm -C tools-node/translate-text build
 
-pnpm --dir tools-node/translate-text exec dotenv -e .env.local -- node dist/index.js <<'JSON'
-{"text":"Hello world","target_language":"Spanish"}}
+NODE_OPTIONS=--no-deprecation \
+pnpm --dir tools-node/translate-text exec dotenv -e .env.local -- \
+node dist/index.js <<'JSON'
+{"text":"Hello world","target_language":"Spanish"}
 JSON
+
 
 uv sync --directory tools-python/summarize-text
 
