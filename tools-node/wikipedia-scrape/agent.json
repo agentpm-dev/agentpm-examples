@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "wikipedia-scrape",
+  "version": "0.1.0",
+  "description": "Fetch a Wikipedia URL and return title, text, and image URLs.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": ["dist/index.js"],
+    "timeout_ms": 120000
+  },
+  "runtime": { "type": "node", "version": "20" },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "url": { "type": "string", "format": "uri", "description": "Wikipedia URL to fetch" }
+    },
+    "required": ["url"],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": true },
+          "title": { "type": "string", "description": "Page title" },
+          "text": { "type": "string", "description": "Concatenated article paragraphs" },
+          "images": {
+            "type": "array",
+            "description": "Absolute image URLs found in the article body",
+            "items": { "type": "string", "format": "uri" }
+          }
+        },
+        "required": ["ok", "title", "text", "images"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": false },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string", "description": "Stable machine-readable error code (e.g. INPUT_INVALID, FETCH_FAILED)" },
+              "message": { "type": "string", "description": "Human-readable error message" },
+              "details": { "type": "object", "description": "Optional structured context" }
+            },
+            "required": ["message"],
+            "additionalProperties": true
+          }
+        },
+        "required": ["ok", "error"],
+        "additionalProperties": false
+      }
+    ]
+  }
+}
