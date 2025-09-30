@@ -1,10 +1,11 @@
 import sys, json, pathlib
-from . import summarize, ToolError  # uses the function defined in __init__.py
 
 # add vendored deps to path
 _vendor = pathlib.Path(__file__).parent / "_vendor"
 if _vendor.exists():
     sys.path.insert(0, str(_vendor))
+
+from . import summarize, ToolError  # uses the function defined in __init__.py
 
 
 def main():

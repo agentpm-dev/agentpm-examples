@@ -1,0 +1,63 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "sentiment-analysis",
+  "version": "0.1.0",
+  "description": "Sentiment analysis using VADER.",
+  "files": ["sentiment_analysis/"],
+  "entrypoint": {
+    "command": "python",
+    "args": ["-u", "-m", "sentiment_analysis"],
+    "timeout_ms": 120000
+  },
+  "runtime": { "type": "python", "version": "3.11" },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "text": { "type": "string", "description": "The text to be analyzed for sentiment" }
+    },
+    "required": ["text"],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": true },
+          "label": { "type": "string", "enum": ["positive", "negative", "neutral"], "description": "Analyzed text" },
+          "scores": {
+            "type":  "object",
+            "properties": {
+              "neg": { "type": "number"},
+              "neu": { "type": "number"},
+              "pos": { "type": "number"},
+              "compound": { "type": "number"}
+            },
+            "required": ["neg", "neu", "pos", "compound"]
+          }
+        },
+        "required": ["ok", "label", "scores"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": false },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string", "description": "Stable machine-readable error code (e.g. INPUT_INVALID, FETCH_FAILED)" },
+              "message": { "type": "string", "description": "Human-readable error message" },
+              "details": { "type": "object", "description": "Optional structured context" }
+            },
+            "required": ["message"],
+            "additionalProperties": true
+          }
+        },
+        "required": ["ok", "error"],
+        "additionalProperties": false
+      }
+    ]
+  }
+}
