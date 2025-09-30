@@ -21,7 +21,7 @@ TOOL_SPECS = [
 
 print("Loading tools from AgentPM…")
 scrape_tool = load("@zack/wikipedia-scrape@0.1.0", with_meta=True)
-summarize_tool = load("@zack/summarize-text@0.1.2", with_meta=True)
+summarize_tool = load("@zack/summarize-text@0.1.3", with_meta=True)
 translate_tool = load("@zack/translate-text@0.1.0", with_meta=True)
 sentiment_tool = load("@zack/sentiment-analysis@0.1.0", with_meta=True)
 resize_tool = load("@zack/resize-image@0.1.0", with_meta=True)
