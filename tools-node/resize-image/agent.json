@@ -1,0 +1,67 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "resize-image",
+  "version": "0.1.0",
+  "description": "Resize an image from a URL. Returns base64 JPEG.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": ["dist/index.cjs"],
+    "timeout_ms": 120000
+  },
+  "runtime": { "type": "node", "version": "20" },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "url": { "type": "string", "format": "uri", "description": "URL of the image to fetch and resize" },
+      "width": { "type": "integer", "minimum": 1, "description": "The desired width of the new image" },
+      "height": { "type": "integer", "minimum": 1, "description": "The desired height of the new image" },
+      "keep_aspect": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to keep aspect while fitting within width x height (true), or to resize to the exact size as requested by the width and height inputs, no aspect preservation (false)"
+      }
+    },
+    "required": ["url", "width", "height"],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": true },
+          "image_base64_jpeg": {
+            "type": "string",
+            "description": "The base64 encoded jpeg",
+            "contentEncoding": "base64",
+            "contentMediaType": "image/jpeg"
+          }
+        },
+        "required": ["ok", "image_base64_jpeg"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": false },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string", "description": "Stable machine-readable error code (e.g. INPUT_INVALID, FETCH_FAILED)" },
+              "message": { "type": "string", "description": "Human-readable error message" },
+              "details": { "type": "object", "description": "Optional structured context" }
+            },
+            "required": ["message"],
+            "additionalProperties": true
+          }
+        },
+        "required": ["ok", "error"],
+        "additionalProperties": false
+      }
+    ]
+  }
+}

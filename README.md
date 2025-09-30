@@ -40,5 +40,12 @@ python -m sentiment_analysis <<'JSON'
 {"text":"Alan Turing is one of history's most influential computer scientists"}
 JSON
 
+pnpm -C tools-node/resize-image build 
+
+Note - cjs instead of js for jimp
+
+echo '{"url":"https://upload.wikimedia.org/wikipedia/commons/a/a1/Alan_Turing_Aged_16.jpg","width":320,"height":180}' | node tools-node/resize-image/dist/index.cjs
+
+
 
 

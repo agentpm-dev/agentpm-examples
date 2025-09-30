@@ -1,0 +1,19 @@
+{
+  "name": "@agentpm-examples/resize-image",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.cjs",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --format=cjs --target=node20 --outfile=dist/index.cjs",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "esbuild": "^0.24.0",
+    "jimp": "^0.22.12",
+    "undici": "^6.19.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.6",
+    "typescript": "^5.9.2"
+  }
+}
