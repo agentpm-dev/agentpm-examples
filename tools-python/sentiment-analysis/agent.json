@@ -25,7 +25,7 @@
         "type": "object",
         "properties": {
           "ok": { "const": true },
-          "label": { "type": "string", "enum": ["positive", "negative", "neutral"], "description": "Analyzed text" },
+          "label": { "type": "string", "enum": ["positive", "negative", "neutral"], "description": "The sentiment label - positive, negative, or neutral" },
           "scores": {
             "type":  "object",
             "properties": {
