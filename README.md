@@ -72,3 +72,9 @@ agentpm publish
 id:   2
 url:  https://www.agentpackagemanager.com/tools/13ad27db-a5ed-4472-a996-3f3f0e1e270b/v0.1.0/overview
 
+
+uv run --directory agent-app-python \
+python -m dotenv -f .env.local run -- \
+python -m app.main
+
+

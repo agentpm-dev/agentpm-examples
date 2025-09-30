@@ -9,8 +9,8 @@
       "version": "0.1.0"
     },
     "@zack/summarize-text": {
-      "integrity": "19bef4bdf12a106fd55459203d561550364c5f0a64fafa1b33553ce2a5061bcb",
-      "version": "0.1.0"
+      "integrity": "211e2f4ce8a9e374123f13fb5323efa86c50c03f4d61bfcda4a857d6b557afbe",
+      "version": "0.1.3"
     },
     "@zack/translate-text": {
       "integrity": "218ea88afd2aa6795de3cb0e8b4dd7adc097680a9f9a1eab8ada5252d6668214",
@@ -21,6 +21,6 @@
       "version": "0.1.0"
     }
   },
-  "generated": "2025-09-30T22:12:14.455120Z",
+  "generated": "2025-09-30T23:13:20.100388Z",
   "lockfile_version": 1
 }

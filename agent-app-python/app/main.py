@@ -13,15 +13,20 @@ from agentpm import load
 # Tool specs: namespace/name@version
 TOOL_SPECS = [
     "research/wikipedia-scrape@0.1.0",
-    "research/summarize-text@0.1.0",
+    "research/summarize-text@0.1.1",
     "research/translate-text@0.1.0",
     "research/sentiment-analysis@0.1.0",
     "research/resize-image@0.1.0",
 ]
 
 print("Loading tools from AgentPM…")
-scrape_loaded = load("@zack/wikipedia-scrape@0.1.0", with_meta=True)
+scrape_tool = load("@zack/wikipedia-scrape@0.1.0", with_meta=True)
+summarize_tool = load("@zack/summarize-text@0.1.2", with_meta=True)
+translate_tool = load("@zack/translate-text@0.1.0", with_meta=True)
+sentiment_tool = load("@zack/sentiment-analysis@0.1.0", with_meta=True)
+resize_tool = load("@zack/resize-image@0.1.0", with_meta=True)
 
+# Map AgentPM callables to LangChain Tools
 def make_tool(name: str, fn, description: str):
     return Tool(
         name=name,
@@ -29,13 +34,18 @@ def make_tool(name: str, fn, description: str):
         func=lambda s: fn(json.loads(s)),
     )
 
-# Map AgentPM callables to LangChain Tools
+def _fmt(x):
+    return x if isinstance(x, str) else json.dumps(x, ensure_ascii=False)
+
+tool_objs = [scrape_tool, summarize_tool, translate_tool, sentiment_tool, resize_tool]
+
 tools = [
-    make_tool("research.scrape", loaded["research.scrape"], "Scrape a Wikipedia URL. Args JSON: {\"url\": string}"),
-    make_tool("research.summarize", loaded["research.summarize"], "Summarize text. Args JSON: {\"text\": string, \"max_words\"?: int}"),
-    make_tool("research.translate", loaded["research.translate"], "Translate text. Args JSON: {\"text\": string, \"target_language\": string}"),
-    make_tool("research.analyze", loaded["research.analyze"], "Sentiment analysis. Args JSON: {\"text\": string}"),
-    make_tool("research.resize", loaded["research.resize"], "Resize image from URL. Args JSON: {\"url\": string, \"width\": int, \"height\": int, \"keep_aspect\"?: bool}"),
+    make_tool(
+        t["meta"]["name"],
+        t["func"],
+        f"{t['meta']['description']} - Inputs: {_fmt(t['meta']['inputs'])}. Outputs: {_fmt(t['meta']['outputs'])}."
+    )
+    for t in tool_objs
 ]
 
 # --- 2) Build a ReAct agent with verbose callbacks ---

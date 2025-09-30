@@ -7,7 +7,7 @@ dependencies = [
     "langchain-openai>=0.2.5",
     "openai>=1.51.0",
     "python-dotenv[cli]>=1.1.1",
-    "agentpm>=0.1.0"
+    "agentpm>=0.1.0",
 ]
 
 [tool.uv]

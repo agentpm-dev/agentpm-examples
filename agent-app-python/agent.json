@@ -9,6 +9,6 @@
     { "name": "@zack/translate-text", "version": "0.1.0" },
     { "name": "@zack/resize-image", "version": "0.1.0" },
     { "name": "@zack/sentiment-analysis", "version": "0.1.0" },
-    { "name": "@zack/summarize-text", "version": "0.1.0" }
+    { "name": "@zack/summarize-text", "version": "0.1.3" }
   ]
 }

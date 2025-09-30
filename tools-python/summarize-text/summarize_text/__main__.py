@@ -1,11 +1,15 @@
 import sys, json, pathlib
 
-# add vendored deps to path
-_vendor = pathlib.Path(__file__).parent / "_vendor"
+here = pathlib.Path(__file__).resolve().parent
+pkg_root = here.parent
+# ensure "summarize_text" is importable as a package
+sys.path.insert(0, str(pkg_root))
+# vendored pure-Python deps (optional)
+_vendor = here / "_vendor"
 if _vendor.exists():
     sys.path.insert(0, str(_vendor))
 
-from . import summarize, ToolError  # uses the function defined in __init__.py
+from summarize_text import summarize, ToolError  # absolute import now works
 
 
 def main():
