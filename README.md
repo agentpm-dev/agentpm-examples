@@ -31,3 +31,14 @@ JSON
 uv pip install --target tools-python/summarize-text/summarize_text/_vendor "openai>=1.51.0"
 
 
+uv sync --directory tools-python/sentiment-analysis
+
+uv pip install --target tools-python/sentiment-analysis/sentiment_analysis/_vendor "vaderSentiment>=3.3.2"
+
+uv run --directory tools-python/sentiment-analysis \
+python -m sentiment_analysis <<'JSON'
+{"text":"Alan Turing is one of history's most influential computer scientists"}
+JSON
+
+
+
