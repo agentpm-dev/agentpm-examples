@@ -20,16 +20,13 @@ TOOL_SPECS = [
 ]
 
 print("Loading tools from AgentPM…")
-loaded = load_tools(TOOL_SPECS)  # returns dict[str, callable], keyed by "namespace.function"
-# Example keys expected (depending on your SDK):
-#   research.scrape, research.summarize, research.translate, research.analyze, research.resize
-# If your SDK returns metadata, adapt the mapping below.
+scrape_loaded = load("@zack/wikipedia-scrape@0.1.0", with_meta=True)
 
 def make_tool(name: str, fn, description: str):
     return Tool(
         name=name,
         description=description,
-        func=lambda s: fn(**json.loads(s)),  # simple JSON-args wrapper for LangChain Tool(func: str->str)
+        func=lambda s: fn(json.loads(s)),
     )
 
 # Map AgentPM callables to LangChain Tools
@@ -42,7 +39,7 @@ tools = [
 ]
 
 # --- 2) Build a ReAct agent with verbose callbacks ---
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2, api_key=OPENAI_API_KEY)
+llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.2, openai_api_key=OPENAI_API_KEY)
 prompt = hub.pull("hwchase17/react")  # stock ReAct prompt is fine for demo
 
 agent = create_react_agent(llm, tools, prompt)
