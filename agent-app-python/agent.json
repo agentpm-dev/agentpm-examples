@@ -1,0 +1,8 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "agent",
+  "name": "research-assistant",
+  "version": "0.1.0",
+  "description": "Assistant composed of multiple tools",
+  "tools": []
+}

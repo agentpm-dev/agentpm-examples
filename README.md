@@ -47,5 +47,6 @@ Note - cjs instead of js for jimp
 echo '{"url":"https://upload.wikimedia.org/wikipedia/commons/a/a1/Alan_Turing_Aged_16.jpg","width":320,"height":180}' | node tools-node/resize-image/dist/index.cjs
 
 
+uv sync --directory tools-python/agent-app-python
 
 
