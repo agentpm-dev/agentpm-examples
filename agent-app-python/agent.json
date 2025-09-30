@@ -4,5 +4,11 @@
   "name": "research-assistant",
   "version": "0.1.0",
   "description": "Assistant composed of multiple tools",
-  "tools": []
+  "tools": [
+    { "name": "@zack/wikipedia-scrape", "version": "0.1.0" },
+    { "name": "@zack/translate-text", "version": "0.1.0" },
+    { "name": "@zack/resize-image", "version": "0.1.0" },
+    { "name": "@zack/sentiment-analysis", "version": "0.1.0" },
+    { "name": "@zack/summarize-text", "version": "0.1.0" }
+  ]
 }
