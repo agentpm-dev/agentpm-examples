@@ -11,19 +11,11 @@ from app.callbacks import VerboseHandler
 from agentpm import load
 
 # Tool specs: namespace/name@version
-TOOL_SPECS = [
-    "research/wikipedia-scrape@0.1.0",
-    "research/summarize-text@0.1.1",
-    "research/translate-text@0.1.0",
-    "research/sentiment-analysis@0.1.0",
-    "research/resize-image@0.1.0",
-]
-
 print("Loading tools from AgentPM…")
 scrape_tool = load("@zack/wikipedia-scrape@0.1.0", with_meta=True)
-summarize_tool = load("@zack/summarize-text@0.1.3", with_meta=True)
-translate_tool = load("@zack/translate-text@0.1.0", with_meta=True)
-sentiment_tool = load("@zack/sentiment-analysis@0.1.0", with_meta=True)
+summarize_tool = load("@zack/summarize-text@0.1.3", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
+translate_tool = load("@zack/translate-text@0.1.0", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
+sentiment_tool = load("@zack/sentiment-analysis@0.1.1", with_meta=True)
 resize_tool = load("@zack/resize-image@0.1.0", with_meta=True)
 
 # Map AgentPM callables to LangChain Tools

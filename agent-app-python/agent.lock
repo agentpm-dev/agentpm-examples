@@ -5,8 +5,8 @@
       "version": "0.1.0"
     },
     "@zack/sentiment-analysis": {
-      "integrity": "2abb0434f423bb3e9fd7028023ea36872bdb6d8213f2575c9eb199454e656c5c",
-      "version": "0.1.0"
+      "integrity": "7a1323c0a15a67a84b28dbc107d1f059d3656c07d5c2411f264e7e405a48742d",
+      "version": "0.1.1"
     },
     "@zack/summarize-text": {
       "integrity": "211e2f4ce8a9e374123f13fb5323efa86c50c03f4d61bfcda4a857d6b557afbe",
@@ -21,6 +21,6 @@
       "version": "0.1.0"
     }
   },
-  "generated": "2025-09-30T23:13:20.100388Z",
+  "generated": "2025-09-30T23:23:19.827940Z",
   "lockfile_version": 1
 }
