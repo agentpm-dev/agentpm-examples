@@ -35,10 +35,10 @@ export async function resize({
         }
 
         const res = await request(url, {
+            signal: ac.signal,
             headers: {
                 "User-Agent": "AgentPM-WikipediaScrape/0.1 (+https://agentpackagemanager.com; contact: zack@example.com)",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
+                "Accept": "*/*",
             },
         }).catch((e) => {
             throw new ToolError("FETCH_FAILED", "Network error", { cause: String(e) });
@@ -63,7 +63,6 @@ export async function resize({
 
         // async variant that returns a Buffer
         const out: Buffer = await img.getBufferAsync(MIME_JPEG);
-
         return { image_base64_jpeg: out.toString("base64") };
     } catch (e:any) {
         if (e.name === "AbortError") throw new ToolError("TIMEOUT", "Resize timed out");
@@ -72,19 +71,33 @@ export async function resize({
     } finally {
         clearTimeout(tid);
         // 2) release undici sockets
-        await getGlobalDispatcher().close().catch(()=>{});
+        try { void getGlobalDispatcher().close(); } catch {}
     }
 }
 
 async function readStdin(ms = 15000): Promise<string> {
     return new Promise((resolve, reject) => {
         const chunks: Buffer[] = [];
-        const t = setTimeout(() => resolve(Buffer.concat(chunks).toString("utf8")), ms);
+        const timer = setTimeout(() => { cleanup(); resolve(Buffer.concat(chunks).toString("utf8")); }, ms);
+        const onData = (c: string | Buffer) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c));
+        const onEnd  = () => { clearTimeout(timer); cleanup(); resolve(Buffer.concat(chunks).toString("utf8")); };
+        const onErr  = (e: any) => { clearTimeout(timer); cleanup(); reject(e); };
+        const cleanup = () => {
+            process.stdin.off("data", onData);
+            process.stdin.off("end", onEnd);
+            process.stdin.off("error", onErr);
+            try { process.stdin.pause(); } catch {}
+        };
         process.stdin.setEncoding("utf8");
-        process.stdin.on("data", (c) => chunks.push(Buffer.from(c)));
-        process.stdin.on("end", () => { clearTimeout(t); resolve(Buffer.concat(chunks).toString("utf8")); });
-        process.stdin.on("error", reject);
+        process.stdin.on("data", onData);
+        process.stdin.on("end", onEnd);
+        process.stdin.on("error", onErr);
     });
+}
+
+function hardExit(code = 0) {
+    try { process.stdin.pause(); } catch {}
+    setImmediate(() => process.exit(code));
 }
 
 async function runFromStdio() {
@@ -93,13 +106,13 @@ async function runFromStdio() {
         const input = raw.trim() ? JSON.parse(raw) : {};
         const out = await resize(input);
         process.stdout.write(JSON.stringify({ ok: true, ...out }));
-        process.stdout.end(() => process.exit(0)); // 3) exit deterministically
+        hardExit(0);
     } catch (e:any) {
         const err = e instanceof ToolError
             ? { code: e.code, message: String(e.message), ...(e.details?{details:e.details}:{}) }
             : { code: "UNEXPECTED", message: String(e?.message || e) };
         process.stdout.write(JSON.stringify({ ok: false, error: err }));
-        process.stdout.end(() => process.exit(e instanceof ToolError ? 0 : 1));
+        hardExit(e instanceof ToolError ? 0 : 1);
     }
 }
 

@@ -2,7 +2,7 @@ from langchain_core.callbacks import BaseCallbackHandler
 
 class VerboseHandler(BaseCallbackHandler):
     def on_chain_start(self, serialized, inputs, **kwargs):
-        name = serialized.get("id") or serialized.get("name") or "chain"
+        name = serialized.get("id") or serialized.get("name") or "chain" if serialized is not None else "chain"
         print(f"\n▶️  Chain start: {name}")
         print(f"   Inputs: {inputs}")
 
