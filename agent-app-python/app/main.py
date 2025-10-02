@@ -51,10 +51,10 @@ if __name__ == "__main__":
     # Demo task: end-to-end flow on a Wikipedia URL.
     task = (
         "Given this Wikipedia URL, scrape it, summarize in <= 150 words, "
-        "translate the summary to Spanish,  "
-        "and resize the first image to 32x32.\n"
+        "translate the summary to Spanish, run sentiment on the English summary,"
+        "and resize the first image to 320x180.\n"
         "URL: https://en.wikipedia.org/wiki/Alan_Turing\n"
-        "Return a compact JSON with keys: title, summary_en, summary_es, resized_image_base64_prefix"
+        "Return a compact JSON with keys: title, summary_en, summary_es, sentiment resized_image_base64_prefix"
     )
     result = executor.invoke({"input": task})
     print("\n=== FINAL ANSWER ===\n", result["output"])
