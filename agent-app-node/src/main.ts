@@ -10,28 +10,66 @@ import { JSONSchemaToZod } from '@dmitryrechkin/json-schema-to-zod';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "";
 
 // ——— Verbose callbacks (similar to your Python VerboseHandler)
-class VerboseHandler extends BaseCallbackHandler {
-    name = "VerboseHandler";
-    onToolStart(tool, input) {
-        // tool.name available on LC >= 0.2
-        console.log(`🛠️  Tool start: ${tool?.name ?? "unknown"}`);
-        console.log(`   Args: ${typeof input === "string" ? input : JSON.stringify(input)}`);
+class TerseHandler extends BaseCallbackHandler {
+    name = "TerseHandler";
+    #t0 = 0;
+
+    // LLM
+    async handleLLMStart(_llm: any, prompts: string | any[]) {
+        const p = prompts?.[prompts.length - 1] ?? "";
+        console.log(`🤖 LLM start: ${p.slice(0, 140)}…`);
     }
-    onToolEnd(output) {
+    async handleLLMEnd() {
+        console.log("🤖 LLM end");
+    }
+
+    // Tools
+    async handleToolStart(serialized: any, input: any, runId: any, parentRunId: any, tags: any[], metadata: {
+        toolName: any;
+    }, runType: any, config: { runName: any; }) {
+        this.#t0 = Date.now();
+        const toolName =
+            config?.runName ||
+            metadata?.toolName ||
+            (tags?.find(t => t.startsWith("tool:"))?.split(":")[1]) ||
+            "tool";
+
+        const args = typeof input === "string" ? input : JSON.stringify(input);
+        console.log(`🛠️ ${toolName} ← ${args.slice(0, 200)}`);
+    }
+
+    async handleToolEnd(output: any, _tool: any, _runId: any, _parentRunId: any, tags: any[], metadata: {
+        toolName: any;
+    }, _runType: any, config: { runName: any; }) {
+        const ms = Date.now() - this.#t0;
+        const toolName =
+            config?.runName || metadata?.toolName ||
+            (tags?.find(t => t.startsWith("tool:"))?.split(":")[1]) || "tool";
+
         const s = typeof output === "string" ? output : JSON.stringify(output);
-        console.log(`✅ Tool output (trunc): ${s.slice(0, 240)}`);
+        console.log(`✅ ${toolName} → ${s.slice(0, 240)} (${ms}ms)`);
     }
-    onChainStart(chain, inputs) {
-        console.log(`🔗 Chain start: ${chain.id?.[0] ?? chain.name ?? "unknown"}`);
+
+    // Chains/agents
+    async handleChainStart(chain: { name: string | string[]; }, _inputs: any, runId: any, parentRunId: any, tags: string | string[]) {
+        // Only log the run that has no parent AND is your top agent
+        if (!parentRunId && (chain?.name?.includes?.("AgentExecutor") || tags?.includes("root"))) {
+            console.log(`🔗 Agent start (${runId})`);
+        }
     }
-    onChainEnd(outputs) {
-        console.log(`🔗 Chain end.`);
+
+    async handleChainEnd(_outputs: any, runId: any, parentRunId: any, tags: string | string[]) {
+        if (!parentRunId && tags?.includes("root")) {
+            console.log(`🔗 Agent end (${runId})`);
+        }
     }
-    onLLMStart(_llm, prompts) {
-        console.log(`🤖 LLM start. Prompts: ${prompts.map(p => p.slice(0,120)).join(" | ")}`);
+
+    // (optional) errors
+    async handleToolError(e, tool) {
+        console.log(`🛑 ${tool?.name ?? "tool"} error:`, e?.message ?? e);
     }
-    onLLMEnd() {
-        console.log(`🤖 LLM end.`);
+    async handleLLMError(e) {
+        console.log(`🛑 LLM error:`, e?.message ?? e);
     }
 }
 
@@ -42,6 +80,8 @@ function makeTool(name: string, fn: (args: unknown) => Promise<unknown> | unknow
         name,
         description,
         schema: JSONSchemaToZod.convert(inputs),
+        metadata: { toolName: name },
+        tags: [`tool:${name}`],
         func: async (input) => {
             try {
                 const out = await fn(input);
@@ -91,8 +131,9 @@ async function main() {
     const prompt = await pull("hwchase17/openai-tools-agent");
 
     // Agent + executor
+    const handler = new TerseHandler();
     const agent = await createOpenAIToolsAgent({ llm, tools, prompt });
-    const executor = new AgentExecutor({ agent, tools, verbose: true });
+    const executor = new AgentExecutor({ agent, tools, callbacks: [handler] });
 
     // Demo task (same as Python)
     const task = [
@@ -105,7 +146,7 @@ async function main() {
 
     const result = await executor.invoke(
         { input: task },
-        { callbacks: [new VerboseHandler()] }
+        { callbacks: [handler], tags: ["root"] }
     );
 
     console.log("\n=== FINAL ANSWER ===\n", result.output);
