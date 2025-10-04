@@ -78,3 +78,11 @@ python -m dotenv -f .env.local run -- \
 python -m app.main
 
 
+
+pnpm -w add langchain@^0.2 @langchain/core@^0.2 @langchain/openai@^0.3 -F agent-app-node
+
+pnpm --dir agent-app-node add -D dotenv-cli
+
+pnpm --dir agent-app-node exec dotenv -e .env.local -- pnpm --dir agent-app-node dev
+
+
