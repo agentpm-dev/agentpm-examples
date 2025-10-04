@@ -16,7 +16,7 @@ scrape_tool = load("@zack/wikipedia-scrape@0.1.1", with_meta=True)
 summarize_tool = load("@zack/summarize-text@0.1.3", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
 translate_tool = load("@zack/translate-text@0.1.0", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
 sentiment_tool = load("@zack/sentiment-analysis@0.1.1", with_meta=True)
-resize_tool = load("@zack/resize-image@0.1.2", with_meta=True)
+resize_tool = load("@zack/resize-image@0.1.4", with_meta=True)
 
 # Map AgentPM callables to LangChain Tools
 def make_tool(name: str, fn, description: str):
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     task = (
         "Given this Wikipedia URL, scrape it, summarize in <= 150 words, "
         "translate the summary to Spanish, run sentiment on the English summary,"
-        "and resize the first image to 320x180.\n"
+        "and resize the first image to 32x32.\n"
         "URL: https://en.wikipedia.org/wiki/Alan_Turing\n"
         "Return a compact JSON with keys: title, summary_en, summary_es, sentiment resized_image_base64_prefix"
     )
