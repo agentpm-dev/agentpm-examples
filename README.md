@@ -16,14 +16,14 @@ Each tool is intentionally simple to highlight integration, not performance.
 
 ### Contents
 - **Tools**
-    - [`tools-node/wikipedia-scrape`](#2-wikipedia-scrape--readme)
-    - [`tools-python/summarize-text`](#3-summarize-text--readme)
-    - [`tools-node/translate-text`](#4-translate-text--readme)
-    - [`tools-python/sentiment-analysis`](#5-sentiment-analysis--readme)
-    - [`tools-node/resize-image`](#6-resize-image--readme)
+    - [`tools-node/wikipedia-scrape`](tools-node/wikipedia-scrape/)
+    - [`tools-python/summarize-text`](tools-python/summarize-text/)
+    - [`tools-node/translate-text`](tools-node/translate-text/)
+    - [`tools-python/sentiment-analysis`](tools-python/sentiment-analysis/)
+    - [`tools-node/resize-image`](tools-node/resize-image)
 - **Agents**
-    - [`agent-app-python`](#7-python-agent--readme)
-    - [`agent-app-node`](#8-node-agent--readme)
+    - [`agent-app-python`](agent-app-python/)
+    - [`agent-app-node`](agent-app-node/)
 
 ### Quick workspace setup
 ```bash
