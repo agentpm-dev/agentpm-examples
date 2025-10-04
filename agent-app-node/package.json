@@ -10,7 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@agentpm/sdk": "^0.1.0",
+    "@agentpm/sdk": "^0.1.2",
     "@dmitryrechkin/json-schema-to-zod": "^1.0.1",
     "@langchain/openai": "^0.3.0",
     "dotenv": "^16.4.5",

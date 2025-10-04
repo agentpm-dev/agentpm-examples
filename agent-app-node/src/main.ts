@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { load } from "@agentpm/sdk";
-import { z } from "zod";
 import { pull } from "langchain/hub";
 import { AgentExecutor, createOpenAIToolsAgent } from "langchain/agents";
 import { ChatOpenAI } from "@langchain/openai";
