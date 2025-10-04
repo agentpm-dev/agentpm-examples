@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@zack/resize-image": {
+      "integrity": "acbb3a7408d6647151e3055bd26540bbf8b1649a8d614bc99c5697f8b4cf7f30",
+      "version": "0.1.4"
+    }
+  },
+  "generated": "2025-10-04T02:07:10.040234Z",
+  "lockfile_version": 1
+}

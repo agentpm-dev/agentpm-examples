@@ -10,9 +10,13 @@ __pycache__/
 *.pyc
 uv.lock
 
+# agentpm
+.agentpm/
+
 # env
 .env
 *.env.local
 .idea
 
 _vendor/
+target/

@@ -2,12 +2,12 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "sentiment-analysis",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sentiment analysis using VADER.",
   "files": ["sentiment_analysis/"],
   "entrypoint": {
     "command": "python",
-    "args": ["-u", "-m", "sentiment_analysis"],
+    "args": ["-u", "sentiment_analysis/__main__.py"],
     "timeout_ms": 120000
   },
   "runtime": { "type": "python", "version": "3.11" },
@@ -25,7 +25,7 @@
         "type": "object",
         "properties": {
           "ok": { "const": true },
-          "label": { "type": "string", "enum": ["positive", "negative", "neutral"], "description": "Analyzed text" },
+          "label": { "type": "string", "enum": ["positive", "negative", "neutral"], "description": "The sentiment label - positive, negative, or neutral" },
           "scores": {
             "type":  "object",
             "properties": {
