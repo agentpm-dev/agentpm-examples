@@ -4,7 +4,7 @@
 
 ---
 
-## AgentPM Examples Repository
+## AgentPM™ Examples Repository
 
 ### What is this?
 A mono-repo of concrete examples showing how to:
