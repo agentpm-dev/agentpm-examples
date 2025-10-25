@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "resize-image",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Resize an image from a URL. Returns base64 JPEG.",
   "files": [
     "dist/"

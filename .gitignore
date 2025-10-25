@@ -12,6 +12,7 @@ uv.lock
 
 # agentpm
 .agentpm/
+pub.txt
 
 # env
 .env

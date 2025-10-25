@@ -6,23 +6,23 @@
   "tools": [
     {
       "name": "@zack/wikipedia-scrape",
-      "version": "0.1.1"
+      "version": "0.1.3"
     },
     {
       "name": "@zack/translate-text",
-      "version": "0.1.0"
-    },
-    {
-      "name": "@zack/resize-image",
-      "version": "0.1.4"
-    },
-    {
-      "name": "@zack/sentiment-analysis",
       "version": "0.1.1"
     },
     {
+      "name": "@zack/resize-image",
+      "version": "0.1.5"
+    },
+    {
+      "name": "@zack/sentiment-analysis",
+      "version": "0.1.2"
+    },
+    {
       "name": "@zack/summarize-text",
-      "version": "0.1.3"
+      "version": "0.1.4"
     }
   ],
   "version": "0.1.0"
