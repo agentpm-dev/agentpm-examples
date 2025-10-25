@@ -96,11 +96,11 @@ function makeTool(name: string, fn: (args: unknown) => Promise<unknown> | unknow
 // ——— Load tools from AgentPM (same set as Python)
 async function loadAllTools() {
     console.log("Loading tools from AgentPM…");
-    const scrape = await load("@zack/wikipedia-scrape@0.1.1", { withMeta: true });
-    const summarize = await load("@zack/summarize-text@0.1.3", { withMeta: true, env: { OPENAI_API_KEY } });
-    const translate = await load("@zack/translate-text@0.1.0", { withMeta: true, env: { OPENAI_API_KEY } });
-    const sentiment = await load("@zack/sentiment-analysis@0.1.1", { withMeta: true });
-    const resize = await load("@zack/resize-image@0.1.4", { withMeta: true });
+    const scrape = await load("@zack/wikipedia-scrape@0.1.3", { withMeta: true });
+    const summarize = await load("@zack/summarize-text@0.1.4", { withMeta: true, env: { OPENAI_API_KEY } });
+    const translate = await load("@zack/translate-text@0.1.1", { withMeta: true, env: { OPENAI_API_KEY } });
+    const sentiment = await load("@zack/sentiment-analysis@0.1.2", { withMeta: true });
+    const resize = await load("@zack/resize-image@0.1.5", { withMeta: true });
 
     // const objs = [scrape, summarize];
     const objs = [scrape, summarize, translate, sentiment, resize];

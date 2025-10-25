@@ -1,10 +1,26 @@
 {
   "dependencies": {
     "@zack/resize-image": {
-      "integrity": "acbb3a7408d6647151e3055bd26540bbf8b1649a8d614bc99c5697f8b4cf7f30",
+      "integrity": "6e036277e0adb101ddbac5fffd8d14bd99fb39511e5101530fdf6e62aa84bb55",
+      "version": "0.1.5"
+    },
+    "@zack/sentiment-analysis": {
+      "integrity": "378d739e1a0e8b4f44443942df340d737fc552f58fdef34c69108aa91b289a40",
+      "version": "0.1.2"
+    },
+    "@zack/summarize-text": {
+      "integrity": "c1c1680b1e156b3f90a17917bdacd072de04f322634bd49bd36dc9ca38e35bf8",
       "version": "0.1.4"
+    },
+    "@zack/translate-text": {
+      "integrity": "6026c6ee1c9829ea73045f2157f60bcdb02761bacc798bff2b307d0ff623e1fe",
+      "version": "0.1.1"
+    },
+    "@zack/wikipedia-scrape": {
+      "integrity": "547cbfe0309b82a615ce8b37003211a1a6d18ca55aadb44d6a6f2c27562c1455",
+      "version": "0.1.3"
     }
   },
-  "generated": "2025-10-04T02:07:10.040234Z",
+  "generated": "2025-10-25T21:39:01.781724Z",
   "lockfile_version": 1
 }

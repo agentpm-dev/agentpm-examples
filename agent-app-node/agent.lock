@@ -1,26 +1,26 @@
 {
   "dependencies": {
     "@zack/resize-image": {
-      "integrity": "acbb3a7408d6647151e3055bd26540bbf8b1649a8d614bc99c5697f8b4cf7f30",
-      "version": "0.1.4"
+      "integrity": "6e036277e0adb101ddbac5fffd8d14bd99fb39511e5101530fdf6e62aa84bb55",
+      "version": "0.1.5"
     },
     "@zack/sentiment-analysis": {
-      "integrity": "7a1323c0a15a67a84b28dbc107d1f059d3656c07d5c2411f264e7e405a48742d",
-      "version": "0.1.1"
+      "integrity": "378d739e1a0e8b4f44443942df340d737fc552f58fdef34c69108aa91b289a40",
+      "version": "0.1.2"
     },
     "@zack/summarize-text": {
-      "integrity": "211e2f4ce8a9e374123f13fb5323efa86c50c03f4d61bfcda4a857d6b557afbe",
-      "version": "0.1.3"
+      "integrity": "c1c1680b1e156b3f90a17917bdacd072de04f322634bd49bd36dc9ca38e35bf8",
+      "version": "0.1.4"
     },
     "@zack/translate-text": {
-      "integrity": "218ea88afd2aa6795de3cb0e8b4dd7adc097680a9f9a1eab8ada5252d6668214",
-      "version": "0.1.0"
+      "integrity": "6026c6ee1c9829ea73045f2157f60bcdb02761bacc798bff2b307d0ff623e1fe",
+      "version": "0.1.1"
     },
     "@zack/wikipedia-scrape": {
-      "integrity": "0d1c38f1ec03558a48831209d14118b9783279eefb39b6d59f6dd2171807d895",
-      "version": "0.1.1"
+      "integrity": "547cbfe0309b82a615ce8b37003211a1a6d18ca55aadb44d6a6f2c27562c1455",
+      "version": "0.1.3"
     }
   },
-  "generated": "2025-10-04T03:18:03.881572Z",
+  "generated": "2025-10-25T21:38:23.727854Z",
   "lockfile_version": 1
 }
