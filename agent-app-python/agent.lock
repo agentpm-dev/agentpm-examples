@@ -1,26 +1,26 @@
 {
   "dependencies": {
     "@zack/resize-image": {
-      "integrity": "6e036277e0adb101ddbac5fffd8d14bd99fb39511e5101530fdf6e62aa84bb55",
-      "version": "0.1.5"
+      "integrity": "ef95293864a4adbb854e671a77cbaa95e8430e194c9a499a5046fc03fb6b0f89",
+      "version": "0.1.6"
     },
     "@zack/sentiment-analysis": {
-      "integrity": "378d739e1a0e8b4f44443942df340d737fc552f58fdef34c69108aa91b289a40",
-      "version": "0.1.2"
+      "integrity": "59415bb49839c7c37e2fb590a131a8fb5ed2f85e171c327ff342bf0b27944148",
+      "version": "0.1.3"
     },
     "@zack/summarize-text": {
-      "integrity": "c1c1680b1e156b3f90a17917bdacd072de04f322634bd49bd36dc9ca38e35bf8",
-      "version": "0.1.4"
+      "integrity": "83d2747ffdb55f975f27d7ac627f2659fb278cc27f1be38728d45c2531f754d4",
+      "version": "0.1.5"
     },
     "@zack/translate-text": {
-      "integrity": "6026c6ee1c9829ea73045f2157f60bcdb02761bacc798bff2b307d0ff623e1fe",
-      "version": "0.1.1"
+      "integrity": "590f7c1cda2d52e394a22b91c900db4163c9c50c96bd7a49d724fa8bdb2240b7",
+      "version": "0.1.2"
     },
     "@zack/wikipedia-scrape": {
-      "integrity": "547cbfe0309b82a615ce8b37003211a1a6d18ca55aadb44d6a6f2c27562c1455",
-      "version": "0.1.3"
+      "integrity": "3d8b377f10f079a8e4ecbaced965dd5e39d33ea83fef332a1b81fb7966f75087",
+      "version": "0.1.4"
     }
   },
-  "generated": "2025-10-25T21:39:01.781724Z",
+  "generated": "2025-10-31T15:22:47.615352Z",
   "lockfile_version": 1
 }
