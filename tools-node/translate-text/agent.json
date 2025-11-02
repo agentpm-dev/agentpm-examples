@@ -13,6 +13,14 @@
     "timeout_ms": 120000
   },
   "runtime": { "type": "node", "version": "20" },
+  "environment": {
+    "vars": {
+      "OPENAI_API_KEY": {
+        "required": true,
+        "description": "API key for OpenAI"
+      }
+    }
+  },
   "inputs": {
     "type": "object",
     "properties": {
