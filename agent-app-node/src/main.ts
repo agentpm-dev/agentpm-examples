@@ -97,8 +97,8 @@ function makeTool(name: string, fn: (args: unknown) => Promise<unknown> | unknow
 async function loadAllTools() {
     console.log("Loading tools from AgentPM…");
     const scrape = await load("@zack/wikipedia-scrape@0.1.4", { withMeta: true });
-    const summarize = await load("@zack/summarize-text@0.1.5", { withMeta: true, env: { OPENAI_API_KEY } });
-    const translate = await load("@zack/translate-text@0.1.2", { withMeta: true, env: { OPENAI_API_KEY } });
+    const summarize = await load("@zack/summarize-text@0.1.7", { withMeta: true, env: { OPENAI_API_KEY } });
+    const translate = await load("@zack/translate-text@0.1.3", { withMeta: true, env: { OPENAI_API_KEY } });
     const sentiment = await load("@zack/sentiment-analysis@0.1.3", { withMeta: true });
     const resize = await load("@zack/resize-image@0.1.6", { withMeta: true });
 

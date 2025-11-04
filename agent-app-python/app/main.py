@@ -13,8 +13,8 @@ from agentpm import load
 # Tool specs: namespace/name@version
 print("Loading tools from AgentPM…")
 scrape_tool = load("@zack/wikipedia-scrape@0.1.4", with_meta=True)
-summarize_tool = load("@zack/summarize-text@0.1.5", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
-translate_tool = load("@zack/translate-text@0.1.2", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
+summarize_tool = load("@zack/summarize-text@0.1.7", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
+translate_tool = load("@zack/translate-text@0.1.3", with_meta=True, env={ "OPENAI_API_KEY": OPENAI_API_KEY })
 sentiment_tool = load("@zack/sentiment-analysis@0.1.3", with_meta=True)
 resize_tool = load("@zack/resize-image@0.1.6", with_meta=True)
 
