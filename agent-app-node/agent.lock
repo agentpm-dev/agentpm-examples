@@ -9,18 +9,18 @@
       "version": "0.1.3"
     },
     "@zack/summarize-text": {
-      "integrity": "83d2747ffdb55f975f27d7ac627f2659fb278cc27f1be38728d45c2531f754d4",
-      "version": "0.1.5"
+      "integrity": "dcf32df519b13a5bf5d4d8f8cb82f4fde6d00829f0e2b47c4ee773eeca94dce8",
+      "version": "0.1.7"
     },
     "@zack/translate-text": {
-      "integrity": "590f7c1cda2d52e394a22b91c900db4163c9c50c96bd7a49d724fa8bdb2240b7",
-      "version": "0.1.2"
+      "integrity": "b5b0c67a9efe2f26555bff6f34ef77dce1105a75fdee6ca18f0b91395b1ddb5a",
+      "version": "0.1.3"
     },
     "@zack/wikipedia-scrape": {
       "integrity": "3d8b377f10f079a8e4ecbaced965dd5e39d33ea83fef332a1b81fb7966f75087",
       "version": "0.1.4"
     }
   },
-  "generated": "2025-10-31T15:23:59.132163Z",
+  "generated": "2025-11-03T23:04:42.209756Z",
   "lockfile_version": 1
 }
