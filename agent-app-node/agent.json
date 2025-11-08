@@ -6,16 +6,16 @@
   "tools": [
     {
       "name": "@zack/wikipedia-scrape",
-      "version": "0.1.4"
+      "version": "0.1.5"
     },
-    "@zack/translate-text@0.1.3",
+    "@zack/translate-text@0.1.4",
     {
       "name": "@zack/resize-image",
-      "version": "0.1.6"
+      "version": "0.1.7"
     },
     {
       "name": "@zack/sentiment-analysis",
-      "version": "0.1.3"
+      "version": "0.1.4"
     },
     {
       "name": "@zack/summarize-text"
