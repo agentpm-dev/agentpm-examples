@@ -1,26 +1,26 @@
 {
   "dependencies": {
     "@zack/resize-image": {
-      "integrity": "ef95293864a4adbb854e671a77cbaa95e8430e194c9a499a5046fc03fb6b0f89",
-      "version": "0.1.6"
-    },
-    "@zack/sentiment-analysis": {
-      "integrity": "59415bb49839c7c37e2fb590a131a8fb5ed2f85e171c327ff342bf0b27944148",
-      "version": "0.1.3"
-    },
-    "@zack/summarize-text": {
-      "integrity": "dcf32df519b13a5bf5d4d8f8cb82f4fde6d00829f0e2b47c4ee773eeca94dce8",
+      "integrity": "49b0c95e4675a59768f79e1c29646e0b4c39bf37bd0039c83461e8ebdedd6f5e",
       "version": "0.1.7"
     },
+    "@zack/sentiment-analysis": {
+      "integrity": "326ee51679de226a27d14d548030cd0a329805c93eaff8a719c0209c20955d84",
+      "version": "0.1.4"
+    },
+    "@zack/summarize-text": {
+      "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "version": "0.1.8"
+    },
     "@zack/translate-text": {
-      "integrity": "b5b0c67a9efe2f26555bff6f34ef77dce1105a75fdee6ca18f0b91395b1ddb5a",
-      "version": "0.1.3"
+      "integrity": "bf8fc61a0224f9a4b5af87c080fbebae936c23a54a4cde3b93f546c499bb0d0c",
+      "version": "0.1.4"
     },
     "@zack/wikipedia-scrape": {
-      "integrity": "3d8b377f10f079a8e4ecbaced965dd5e39d33ea83fef332a1b81fb7966f75087",
-      "version": "0.1.4"
+      "integrity": "5d26de3f25b4cb81ed7fc54ebb2eb4b81bb0b499f873c67abfb7ef4733d26c87",
+      "version": "0.1.5"
     }
   },
-  "generated": "2025-11-03T23:06:33.411017Z",
+  "generated": "2025-11-08T01:48:45.091666Z",
   "lockfile_version": 1
 }
