@@ -18,6 +18,7 @@ pub.txt
 .env
 *.env.local
 .idea
+.DS_STORE
 
 _vendor/
 target/

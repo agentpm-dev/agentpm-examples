@@ -19,6 +19,9 @@
     },
     {
       "name": "@zack/summarize-text"
+    },
+    {
+      "name": "@zack/html-to-markdown"
     }
   ],
   "version": "0.1.0"

@@ -1,5 +1,9 @@
 {
   "dependencies": {
+    "@zack/html-to-markdown": {
+      "integrity": "723db69f47780c46641a1a94c5f42a50196295d6765118b8c90f4631e80aba9e",
+      "version": "0.1.1"
+    },
     "@zack/resize-image": {
       "integrity": "49b0c95e4675a59768f79e1c29646e0b4c39bf37bd0039c83461e8ebdedd6f5e",
       "version": "0.1.7"
@@ -21,6 +25,6 @@
       "version": "0.1.5"
     }
   },
-  "generated": "2025-11-08T01:47:02.597630Z",
+  "generated": "2025-11-30T19:48:33.457582Z",
   "lockfile_version": 1
 }
