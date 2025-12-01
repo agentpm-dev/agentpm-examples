@@ -1,0 +1,167 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "pdf-to-text",
+  "version": "0.1.1",
+  "description": "Extract text from PDFs, either from a URL or base64-encoded PDF data.",
+  "files": ["pdf_to_text/"],
+  "entrypoint": {
+    "command": "python",
+    "args": ["-u", "pdf_to_text/__main__.py"],
+    "timeout_ms": 120000
+  },
+  "runtime": { "type": "python", "version": "3.11" },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "pdf_url": {
+        "type": "string",
+        "format": "uri",
+        "description": "HTTP(S) URL of the PDF to download and extract text from."
+      },
+      "pdf_base64": {
+        "type": "string",
+        "description": "Base64-encoded PDF bytes. Use this when you already have the PDF contents."
+      },
+      "max_pages": {
+        "type": "integer",
+        "description": "Maximum number of pages to process, starting from page 1.",
+        "minimum": 1
+      },
+      "strip_whitespace": {
+        "type": "boolean",
+        "description": "If true, collapse excessive whitespace/newlines in extracted text.",
+        "default": true
+      },
+      "user_agent": {
+        "type": "string",
+        "description": "Optional User-Agent header when fetching pdf_url. Overrides default and any environment value."
+      },
+      "split_by": {
+        "type": "string",
+        "description": "How to split the extracted text. 'page' returns per-page text; 'chunk' additionally returns contiguous text chunks.",
+        "enum": ["page", "chunk"],
+        "default": "page"
+      }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "description": "Exactly one of pdf_url or pdf_base64 must be provided. This is enforced at runtime."
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": true },
+          "pages": {
+            "type": "array",
+            "description": "Per-page extracted text.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "page_number": {
+                  "type": "integer",
+                  "description": "1-based page index."
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Extracted text for this page."
+                }
+              },
+              "required": ["page_number", "text"],
+              "additionalProperties": false
+            }
+          },
+          "raw_text": {
+            "type": "string",
+            "description": "All page texts concatenated together (typically separated by newlines)."
+          },
+          "chunks": {
+            "type": "array",
+            "description": "Optional text chunks when split_by='chunk'. Omitted when split_by='page'.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "description": "0-based index of the chunk."
+                },
+                "start_page": {
+                  "type": "integer",
+                  "description": "1-based index of the first page that contributed text to this chunk."
+                },
+                "end_page": {
+                  "type": "integer",
+                  "description": "1-based index of the last page that contributed text to this chunk."
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Chunk text."
+                }
+              },
+              "required": ["index", "text"],
+              "additionalProperties": false
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata about the extracted PDF.",
+            "properties": {
+              "page_count": {
+                "type": "integer",
+                "description": "Total number of pages in the PDF (may be greater than pages.length if truncated by max_pages)."
+              },
+              "truncated": {
+                "type": "boolean",
+                "description": "True if extraction stopped early due to max_pages."
+              },
+              "source": {
+                "type": "string",
+                "description": "Source type used for extraction, e.g. 'url' or 'base64'."
+              },
+              "url": {
+                "type": "string",
+                "description": "The URL used to fetch the PDF, if any."
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "required": ["ok", "pages", "raw_text"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": { "const": false },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code (e.g. INPUT_INVALID, FETCH_FAILED, PARSE_FAILED)."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable error message."
+              },
+              "details": {
+                "type": "object",
+                "description": "Optional structured context (e.g. HTTP status, URL, page index)."
+              }
+            },
+            "required": ["message"],
+            "additionalProperties": true
+          }
+        },
+        "required": ["ok", "error"],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "file": "LICENSE"
+  }
+}
