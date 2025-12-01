@@ -4,6 +4,14 @@
       "integrity": "723db69f47780c46641a1a94c5f42a50196295d6765118b8c90f4631e80aba9e",
       "version": "0.1.1"
     },
+    "@zack/http-fetch": {
+      "integrity": "cfc814f12da372ed6471c4786383c58fcd8d27889324cbbaf6e2e658ef85a1f7",
+      "version": "0.1.0"
+    },
+    "@zack/pdf-to-text": {
+      "integrity": "100a46bac09a07176d36f09fe6db32cf75a6824facf2568bcb4fb52b31060258",
+      "version": "0.1.1"
+    },
     "@zack/resize-image": {
       "integrity": "49b0c95e4675a59768f79e1c29646e0b4c39bf37bd0039c83461e8ebdedd6f5e",
       "version": "0.1.7"
@@ -25,6 +33,6 @@
       "version": "0.1.5"
     }
   },
-  "generated": "2025-11-30T19:48:33.457582Z",
+  "generated": "2025-12-01T16:52:59.023298Z",
   "lockfile_version": 1
 }

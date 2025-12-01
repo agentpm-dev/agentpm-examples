@@ -22,6 +22,12 @@
     },
     {
       "name": "@zack/html-to-markdown"
+    },
+    {
+      "name": "@zack/http-fetch"
+    },
+    {
+      "name": "@zack/pdf-to-text"
     }
   ],
   "version": "0.1.0"

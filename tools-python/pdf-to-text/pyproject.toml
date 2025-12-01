@@ -1,0 +1,11 @@
+[project]
+name = "agentpm-examples-pdf-to-text"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "pypdf>=5.0.0",
+    "httpx>=0.27.0",
+    "python-dotenv[cli]>=1.1.1",
+]
+
+[tool.uv]
