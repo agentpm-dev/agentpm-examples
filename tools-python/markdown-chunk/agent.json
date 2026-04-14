@@ -1,0 +1,158 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "markdown-chunk",
+  "version": "0.1.0",
+  "description": "Split markdown or text into deterministic chunks with heading context and offsets.",
+  "files": [
+    "markdown_chunk/",
+    "tests/",
+    "README.md"
+  ],
+  "entrypoint": {
+    "command": "python",
+    "args": [
+      "-u",
+      "markdown_chunk/__main__.py"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "python",
+    "version": "3.11"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "text": {
+        "type": "string",
+        "description": "Markdown or plain text to chunk."
+      },
+      "strategy": {
+        "type": "string",
+        "enum": [
+          "heading",
+          "paragraph",
+          "hybrid"
+        ],
+        "default": "hybrid"
+      },
+      "max_chars": {
+        "type": "integer",
+        "minimum": 100,
+        "maximum": 50000,
+        "default": 1200
+      },
+      "overlap": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 5000,
+        "default": 150
+      },
+      "source_id": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "text"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "chunks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "heading_path": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "start_offset": {
+                  "type": "integer"
+                },
+                "end_offset": {
+                  "type": "integer"
+                },
+                "char_count": {
+                  "type": "integer"
+                },
+                "source_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "text",
+                "heading_path",
+                "start_offset",
+                "end_offset",
+                "char_count"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "chunks",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md"
+}

@@ -1,0 +1,167 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "web-page-extract",
+  "version": "0.1.0",
+  "description": "Fetch a web page and return cleaned content, metadata, and discovered links.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": [
+      "dist/index.js"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "node",
+    "version": "20"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "format": "uri",
+        "description": "HTTP(S) URL to fetch and extract."
+      },
+      "format": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "text"
+        ],
+        "default": "markdown",
+        "description": "Preferred output format for the extracted page body."
+      },
+      "include_links": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to include normalized links discovered in the page body."
+      },
+      "timeout_ms": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 120000,
+        "default": 15000,
+        "description": "Fetch timeout in milliseconds."
+      },
+      "max_chars": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 200000,
+        "default": 40000,
+        "description": "Maximum number of characters to return in the cleaned content."
+      }
+    },
+    "required": [
+      "url"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "url": {
+            "type": "string"
+          },
+          "final_url": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "canonical_url": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": "string"
+          },
+          "byline": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "href": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "href"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "url",
+          "final_url",
+          "format",
+          "content",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md"
+}

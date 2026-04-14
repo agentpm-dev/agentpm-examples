@@ -17,13 +17,26 @@ Each tool is intentionally simple to highlight integration, not performance.
 ### Contents
 - **Tools**
     - [`tools-node/wikipedia-scrape`](tools-node/wikipedia-scrape/)
+    - [`tools-node/web-page-extract`](tools-node/web-page-extract/)
     - [`tools-python/summarize-text`](tools-python/summarize-text/)
+    - [`tools-python/markdown-chunk`](tools-python/markdown-chunk/)
     - [`tools-node/translate-text`](tools-node/translate-text/)
     - [`tools-python/sentiment-analysis`](tools-python/sentiment-analysis/)
+    - [`tools-python/csv-query`](tools-python/csv-query/)
+    - [`tools-python/json-transform`](tools-python/json-transform/)
     - [`tools-node/resize-image`](tools-node/resize-image)
 - **Agents**
     - [`agent-app-python`](agent-app-python/)
     - [`agent-app-node`](agent-app-node/)
+
+### Phase 1: Seeding
+
+The first Phase 1 additions are meant to prove there is value in installing shared agent primitives rather than rebuilding them:
+
+- `web-page-extract`: fetch and normalize a page into metadata, links, and cleaned content
+- `markdown-chunk`: split text into deterministic chunks with heading context
+- `csv-query`: filter, sort, group, and aggregate CSV data
+- `json-transform`: apply reusable transformations to JSON objects and arrays
 
 ### Quick workspace setup
 ```bash
@@ -60,4 +73,12 @@ Use a bundler (e.g., **tsup/esbuild**) to produce a single dist file (CJS or ESM
 "entrypoint": { "command": "node", "args": ["dist/index.js"] }
 ```
 
+### Running the Phase 1 tests
+
+```bash
+cd tools-node/web-page-extract && npm test
+cd tools-python/markdown-chunk && python -m unittest discover -s tests -p 'test_*.py'
+cd tools-python/csv-query && python -m unittest discover -s tests -p 'test_*.py'
+cd tools-python/json-transform && python -m unittest discover -s tests -p 'test_*.py'
+```
 
