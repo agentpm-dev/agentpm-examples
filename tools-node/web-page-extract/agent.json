@@ -66,45 +66,58 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": true
+            "const": true,
+            "description": "True when the page was fetched and parsed successfully."
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "description": "Original URL requested by the caller."
           },
           "final_url": {
-            "type": "string"
+            "type": "string",
+            "description": "Final URL after any redirects applied by the fetch layer."
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Best-effort page title derived from title tags or social metadata."
           },
           "canonical_url": {
-            "type": "string"
+            "type": "string",
+            "description": "Canonical URL declared by the page, resolved against the fetched URL when present."
           },
           "published_at": {
-            "type": "string"
+            "type": "string",
+            "description": "Best-effort publish timestamp extracted from page metadata."
           },
           "byline": {
-            "type": "string"
+            "type": "string",
+            "description": "Best-effort author or byline extracted from page metadata."
           },
           "excerpt": {
-            "type": "string"
+            "type": "string",
+            "description": "Short summary or description extracted from page metadata."
           },
           "format": {
-            "type": "string"
+            "type": "string",
+            "description": "Output format used for the cleaned page body."
           },
           "content": {
-            "type": "string"
+            "type": "string",
+            "description": "Cleaned main page content in the requested format."
           },
           "links": {
             "type": "array",
+            "description": "Normalized links discovered in the page body when include_links is true.",
             "items": {
               "type": "object",
               "properties": {
                 "text": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Visible link text associated with the discovered URL, when available."
                 },
                 "href": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Absolute URL for the discovered link."
                 }
               },
               "required": [
@@ -115,6 +128,7 @@
           },
           "metadata": {
             "type": "object",
+            "description": "Additional extraction metadata such as truncation state and source size.",
             "additionalProperties": true
           }
         },
@@ -132,19 +146,24 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": false
+            "const": false,
+            "description": "False when the request or extraction failed."
           },
           "error": {
             "type": "object",
+            "description": "Structured error returned by the tool.",
             "properties": {
               "code": {
-                "type": "string"
+                "type": "string",
+                "description": "Stable machine-readable error code."
               },
               "message": {
-                "type": "string"
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
               },
               "details": {
                 "type": "object",
+                "description": "Optional structured context about the failure.",
                 "additionalProperties": true
               }
             },

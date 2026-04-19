@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import pathlib
+import sys
 import unittest
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 from csv_query import query_csv
 
@@ -32,6 +36,13 @@ class CsvQueryTests(unittest.TestCase):
         red = next(row for row in out["rows"] if row["team"] == "red")
         self.assertEqual(red["members"], 2)
         self.assertEqual(red["total_score"], 8)
+
+    def test_sort_orders_rows_by_numeric_column(self) -> None:
+        out = query_csv(
+            csv_text=CSV,
+            sort=[{"column": "score", "direction": "asc"}],
+        )
+        self.assertEqual([row["name"] for row in out["rows"]], ["Ada", "Cara", "Ben"])
 
 
 if __name__ == "__main__":

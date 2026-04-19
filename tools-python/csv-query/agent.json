@@ -23,43 +23,56 @@
     "type": "object",
     "properties": {
       "path": {
-        "type": "string"
+        "type": "string",
+        "description": "Path to a local CSV file to query. Provide either path or csv_text."
       },
       "csv_text": {
-        "type": "string"
+        "type": "string",
+        "description": "Raw CSV content to query directly. Provide either csv_text or path."
       },
       "select": {
         "type": "array",
+        "description": "Subset of columns to keep in the returned rows.",
         "items": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of a CSV column to include in the output."
         }
       },
       "filter": {
         "type": "array",
+        "description": "Filter conditions applied before grouping, sorting, and limiting.",
         "items": {
-          "type": "object"
+          "type": "object",
+          "description": "A filter object with at least column, op, and value fields."
         }
       },
       "sort": {
         "type": "array",
+        "description": "Sort operations applied in order.",
         "items": {
-          "type": "object"
+          "type": "object",
+          "description": "A sort object with column and optional direction fields."
         }
       },
       "limit": {
         "type": "integer",
-        "minimum": 1
+        "minimum": 1,
+        "description": "Maximum number of rows to return after all other operations."
       },
       "group_by": {
         "type": "array",
+        "description": "Columns to group by before computing aggregations.",
         "items": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of a CSV column to group rows by."
         }
       },
       "aggregations": {
         "type": "array",
+        "description": "Aggregate computations to run over the filtered rows or groups.",
         "items": {
-          "type": "object"
+          "type": "object",
+          "description": "An aggregation object such as count, sum, avg, min, or max."
         }
       }
     },
@@ -71,25 +84,32 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": true
+            "const": true,
+            "description": "True when the CSV query completed successfully."
           },
           "columns": {
             "type": "array",
+            "description": "Column names present in the returned rows.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Name of an output column."
             }
           },
           "rows": {
             "type": "array",
+            "description": "Query result rows after filters, grouping, sorting, and selection.",
             "items": {
-              "type": "object"
+              "type": "object",
+              "description": "One result row represented as a JSON object."
             }
           },
           "row_count": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Number of rows returned in the result set."
           },
           "summary": {
             "type": "object",
+            "description": "Summary information about the query, such as grouping metadata or aggregate results.",
             "additionalProperties": true
           }
         },
@@ -106,16 +126,20 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": false
+            "const": false,
+            "description": "False when the query failed validation or execution."
           },
           "error": {
             "type": "object",
+            "description": "Structured error returned by the tool.",
             "properties": {
               "code": {
-                "type": "string"
+                "type": "string",
+                "description": "Stable machine-readable error code."
               },
               "message": {
-                "type": "string"
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
               }
             },
             "required": [

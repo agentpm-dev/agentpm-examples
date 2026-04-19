@@ -6,6 +6,24 @@ Query CSV data with structured filter, sort, select, and aggregate operations.
 
 CSV handling shows up constantly in ops and analyst workflows. This tool gives agents a safe, predictable query surface without embedding ad hoc dataframe code into each app.
 
+## Inputs
+
+- `path`: path to a local CSV file
+- `csv_text`: raw CSV content passed directly to the tool
+- `select`: subset of columns to keep in the output
+- `filter`: filter conditions such as `eq`, `gt`, or `contains`
+- `sort`: sort operations with column and optional direction
+- `limit`: maximum number of rows to return
+- `group_by`: columns used to group rows before aggregation
+- `aggregations`: aggregate calculations such as `count`, `sum`, `avg`, `min`, and `max`
+
+## Outputs
+
+- `columns`: output column names
+- `rows`: resulting rows after query operations
+- `row_count`: number of rows returned
+- `summary`: aggregate or grouping summary information
+
 ## Local development
 
 ```bash

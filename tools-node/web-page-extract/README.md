@@ -16,11 +16,14 @@ Most agent systems need a reliable first-step web ingestion primitive. This tool
 
 ## Outputs
 
+- `url`: original requested URL
+- `final_url`: final fetched URL after redirects
 - `title`
 - `canonical_url`
 - `published_at`
 - `byline`
 - `excerpt`
+- `format`
 - `content`
 - `links`
 - `metadata`
@@ -31,8 +34,14 @@ Most agent systems need a reliable first-step web ingestion primitive. This tool
 node --test
 ```
 
+To build the packaged entrypoint:
+
+```bash
+npm run build
+```
+
 ## Example invocation
 
 ```bash
-printf '%s' '{"url":"https://example.com","format":"markdown"}' | node src/index.js
+printf '%s' '{"url":"https://example.com","format":"markdown"}' | node dist/index.js
 ```

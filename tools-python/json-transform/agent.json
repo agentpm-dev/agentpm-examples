@@ -24,11 +24,15 @@
   "inputs": {
     "type": "object",
     "properties": {
-      "input": {},
+      "input": {
+        "description": "Input JSON value to transform. Can be an object, array, or primitive."
+      },
       "operations": {
         "type": "array",
+        "description": "Ordered list of transformation operations to apply to the input value.",
         "items": {
-          "type": "object"
+          "type": "object",
+          "description": "An operation object such as pick, rename, set, delete, flatten, pluck, or filter_array."
         }
       }
     },
@@ -44,19 +48,26 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": true
+            "const": true,
+            "description": "True when all requested transformations were processed."
           },
-          "result": {},
+          "result": {
+            "description": "Final transformed JSON value."
+          },
           "applied_operations": {
             "type": "array",
+            "description": "Names of transformation operations that were applied successfully.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Name of an applied operation."
             }
           },
           "validation_errors": {
             "type": "array",
+            "description": "Validation or application errors collected while processing operations.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "One validation or processing error message."
             }
           }
         },
@@ -72,16 +83,20 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": false
+            "const": false,
+            "description": "False when the tool could not process the transformation request."
           },
           "error": {
             "type": "object",
+            "description": "Structured error returned by the tool.",
             "properties": {
               "code": {
-                "type": "string"
+                "type": "string",
+                "description": "Stable machine-readable error code."
               },
               "message": {
-                "type": "string"
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
               }
             },
             "required": [

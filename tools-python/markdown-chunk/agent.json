@@ -3,7 +3,7 @@
   "kind": "tool",
   "name": "markdown-chunk",
   "version": "0.1.0",
-  "description": "Split markdown or text into deterministic chunks with heading context and offsets.",
+  "description": "Split markdown or text into deterministic chunks with heading context, overlap, and fallback subdivision for oversized content.",
   "files": [
     "markdown_chunk/",
     "tests/",
@@ -35,22 +35,26 @@
           "paragraph",
           "hybrid"
         ],
-        "default": "hybrid"
+        "default": "hybrid",
+        "description": "Chunking strategy: heading preserves section boundaries when possible, paragraph prefers paragraph breaks, hybrid mixes both before falling back further."
       },
       "max_chars": {
         "type": "integer",
         "minimum": 100,
         "maximum": 50000,
-        "default": 1200
+        "default": 1200,
+        "description": "Target maximum number of characters per chunk. Oversized sections fall back through paragraph, sentence, and window splitting."
       },
       "overlap": {
         "type": "integer",
         "minimum": 0,
         "maximum": 5000,
-        "default": 150
+        "default": 150,
+        "description": "Number of trailing characters to carry into the next chunk for continuity."
       },
       "source_id": {
-        "type": "string"
+        "type": "string",
+        "description": "Optional stable identifier for the source document; copied into each chunk."
       }
     },
     "required": [
@@ -64,36 +68,46 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": true
+            "const": true,
+            "description": "True when chunk generation succeeded."
           },
           "chunks": {
             "type": "array",
+            "description": "Ordered list of generated chunks.",
             "items": {
               "type": "object",
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Deterministic chunk identifier derived from offsets and content."
                 },
                 "text": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Chunk text content."
                 },
                 "heading_path": {
                   "type": "array",
+                  "description": "Heading ancestry active at the point this chunk was generated.",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "One heading segment in the heading path."
                   }
                 },
                 "start_offset": {
-                  "type": "integer"
+                  "type": "integer",
+                  "description": "Character offset in the source text where this chunk begins."
                 },
                 "end_offset": {
-                  "type": "integer"
+                  "type": "integer",
+                  "description": "Character offset in the source text where this chunk ends."
                 },
                 "char_count": {
-                  "type": "integer"
+                  "type": "integer",
+                  "description": "Character count of the chunk text."
                 },
                 "source_id": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Optional source identifier copied from the input."
                 }
               },
               "required": [
@@ -109,6 +123,7 @@
           },
           "metadata": {
             "type": "object",
+            "description": "Summary metadata about the chunking run, including fallback behavior used to respect max_chars.",
             "additionalProperties": true
           }
         },
@@ -123,19 +138,24 @@
         "type": "object",
         "properties": {
           "ok": {
-            "const": false
+            "const": false,
+            "description": "False when input validation or chunk generation failed."
           },
           "error": {
             "type": "object",
+            "description": "Structured error returned by the tool.",
             "properties": {
               "code": {
-                "type": "string"
+                "type": "string",
+                "description": "Stable machine-readable error code."
               },
               "message": {
-                "type": "string"
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
               },
               "details": {
                 "type": "object",
+                "description": "Optional structured context about the failure.",
                 "additionalProperties": true
               }
             },
