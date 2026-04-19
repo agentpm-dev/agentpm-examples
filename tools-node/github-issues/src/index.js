@@ -35,8 +35,8 @@ function getBaseUrl() {
   return (process.env.GITHUB_API_BASE_URL || "https://api.github.com").replace(/\/+$/, "");
 }
 
-function getToken(inputToken) {
-  const token = inputToken || process.env.GITHUB_TOKEN;
+function getToken() {
+  const token = process.env.GITHUB_TOKEN;
   if (!token) {
     throw new ToolError("AUTH_MISSING", "Missing GitHub token", {
       env_var: "GITHUB_TOKEN",
@@ -114,7 +114,7 @@ export async function githubIssues(input) {
   const action = requireString(input?.action, "action");
   const owner = requireString(input?.owner, "owner");
   const repo = requireString(input?.repo, "repo");
-  const token = getToken(input?.token);
+  const token = getToken();
   const repository = `${owner}/${repo}`;
 
   switch (action) {

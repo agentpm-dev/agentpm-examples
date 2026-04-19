@@ -22,8 +22,8 @@ function requireString(value, field) {
   return value.trim();
 }
 
-function getToken(inputToken) {
-  const token = inputToken || process.env.SLACK_BOT_TOKEN;
+function getToken() {
+  const token = process.env.SLACK_BOT_TOKEN;
   if (!token) {
     throw new ToolError("AUTH_MISSING", "Missing Slack bot token", {
       env_var: "SLACK_BOT_TOKEN",
@@ -71,7 +71,7 @@ export async function slackPostMessage(input) {
   const action = requireString(input?.action, "action");
   const channel = requireString(input?.channel, "channel");
   const text = requireString(input?.text, "text");
-  const token = getToken(input?.token);
+  const token = getToken();
   const blocks = Array.isArray(input?.blocks) ? input.blocks : undefined;
 
   switch (action) {
