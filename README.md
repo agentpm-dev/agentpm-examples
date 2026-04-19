@@ -18,6 +18,8 @@ Each tool is intentionally simple to highlight integration, not performance.
 - **Tools**
     - [`tools-node/wikipedia-scrape`](tools-node/wikipedia-scrape/)
     - [`tools-node/web-page-extract`](tools-node/web-page-extract/)
+    - [`tools-node/github-issues`](tools-node/github-issues/)
+    - [`tools-node/slack-post-message`](tools-node/slack-post-message/)
     - [`tools-python/summarize-text`](tools-python/summarize-text/)
     - [`tools-python/markdown-chunk`](tools-python/markdown-chunk/)
     - [`tools-node/translate-text`](tools-node/translate-text/)
@@ -37,6 +39,13 @@ The first Phase 1 additions are meant to prove there is value in installing shar
 - `markdown-chunk`: split text into deterministic chunks with heading context
 - `csv-query`: filter, sort, group, and aggregate CSV data
 - `json-transform`: apply reusable transformations to JSON objects and arrays
+
+### Milestone 2: Integrations
+
+The next additions prove AgentPM can package tools for external systems people already use:
+
+- `github-issues`: list, create, comment on, and update GitHub issues
+- `slack-post-message`: post or update Slack messages for notifications and agent status updates
 
 ### Quick workspace setup
 ```bash
@@ -82,3 +91,9 @@ cd tools-python/csv-query && python -m unittest discover -s tests -p 'test_*.py'
 cd tools-python/json-transform && python -m unittest discover -s tests -p 'test_*.py'
 ```
 
+### Running the Milestone 2 tests
+
+```bash
+cd tools-node/github-issues && npm test
+cd tools-node/slack-post-message && npm test
+```

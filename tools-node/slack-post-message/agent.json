@@ -1,0 +1,161 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "slack-post-message",
+  "version": "0.1.0",
+  "description": "Post or update Slack messages using a compact action surface for agent notifications.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": [
+      "dist/index.js"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "node",
+    "version": "20"
+  },
+  "environment": {
+    "vars": {
+      "SLACK_BOT_TOKEN": {
+        "required": true,
+        "description": "Slack bot token used for message API requests."
+      },
+      "SLACK_API_BASE_URL": {
+        "required": false,
+        "description": "Optional Slack API base URL. Defaults to https://slack.com/api.",
+        "default": "https://slack.com/api"
+      }
+    }
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "post_message",
+          "update_message"
+        ],
+        "description": "Slack message action to perform."
+      },
+      "channel": {
+        "type": "string",
+        "description": "Slack channel ID where the message will be posted or updated."
+      },
+      "text": {
+        "type": "string",
+        "description": "Primary message text."
+      },
+      "thread_ts": {
+        "type": "string",
+        "description": "Optional Slack thread timestamp for posting a threaded reply."
+      },
+      "ts": {
+        "type": "string",
+        "description": "Slack timestamp of the message to update."
+      },
+      "blocks": {
+        "type": "array",
+        "description": "Optional Slack block kit payload.",
+        "items": {
+          "type": "object",
+          "description": "One Slack block object.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "required": [
+      "action",
+      "channel",
+      "text"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when the Slack API call succeeded."
+          },
+          "action": {
+            "type": "string",
+            "description": "Action that was executed."
+          },
+          "channel": {
+            "type": "string",
+            "description": "Slack channel ID returned by Slack."
+          },
+          "ts": {
+            "type": "string",
+            "description": "Slack timestamp of the created or updated message."
+          },
+          "message": {
+            "type": "object",
+            "description": "Normalized Slack message payload.",
+            "additionalProperties": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional request metadata such as whether a thread was targeted.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "action",
+          "channel",
+          "ts",
+          "message",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when validation or the Slack API call failed."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              },
+              "details": {
+                "type": "object",
+                "description": "Optional structured context about the failure.",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md"
+}
