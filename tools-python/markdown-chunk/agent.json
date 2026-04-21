@@ -5,9 +5,7 @@
   "version": "0.1.0",
   "description": "Split markdown or text into deterministic chunks with heading context, overlap, and fallback subdivision for oversized content.",
   "files": [
-    "markdown_chunk/",
-    "tests/",
-    "README.md"
+    "markdown_chunk/"
   ],
   "entrypoint": {
     "command": "python",

@@ -1,0 +1,7 @@
+[project]
+name = "agentpm-examples-table-extract"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]

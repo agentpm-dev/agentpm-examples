@@ -19,13 +19,16 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`tools-node/wikipedia-scrape`](tools-node/wikipedia-scrape/)
     - [`tools-node/web-page-extract`](tools-node/web-page-extract/)
     - [`tools-node/github-issues`](tools-node/github-issues/)
+    - [`tools-node/robots-aware-crawl`](tools-node/robots-aware-crawl/)
     - [`tools-node/slack-post-message`](tools-node/slack-post-message/)
+    - [`tools-python/document-convert`](tools-python/document-convert/)
     - [`tools-python/summarize-text`](tools-python/summarize-text/)
     - [`tools-python/markdown-chunk`](tools-python/markdown-chunk/)
     - [`tools-node/translate-text`](tools-node/translate-text/)
     - [`tools-python/sentiment-analysis`](tools-python/sentiment-analysis/)
     - [`tools-python/csv-query`](tools-python/csv-query/)
     - [`tools-python/json-transform`](tools-python/json-transform/)
+    - [`tools-python/table-extract`](tools-python/table-extract/)
     - [`tools-node/resize-image`](tools-node/resize-image)
 - **Agents**
     - [`agent-app-python`](agent-app-python/)
@@ -46,6 +49,14 @@ The next additions prove AgentPM can package tools for external systems people a
 
 - `github-issues`: list, create, comment on, and update GitHub issues
 - `slack-post-message`: post or update Slack messages for notifications and agent status updates
+
+### Milestone 3: Retrieval and Documents
+
+The final three tools deepen the knowledge and research story:
+
+- `robots-aware-crawl`: bounded multi-page crawling with robots.txt awareness
+- `document-convert`: normalize local documents into markdown or text
+- `table-extract`: turn HTML or CSV tables into structured rows and columns
 
 ### Quick workspace setup
 ```bash
@@ -96,4 +107,12 @@ cd tools-python/json-transform && python -m unittest discover -s tests -p 'test_
 ```bash
 cd tools-node/github-issues && npm test
 cd tools-node/slack-post-message && npm test
+```
+
+### Running the Milestone 3 tests
+
+```bash
+cd tools-node/robots-aware-crawl && npm test
+cd tools-python/document-convert && python -m unittest discover -s tests -p 'test_*.py'
+cd tools-python/table-extract && python -m unittest discover -s tests -p 'test_*.py'
 ```

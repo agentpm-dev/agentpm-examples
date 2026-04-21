@@ -4,7 +4,7 @@ Post or update Slack messages using a compact action surface for agent notificat
 
 ## Why install it
 
-Many useful agents need to report status or deliver results back to people. This tool gives AgentPM a portable Slack notification primitive instead of custom Slack client code inside every app.
+Many useful agents need to report status or deliver results back to people. This tool gives agents a portable Slack notification primitive instead of custom Slack client code inside every app.
 
 ## Inputs
 

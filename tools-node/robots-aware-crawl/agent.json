@@ -1,0 +1,184 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "robots-aware-crawl",
+  "version": "0.1.0",
+  "description": "Crawl a bounded set of pages while respecting robots.txt, depth limits, and URL filters.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": [
+      "dist/index.js"
+    ],
+    "timeout_ms": 60000
+  },
+  "runtime": {
+    "type": "node",
+    "version": "20"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "start_urls": {
+        "type": "array",
+        "description": "Seed URLs used to start the crawl.",
+        "items": {
+          "type": "string",
+          "format": "uri",
+          "description": "One absolute URL to begin crawling from."
+        }
+      },
+      "allowed_domains": {
+        "type": "array",
+        "description": "Optional domain allowlist for visited URLs.",
+        "items": {
+          "type": "string",
+          "description": "One allowed domain, such as example.com."
+        }
+      },
+      "max_pages": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100,
+        "default": 10,
+        "description": "Maximum number of pages to fetch."
+      },
+      "max_depth": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 5,
+        "default": 1,
+        "description": "Maximum crawl depth relative to the start URLs."
+      },
+      "same_origin_only": {
+        "type": "boolean",
+        "default": false,
+        "description": "Restrict crawled links to the same origin as the current seed URL."
+      },
+      "respect_robots": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to fetch and honor robots.txt disallow rules."
+      },
+      "include_patterns": {
+        "type": "array",
+        "description": "Optional regex patterns that a URL must match to be crawled.",
+        "items": {
+          "type": "string",
+          "description": "One JavaScript regex pattern."
+        }
+      },
+      "exclude_patterns": {
+        "type": "array",
+        "description": "Optional regex patterns that prevent a URL from being crawled.",
+        "items": {
+          "type": "string",
+          "description": "One JavaScript regex pattern."
+        }
+      }
+    },
+    "required": [
+      "start_urls"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when the crawl completed successfully."
+          },
+          "pages": {
+            "type": "array",
+            "description": "Fetched pages in crawl order.",
+            "items": {
+              "type": "object",
+              "description": "One crawled page with extracted metadata and discovered links.",
+              "additionalProperties": true
+            }
+          },
+          "visited_count": {
+            "type": "integer",
+            "description": "Number of pages actually fetched."
+          },
+          "skipped": {
+            "type": "array",
+            "description": "URLs that were skipped, along with the reason.",
+            "items": {
+              "type": "object",
+              "description": "One skipped URL entry.",
+              "additionalProperties": true
+            }
+          },
+          "errors": {
+            "type": "array",
+            "description": "Fetch or parsing errors encountered during the crawl.",
+            "items": {
+              "type": "object",
+              "description": "One crawl error entry.",
+              "additionalProperties": true
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Summary metadata about the crawl.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "pages",
+          "visited_count",
+          "skipped",
+          "errors",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when validation or the crawl setup failed."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              },
+              "details": {
+                "type": "object",
+                "description": "Optional structured context about the failure.",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md"
+}

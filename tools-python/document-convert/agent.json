@@ -1,17 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
-  "name": "json-transform",
+  "name": "document-convert",
   "version": "0.1.0",
-  "description": "Apply deterministic transformation operations to JSON objects and arrays.",
+  "description": "Convert local documents into normalized markdown or plain text with lightweight metadata.",
   "files": [
-    "json_transform/"
+    "document_convert/"
   ],
   "entrypoint": {
     "command": "python",
     "args": [
       "-u",
-      "json_transform/__main__.py"
+      "document_convert/__main__.py"
     ],
     "timeout_ms": 30000
   },
@@ -22,21 +22,27 @@
   "inputs": {
     "type": "object",
     "properties": {
-      "input": {
-        "description": "Input JSON value to transform. Can be an object, array, or primitive."
+      "path": {
+        "type": "string",
+        "description": "Path to the local document to convert."
       },
-      "operations": {
-        "type": "array",
-        "description": "Ordered list of transformation operations to apply to the input value.",
-        "items": {
-          "type": "object",
-          "description": "An operation object such as pick, rename, set, delete, flatten, pluck, or filter_array."
-        }
+      "to_format": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "text"
+        ],
+        "default": "markdown",
+        "description": "Desired output format for the converted document."
+      },
+      "extract_metadata": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to include file and conversion metadata in the output."
       }
     },
     "required": [
-      "input",
-      "operations"
+      "path"
     ],
     "additionalProperties": false
   },
@@ -47,33 +53,32 @@
         "properties": {
           "ok": {
             "const": true,
-            "description": "True when all requested transformations were processed."
+            "description": "True when document conversion succeeded."
           },
-          "result": {
-            "description": "Final transformed JSON value."
+          "path": {
+            "type": "string",
+            "description": "Original file path supplied to the tool."
           },
-          "applied_operations": {
-            "type": "array",
-            "description": "Names of transformation operations that were applied successfully.",
-            "items": {
-              "type": "string",
-              "description": "Name of an applied operation."
-            }
+          "media_type": {
+            "type": "string",
+            "description": "Detected media type for the input file."
           },
-          "validation_errors": {
-            "type": "array",
-            "description": "Validation or application errors collected while processing operations.",
-            "items": {
-              "type": "string",
-              "description": "One validation or processing error message."
-            }
+          "content": {
+            "type": "string",
+            "description": "Converted document content."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "File and conversion metadata.",
+            "additionalProperties": true
           }
         },
         "required": [
           "ok",
-          "result",
-          "applied_operations",
-          "validation_errors"
+          "path",
+          "media_type",
+          "content",
+          "metadata"
         ],
         "additionalProperties": false
       },
@@ -82,7 +87,7 @@
         "properties": {
           "ok": {
             "const": false,
-            "description": "False when the tool could not process the transformation request."
+            "description": "False when validation or conversion failed."
           },
           "error": {
             "type": "object",
