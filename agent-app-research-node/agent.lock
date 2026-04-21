@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "@zack/html-to-markdown": {
+      "integrity": "723db69f47780c46641a1a94c5f42a50196295d6765118b8c90f4631e80aba9e",
+      "version": "0.1.1"
+    },
+    "@zack/http-fetch": {
+      "integrity": "cfc814f12da372ed6471c4786383c58fcd8d27889324cbbaf6e2e658ef85a1f7",
+      "version": "0.1.0"
+    },
+    "@zack/pdf-to-text": {
+      "integrity": "100a46bac09a07176d36f09fe6db32cf75a6824facf2568bcb4fb52b31060258",
+      "version": "0.1.1"
+    },
+    "@zack/summarize-text": {
+      "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "version": "0.1.8"
+    },
+    "@zack/translate-text": {
+      "integrity": "bf8fc61a0224f9a4b5af87c080fbebae936c23a54a4cde3b93f546c499bb0d0c",
+      "version": "0.1.4"
+    },
+    "@zack/wikipedia-scrape": {
+      "integrity": "5d26de3f25b4cb81ed7fc54ebb2eb4b81bb0b499f873c67abfb7ef4733d26c87",
+      "version": "0.1.5"
+    }
+  },
+  "generated": "2026-04-21T02:01:29.038917Z",
+  "lockfile_version": 1
+}

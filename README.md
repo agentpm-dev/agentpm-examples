@@ -33,6 +33,7 @@ Each tool is intentionally simple to highlight integration, not performance.
 - **Agents**
     - [`agent-app-python`](agent-app-python/)
     - [`agent-app-node`](agent-app-node/)
+    - [`agent-app-research-node`](agent-app-research-node/)
 
 ### Phase 1: Seeding
 
