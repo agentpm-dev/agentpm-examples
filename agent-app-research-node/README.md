@@ -13,6 +13,12 @@ The app is designed to make tool orchestration obvious:
 - it prints tool arguments before each call
 - it prints a summarized view of each tool result
 
+## Pattern
+
+- orchestration style: manual OpenAI tool-calling loop
+- runtime: Node
+- best for: learning the core tool-calling mechanics without much framework abstraction
+
 ## Tooling model
 
 - tools are installed with `agentpm install` from this directory
@@ -46,6 +52,16 @@ Or from this app directory:
 
 ```bash
 pnpm install
+```
+
+## Install and run
+
+From this app directory:
+
+```bash
+agentpm install
+cp .env.example .env.local
+pnpm dev
 ```
 
 ## Install AgentPM tools
@@ -106,3 +122,4 @@ pnpm start
 - This app is intentionally simple and sturdy, not framework-heavy.
 - It keeps conversational history across prompts until you run `/reset`.
 - Tool results are truncated in the model context and in logs so the terminal stays readable.
+- If you want the clearest example of how AgentPM tools map into raw model tool calls, start here.

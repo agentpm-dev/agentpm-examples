@@ -19,6 +19,12 @@ The graph is intentionally simple but sturdy:
 - approval gate for GitHub write actions
 - explicit `/approve` and `/cancel` flow for pending writes
 
+## Pattern
+
+- orchestration style: LangGraph state machine with guarded transitions
+- runtime: Python
+- best for: showing explicit workflow state, approval gates, and safer write-capable agent behavior
+
 ## Tooling model
 
 - tools are installed with `agentpm install` from this directory
@@ -41,6 +47,16 @@ From this app directory:
 
 ```bash
 uv sync
+```
+
+## Install and run
+
+From this app directory:
+
+```bash
+agentpm install
+cp .env.example .env.local
+uv run python -m dotenv -f .env.local run -- python -m app.main
 ```
 
 ## Install AgentPM tools
@@ -104,3 +120,4 @@ For write requests, the app should stop and ask for `/approve` before executing 
 - This app is intentionally read/write aware. GitHub write actions are gated behind explicit user approval.
 - The graph keeps local conversational state across turns until `/reset`.
 - Tool calls and tool outputs are logged so the execution path is easy to inspect.
+- If you want to show how AgentPM tools can be used inside a stateful workflow rather than a freeform agent loop, start here.

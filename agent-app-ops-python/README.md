@@ -14,6 +14,12 @@ The app is designed to make framework-driven orchestration obvious:
 - it prints summarized tool outputs
 - it keeps chat history until you reset it
 
+## Pattern
+
+- orchestration style: LangChain-managed tools agent
+- runtime: Python
+- best for: showing a framework-managed agent loop over operational tools like GitHub, Slack, CSV, and JSON transforms
+
 ## Tooling model
 
 - tools are installed with `agentpm install` from this directory
@@ -38,6 +44,16 @@ From this app directory:
 
 ```bash
 uv sync
+```
+
+## Install and run
+
+From this app directory:
+
+```bash
+agentpm install
+cp .env.example .env.local
+uv run python -m dotenv -f .env.local run -- python -m app.main
 ```
 
 ## Install AgentPM tools
@@ -102,3 +118,4 @@ uv run python -m unittest discover -s tests -p 'test_*.py'
 - This app intentionally uses a framework-managed tool loop so it contrasts with the manual OpenAI tool-calls flow in `agent-app-research-node`.
 - The prompt tells the model not to write to Slack or GitHub unless the user clearly asked for it.
 - Tool results are truncated in logs so the terminal stays readable.
+- For file-based prompts, absolute paths are more reliable than relative paths because tools run as subprocesses.
