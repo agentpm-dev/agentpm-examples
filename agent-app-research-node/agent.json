@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "agent",
+  "name": "research-console",
+  "version": "0.1.0",
+  "description": "Interactive local research console that loads AgentPM-installed tools and uses them through the Node SDK.",
+  "tools": [
+    {
+      "name": "@zack/web-page-extract",
+      "version": "0.1.2"
+    },
+    {
+      "name": "@zack/robots-aware-crawl",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/document-convert",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/table-extract",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/markdown-chunk",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    },
+    {
+      "name": "@zack/translate-text",
+      "version": "0.1.4"
+    }
+  ]
+}

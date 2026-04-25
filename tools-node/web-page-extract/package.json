@@ -1,0 +1,14 @@
+{
+  "name": "@agentpm-examples/web-page-extract",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --platform=node --format=esm --target=node20 --inject:require-shim.js --outfile=dist/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

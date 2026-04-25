@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "agent",
+  "name": "ops-console",
+  "version": "0.1.0",
+  "description": "Interactive ops console that loads AgentPM-installed tools and uses a LangChain tools agent for orchestration.",
+  "tools": [
+    {
+      "name": "@zack/github-issues",
+      "version": "0.1.1"
+    },
+    {
+      "name": "@zack/slack-post-message",
+      "version": "0.1.1"
+    },
+    {
+      "name": "@zack/csv-query",
+      "version": "0.1.4"
+    },
+    {
+      "name": "@zack/json-transform",
+      "version": "0.1.0"
+    }
+  ]
+}

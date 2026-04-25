@@ -1,0 +1,194 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "github-issues",
+  "version": "0.1.1",
+  "description": "Read and update GitHub issues using a compact, agent-friendly action surface.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": [
+      "dist/index.js"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "node",
+    "version": "20"
+  },
+  "environment": {
+    "vars": {
+      "GITHUB_TOKEN": {
+        "required": true,
+        "description": "GitHub personal access token or app token used for API requests."
+      },
+      "GITHUB_API_BASE_URL": {
+        "required": false,
+        "description": "Optional GitHub API base URL. Defaults to https://api.github.com.",
+        "default": "https://api.github.com"
+      }
+    }
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "list_issues",
+          "get_issue",
+          "create_issue",
+          "comment_issue",
+          "update_issue_state"
+        ],
+        "description": "GitHub issue action to perform."
+      },
+      "owner": {
+        "type": "string",
+        "description": "GitHub repository owner or organization."
+      },
+      "repo": {
+        "type": "string",
+        "description": "GitHub repository name."
+      },
+      "issue_number": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Issue number for get, comment, or update actions."
+      },
+      "state": {
+        "type": "string",
+        "enum": [
+          "open",
+          "closed"
+        ],
+        "description": "Issue state for list or update actions."
+      },
+      "per_page": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100,
+        "default": 20,
+        "description": "Maximum number of issues to return for list actions."
+      },
+      "labels": {
+        "type": "array",
+        "description": "Issue labels for create actions.",
+        "items": {
+          "type": "string",
+          "description": "One GitHub issue label."
+        }
+      },
+      "title": {
+        "type": "string",
+        "description": "Issue title for create actions."
+      },
+      "body": {
+        "type": "string",
+        "description": "Issue body or comment body, depending on the action."
+      }
+    },
+    "required": [
+      "action",
+      "owner",
+      "repo"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when the GitHub API call succeeded."
+          },
+          "action": {
+            "type": "string",
+            "description": "Action that was executed."
+          },
+          "repository": {
+            "type": "string",
+            "description": "Repository in owner/repo form."
+          },
+          "issue": {
+            "type": "object",
+            "description": "Normalized issue returned by get, create, or update actions.",
+            "additionalProperties": true
+          },
+          "issues": {
+            "type": "array",
+            "description": "Normalized issue list returned by list actions.",
+            "items": {
+              "type": "object",
+              "description": "One normalized GitHub issue.",
+              "additionalProperties": true
+            }
+          },
+          "comment": {
+            "type": "object",
+            "description": "Normalized comment returned by comment actions.",
+            "additionalProperties": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional request metadata such as pagination or state.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "action",
+          "repository",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when validation or the GitHub API call failed."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              },
+              "details": {
+                "type": "object",
+                "description": "Optional structured context about the failure.",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

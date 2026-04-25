@@ -1,0 +1,189 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "web-page-extract",
+  "version": "0.1.2",
+  "description": "Fetch a web page and return cleaned content, metadata, and discovered links.",
+  "files": [
+    "dist/"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": [
+      "dist/index.js"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "node",
+    "version": "20"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "format": "uri",
+        "description": "HTTP(S) URL to fetch and extract."
+      },
+      "format": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "text"
+        ],
+        "default": "markdown",
+        "description": "Preferred output format for the extracted page body."
+      },
+      "include_links": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to include normalized links discovered in the page body."
+      },
+      "timeout_ms": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 120000,
+        "default": 15000,
+        "description": "Fetch timeout in milliseconds."
+      },
+      "max_chars": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 200000,
+        "default": 40000,
+        "description": "Maximum number of characters to return in the cleaned content."
+      }
+    },
+    "required": [
+      "url"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when the page was fetched and parsed successfully."
+          },
+          "url": {
+            "type": "string",
+            "description": "Original URL requested by the caller."
+          },
+          "final_url": {
+            "type": "string",
+            "description": "Final URL after any redirects applied by the fetch layer."
+          },
+          "title": {
+            "type": "string",
+            "description": "Best-effort page title derived from title tags or social metadata."
+          },
+          "canonical_url": {
+            "type": "string",
+            "description": "Canonical URL declared by the page, resolved against the fetched URL when present."
+          },
+          "published_at": {
+            "type": "string",
+            "description": "Best-effort publish timestamp extracted from page metadata."
+          },
+          "byline": {
+            "type": "string",
+            "description": "Best-effort author or byline extracted from page metadata."
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "Short summary or description extracted from page metadata."
+          },
+          "format": {
+            "type": "string",
+            "description": "Output format used for the cleaned page body."
+          },
+          "content": {
+            "type": "string",
+            "description": "Cleaned main page content in the requested format."
+          },
+          "links": {
+            "type": "array",
+            "description": "Normalized links discovered in the page body when include_links is true.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Visible link text associated with the discovered URL, when available."
+                },
+                "href": {
+                  "type": "string",
+                  "description": "Absolute URL for the discovered link."
+                }
+              },
+              "required": [
+                "href"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional extraction metadata such as truncation state and source size.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "url",
+          "final_url",
+          "format",
+          "content",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when the request or extraction failed."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              },
+              "details": {
+                "type": "object",
+                "description": "Optional structured context about the failure.",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "markdown-chunk",
+  "version": "0.1.0",
+  "description": "Split markdown or text into deterministic chunks with heading context, overlap, and fallback subdivision for oversized content.",
+  "files": [
+    "markdown_chunk/"
+  ],
+  "entrypoint": {
+    "command": "python",
+    "args": [
+      "-u",
+      "markdown_chunk/__main__.py"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "python",
+    "version": "3.11"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "text": {
+        "type": "string",
+        "description": "Markdown or plain text to chunk."
+      },
+      "strategy": {
+        "type": "string",
+        "enum": [
+          "heading",
+          "paragraph",
+          "hybrid"
+        ],
+        "default": "hybrid",
+        "description": "Chunking strategy: heading preserves section boundaries when possible, paragraph prefers paragraph breaks, hybrid mixes both before falling back further."
+      },
+      "max_chars": {
+        "type": "integer",
+        "minimum": 100,
+        "maximum": 50000,
+        "default": 1200,
+        "description": "Target maximum number of characters per chunk. Oversized sections fall back through paragraph, sentence, and window splitting."
+      },
+      "overlap": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 5000,
+        "default": 150,
+        "description": "Number of trailing characters to carry into the next chunk for continuity."
+      },
+      "source_id": {
+        "type": "string",
+        "description": "Optional stable identifier for the source document; copied into each chunk."
+      }
+    },
+    "required": [
+      "text"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when chunk generation succeeded."
+          },
+          "chunks": {
+            "type": "array",
+            "description": "Ordered list of generated chunks.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Deterministic chunk identifier derived from offsets and content."
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Chunk text content."
+                },
+                "heading_path": {
+                  "type": "array",
+                  "description": "Heading ancestry active at the point this chunk was generated.",
+                  "items": {
+                    "type": "string",
+                    "description": "One heading segment in the heading path."
+                  }
+                },
+                "start_offset": {
+                  "type": "integer",
+                  "description": "Character offset in the source text where this chunk begins."
+                },
+                "end_offset": {
+                  "type": "integer",
+                  "description": "Character offset in the source text where this chunk ends."
+                },
+                "char_count": {
+                  "type": "integer",
+                  "description": "Character count of the chunk text."
+                },
+                "source_id": {
+                  "type": "string",
+                  "description": "Optional source identifier copied from the input."
+                }
+              },
+              "required": [
+                "id",
+                "text",
+                "heading_path",
+                "start_offset",
+                "end_offset",
+                "char_count"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Summary metadata about the chunking run, including fallback behavior used to respect max_chars.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "chunks",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when input validation or chunk generation failed."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              },
+              "details": {
+                "type": "object",
+                "description": "Optional structured context about the failure.",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

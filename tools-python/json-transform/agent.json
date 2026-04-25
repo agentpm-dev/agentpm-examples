@@ -1,0 +1,119 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "json-transform",
+  "version": "0.1.0",
+  "description": "Apply deterministic transformation operations to JSON objects and arrays.",
+  "files": [
+    "json_transform/"
+  ],
+  "entrypoint": {
+    "command": "python",
+    "args": [
+      "-u",
+      "json_transform/__main__.py"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "python",
+    "version": "3.11"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "input": {
+        "description": "Input JSON value to transform. Can be an object, array, or primitive."
+      },
+      "operations": {
+        "type": "array",
+        "description": "Ordered list of transformation operations to apply to the input value.",
+        "items": {
+          "type": "object",
+          "description": "An operation object such as pick, rename, set, delete, flatten, pluck, or filter_array."
+        }
+      }
+    },
+    "required": [
+      "input",
+      "operations"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when all requested transformations were processed."
+          },
+          "result": {
+            "description": "Final transformed JSON value."
+          },
+          "applied_operations": {
+            "type": "array",
+            "description": "Names of transformation operations that were applied successfully.",
+            "items": {
+              "type": "string",
+              "description": "Name of an applied operation."
+            }
+          },
+          "validation_errors": {
+            "type": "array",
+            "description": "Validation or application errors collected while processing operations.",
+            "items": {
+              "type": "string",
+              "description": "One validation or processing error message."
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "result",
+          "applied_operations",
+          "validation_errors"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when the tool could not process the transformation request."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "csv-query",
+  "version": "0.1.4",
+  "description": "Query CSV data with structured filter, sort, select, and aggregate operations.",
+  "files": [
+    "csv_query/"
+  ],
+  "entrypoint": {
+    "command": "python",
+    "args": [
+      "-u",
+      "csv_query/__main__.py"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "python",
+    "version": "3.11"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Path to a local CSV file to query. Provide either path or csv_text."
+      },
+      "csv_text": {
+        "type": "string",
+        "description": "Raw CSV content to query directly. Provide either csv_text or path."
+      },
+      "select": {
+        "type": "array",
+        "description": "Subset of columns to keep in the returned rows.",
+        "items": {
+          "type": "string",
+          "description": "Name of a CSV column to include in the output."
+        }
+      },
+      "filter": {
+        "type": "array",
+        "description": "Filter conditions applied before grouping, sorting, and limiting.",
+        "items": {
+          "type": "object",
+          "description": "A filter object with at least column, op, and value fields."
+        }
+      },
+      "sort": {
+        "type": "array",
+        "description": "Sort operations applied in order.",
+        "items": {
+          "type": "object",
+          "description": "A sort object with column and optional direction fields."
+        }
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Maximum number of rows to return after all other operations."
+      },
+      "group_by": {
+        "type": "array",
+        "description": "Columns to group by before computing aggregations.",
+        "items": {
+          "type": "string",
+          "description": "Name of a CSV column to group rows by."
+        }
+      },
+      "aggregations": {
+        "type": "array",
+        "description": "Aggregate computations to run over the filtered rows or groups.",
+        "items": {
+          "type": "object",
+          "description": "An aggregation object such as count, sum, avg, min, or max."
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when the CSV query completed successfully."
+          },
+          "columns": {
+            "type": "array",
+            "description": "Column names present in the returned rows.",
+            "items": {
+              "type": "string",
+              "description": "Name of an output column."
+            }
+          },
+          "rows": {
+            "type": "array",
+            "description": "Query result rows after filters, grouping, sorting, and selection.",
+            "items": {
+              "type": "object",
+              "description": "One result row represented as a JSON object."
+            }
+          },
+          "row_count": {
+            "type": "integer",
+            "description": "Number of rows returned in the result set."
+          },
+          "summary": {
+            "type": "object",
+            "description": "Summary information about the query, such as grouping metadata or aggregate results.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "columns",
+          "rows",
+          "row_count",
+          "summary"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when the query failed validation or execution."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md"
+}

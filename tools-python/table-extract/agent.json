@@ -1,0 +1,145 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "table-extract",
+  "version": "0.1.0",
+  "description": "Extract structured tables from HTML or CSV sources into normalized rows and columns.",
+  "files": [
+    "table_extract/"
+  ],
+  "entrypoint": {
+    "command": "python",
+    "args": [
+      "-u",
+      "table_extract/__main__.py"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "python",
+    "version": "3.11"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "source_type": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "html",
+          "csv"
+        ],
+        "default": "auto",
+        "description": "Source type to extract tables from."
+      },
+      "path": {
+        "type": "string",
+        "description": "Optional local file path containing HTML or CSV content."
+      },
+      "html_text": {
+        "type": "string",
+        "description": "Optional raw HTML content to extract tables from."
+      },
+      "csv_text": {
+        "type": "string",
+        "description": "Optional raw CSV content to treat as a single table."
+      },
+      "table_index": {
+        "type": "integer",
+        "minimum": 0,
+        "default": 0,
+        "description": "Zero-based HTML table index to return when multiple tables are present."
+      },
+      "header_row": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether the first row should be treated as the header."
+      }
+    },
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when table extraction succeeded."
+          },
+          "tables": {
+            "type": "array",
+            "description": "Extracted tables in normalized form.",
+            "items": {
+              "type": "object",
+              "description": "One extracted table with columns and rows.",
+              "additionalProperties": true
+            }
+          },
+          "detected_count": {
+            "type": "integer",
+            "description": "Number of tables detected in the source."
+          },
+          "warnings": {
+            "type": "array",
+            "description": "Warnings encountered during extraction.",
+            "items": {
+              "type": "string",
+              "description": "One warning message."
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Summary metadata about the extraction.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "tables",
+          "detected_count",
+          "warnings",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when validation or extraction failed."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "document-convert",
+  "version": "0.1.0",
+  "description": "Convert local documents into normalized markdown or plain text with lightweight metadata.",
+  "files": [
+    "document_convert/"
+  ],
+  "entrypoint": {
+    "command": "python",
+    "args": [
+      "-u",
+      "document_convert/__main__.py"
+    ],
+    "timeout_ms": 30000
+  },
+  "runtime": {
+    "type": "python",
+    "version": "3.11"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Path to the local document to convert."
+      },
+      "to_format": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "text"
+        ],
+        "default": "markdown",
+        "description": "Desired output format for the converted document."
+      },
+      "extract_metadata": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to include file and conversion metadata in the output."
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true,
+            "description": "True when document conversion succeeded."
+          },
+          "path": {
+            "type": "string",
+            "description": "Original file path supplied to the tool."
+          },
+          "media_type": {
+            "type": "string",
+            "description": "Detected media type for the input file."
+          },
+          "content": {
+            "type": "string",
+            "description": "Converted document content."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "File and conversion metadata.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "path",
+          "media_type",
+          "content",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": false,
+            "description": "False when validation or conversion failed."
+          },
+          "error": {
+            "type": "object",
+            "description": "Structured error returned by the tool.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable explanation of the failure."
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

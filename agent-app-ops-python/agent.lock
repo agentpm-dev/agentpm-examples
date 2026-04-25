@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "@zack/csv-query": {
+      "integrity": "908e9f963a91d7ce24d61f6c7c5e339d36a658f2c7e806589cfbc01b45f760c2",
+      "version": "0.1.4"
+    },
+    "@zack/github-issues": {
+      "integrity": "b04c929385df7ceb78ab459f9c2104006f286d57f372fc1afa8ec77db00e8935",
+      "version": "0.1.1"
+    },
+    "@zack/json-transform": {
+      "integrity": "d217cd3555aeea0f1b5baad3674b03a90d562f3bb2ce6ad0d57e08ea6265a76f",
+      "version": "0.1.0"
+    },
+    "@zack/slack-post-message": {
+      "integrity": "b72d2c239da44b1e1dfd40b8a6a0a53f958d29ba26f55d9625e85e1652426991",
+      "version": "0.1.1"
+    }
+  },
+  "generated": "2026-04-25T02:37:08.609791Z",
+  "lockfile_version": 1
+}
