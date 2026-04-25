@@ -34,6 +34,7 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-app-python`](agent-app-python/)
     - [`agent-app-node`](agent-app-node/)
     - [`agent-app-research-node`](agent-app-research-node/)
+    - [`agent-app-ops-python`](agent-app-ops-python/)
 
 ### Phase 1: Seeding
 
@@ -64,6 +65,7 @@ The final three tools deepen the knowledge and research story:
 # from repo root
 pnpm -r install                    # installs Node deps for node tools & node agent
 uv sync --directory agent-app-python
+uv sync --directory agent-app-ops-python
 uv sync --directory tools-python/summarize-text
 uv sync --directory tools-python/sentiment-analysis
 ```
