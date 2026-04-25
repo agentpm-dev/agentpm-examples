@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "markdown-chunk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Split markdown or text into deterministic chunks with heading context, overlap, and fallback subdivision for oversized content.",
   "files": [
     "markdown_chunk/"

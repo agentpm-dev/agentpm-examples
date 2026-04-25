@@ -32,6 +32,10 @@ When a chunk overflows, the configured `overlap` is carried into the next chunk 
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-python/markdown-chunk)
+
+Test:
+
 ```bash
 python -m unittest discover -s tests -p 'test_*.py'
 ```
