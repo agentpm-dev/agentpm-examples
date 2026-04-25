@@ -1,0 +1,15 @@
+[project]
+name = "agentpm-examples-agent-app-devwork-python"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "agentpm>=0.1.2",
+    "langchain>=1.0.0",
+    "langchain-openai>=0.3.0",
+    "langgraph>=0.2.0",
+    "openai>=1.51.0",
+    "pydantic>=2.7.0",
+    "python-dotenv[cli]>=1.1.1"
+]
+
+[tool.uv]

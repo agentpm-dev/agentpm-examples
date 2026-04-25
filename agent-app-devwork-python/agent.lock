@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@zack/github-issues": {
+      "integrity": "b04c929385df7ceb78ab459f9c2104006f286d57f372fc1afa8ec77db00e8935",
+      "version": "0.1.1"
+    },
+    "@zack/summarize-text": {
+      "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "version": "0.1.8"
+    }
+  },
+  "generated": "2026-04-25T04:15:54.514797Z",
+  "lockfile_version": 1
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "agent",
+  "name": "devwork-copilot",
+  "version": "0.1.0",
+  "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions.",
+  "tools": [
+    {
+      "name": "@zack/github-issues",
+      "version": "0.1.1"
+    },
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    }
+  ]
+}
