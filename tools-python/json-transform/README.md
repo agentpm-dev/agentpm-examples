@@ -29,6 +29,10 @@ Agents constantly need to reshape API responses and intermediate data. This tool
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-python/json-transform)
+
+Test:
+
 ```bash
 python -m unittest discover -s tests -p 'test_*.py'
 ```
