@@ -6,20 +6,24 @@
   "description": "Interactive local research console that loads AgentPM-installed tools and uses them through the Node SDK.",
   "tools": [
     {
-      "name": "@zack/wikipedia-scrape",
-      "version": "0.1.5"
+      "name": "@zack/web-page-extract",
+      "version": "0.1.2"
     },
     {
-      "name": "@zack/http-fetch",
+      "name": "@zack/robots-aware-crawl",
       "version": "0.1.0"
     },
     {
-      "name": "@zack/html-to-markdown",
-      "version": "0.1.1"
+      "name": "@zack/document-convert",
+      "version": "0.1.0"
     },
     {
-      "name": "@zack/pdf-to-text",
-      "version": "0.1.1"
+      "name": "@zack/table-extract",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/markdown-chunk",
+      "version": "0.1.0"
     },
     {
       "name": "@zack/summarize-text",

@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "csv-query",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Query CSV data with structured filter, sort, select, and aggregate operations.",
   "files": [
     "csv_query/"

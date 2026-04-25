@@ -39,5 +39,14 @@ python -m unittest discover -s tests -p 'test_*.py'
 ## Example invocation
 
 ```bash
-printf '%s' '{"text":"# Intro\n\nHello world","strategy":"hybrid"}' | python -u markdown_chunk/__main__.py
+python -u markdown_chunk/__main__.py < input.json
+```
+
+With input.json containing:
+
+```json
+{
+  "text": "# Intro\n\nHello world",
+  "strategy": "hybrid"
+}
 ```

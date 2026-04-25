@@ -30,11 +30,15 @@ Most agent systems need a reliable first-step web ingestion primitive. This tool
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-node/web-page-extract)
+
+Test:
+
 ```bash
 node --test
 ```
 
-To build the packaged entrypoint:
+Build:
 
 ```bash
 npm run build

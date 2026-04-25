@@ -34,11 +34,15 @@ Issue triage, follow-up, and status workflows are common agent tasks. This tool 
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-node/github-issues)
+
+Test:
+
 ```bash
 npm test
 ```
 
-To build the packaged entrypoint:
+Build:
 
 ```bash
 npm run build

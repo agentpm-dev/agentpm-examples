@@ -27,11 +27,15 @@ Research and ingestion agents often need more than a single fetch. This tool pac
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-node/robots-aware-crawl)
+
+Test:
+
 ```bash
 npm test
 ```
 
-To build the packaged entrypoint:
+Build:
 
 ```bash
 npm run build

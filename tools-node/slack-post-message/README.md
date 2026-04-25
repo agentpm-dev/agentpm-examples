@@ -30,11 +30,15 @@ Many useful agents need to report status or deliver results back to people. This
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-node/slack-post-message)
+
+Test:
+
 ```bash
 npm test
 ```
 
-To build the packaged entrypoint:
+Build:
 
 ```bash
 npm run build

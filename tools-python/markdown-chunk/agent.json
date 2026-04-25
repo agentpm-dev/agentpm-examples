@@ -172,5 +172,8 @@
       }
     ]
   },
-  "readme": "README.md"
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
 }

@@ -24,10 +24,11 @@ The app is designed to make tool orchestration obvious:
 
 The default `agent.json` is aimed at research workflows:
 
-- `@zack/wikipedia-scrape`
-- `@zack/http-fetch`
-- `@zack/html-to-markdown`
-- `@zack/pdf-to-text`
+- `@zack/web-page-extract`
+- `@zack/robots-aware-crawl`
+- `@zack/document-convert`
+- `@zack/table-extract`
+- `@zack/markdown-chunk`
 - `@zack/summarize-text`
 - `@zack/translate-text`
 
@@ -94,9 +95,11 @@ pnpm start
 
 ## Example prompts
 
-- `Research the Alan Turing Wikipedia article, summarize the key contributions, and translate the summary to Spanish.`
-- `Fetch https://docs.github.com and summarize the landing page.`
-- `Given a PDF URL, extract the text and summarize it in bullets.`
+- `Crawl https://docs.github.com up to 3 pages, identify the main themes, and summarize them in bullets.`
+- `Extract the main content from https://docs.github.com and translate the summary to Spanish.`
+- `Convert a local HTML or JSON file to markdown, then summarize the result.`
+- `Extract the first table from a local HTML file and explain what it contains.`
+- `Chunk a long markdown document into sections and summarize the most important points.`
 
 ## Notes
 

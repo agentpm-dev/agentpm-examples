@@ -26,6 +26,10 @@ CSV handling shows up constantly in ops and analyst workflows. This tool gives a
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-python/csv-query)
+
+Test:
+
 ```bash
 python -m unittest discover -s tests -p 'test_*.py'
 ```
@@ -33,5 +37,22 @@ python -m unittest discover -s tests -p 'test_*.py'
 ## Example invocation
 
 ```bash
-printf '%s' '{"csv_text":"name,score\nA,2\nB,5","filter":[{"column":"score","op":"gt","value":"2"}]}' | python -u csv_query/__main__.py
+python -u csv_query/__main__.py < input.json
 ```
+
+With input.json containing:
+
+```json
+ {
+    "csv_text": "name,score\nA,2\nB,5",
+    "filter": [
+      {
+        "column": "score",
+        "op": "gt",
+        "value": "2"
+      }
+    ]
+  }
+
+```
+

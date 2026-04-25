@@ -31,5 +31,14 @@ python -m unittest discover -s tests -p 'test_*.py'
 ## Example invocation
 
 ```bash
-printf '%s' '{"html_text":"<table><tr><th>Name</th></tr><tr><td>Ada</td></tr></table>","source_type":"html"}' | python -u table_extract/__main__.py
+python -u table_extract/__main__.py < input.json
+```
+
+With input.json containing:
+
+```json
+{
+  "html_text": "<table><tr><th>Name</th></tr><tr><td>Ada</td></tr></table>",
+  "source_type": "html"
+}
 ```

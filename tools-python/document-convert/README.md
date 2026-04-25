@@ -21,6 +21,10 @@ Knowledge workflows need a common representation for mixed source files. This to
 
 ## Local development
 
+The source code for this tool can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/tools-python/document-convert)
+
+Test:
+
 ```bash
 python -m unittest discover -s tests -p 'test_*.py'
 ```
@@ -28,5 +32,14 @@ python -m unittest discover -s tests -p 'test_*.py'
 ## Example invocation
 
 ```bash
-printf '%s' '{"path":"fixtures/sample.html","to_format":"markdown"}' | python -u document_convert/__main__.py
+python -u document_convert/__main__.py < input.json
+```
+
+With input.json containing:
+
+```json
+ {
+    "path": "fixtures/sample.html",
+    "to_format": "markdown"
+  }
 ```
