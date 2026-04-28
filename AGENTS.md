@@ -108,7 +108,6 @@ Example:
     - Do document required env vars, setup steps, and expected local commands in the example README.
 
 ## Verification
-## Verification
 - Verify tools and agent apps when changes affect packaging, manifests, installs, or runtime behavior.
 - Keep README instructions runnable and believable.
 - Use the local package manager and test flow that the example already uses: `pnpm` for Node examples, `uv` for Python examples.
