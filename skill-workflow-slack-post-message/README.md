@@ -102,6 +102,23 @@ In a skill-capable client, the Skill tells the agent:
 
 The important part is that the skill does not replace the tool. It tells the agent how to use the tool correctly.
 
+## Why this pattern works
+
+This pattern scales better than exposing every tool contract directly to an agent at once.
+
+- The Skill acts like a manual:
+  - when to use the tool
+  - how to choose the right arguments
+  - what workflow assumptions matter
+- `agentpm run` stays the universal execution boundary:
+  - the tool contract
+  - runtime handling
+  - environment defaults
+  - subprocess execution
+  all stay canonical in AgentPM
+
+That split matters because a JSON schema tells an agent what fields exist, but a Skill tells the agent why to use those fields in a particular workflow.
+
 ## Manual command examples
 
 Minimal post:
