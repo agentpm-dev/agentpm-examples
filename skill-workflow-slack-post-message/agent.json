@@ -1,0 +1,8 @@
+{
+  "kind": "agent",
+  "name": "skill-workflow-slack-post-message",
+  "description": "Minimal example project for exporting a Slack notification skill from a published AgentPM tool.",
+  "tools": [
+    "@zack/slack-post-message@0.1.1"
+  ]
+}

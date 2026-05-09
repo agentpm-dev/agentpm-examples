@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@zack/slack-post-message": {
+      "integrity": "b72d2c239da44b1e1dfd40b8a6a0a53f958d29ba26f55d9625e85e1652426991",
+      "version": "0.1.1"
+    }
+  },
+  "generated": "2026-05-09T02:24:56.169935Z",
+  "lockfile_version": 1
+}

@@ -38,6 +38,9 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-app-python`](agent-app-python/)
     - [`agent-app-node`](agent-app-node/)
 
+- **Skill workflow example**
+    - [`skill-workflow-slack-post-message`](skill-workflow-slack-post-message/)
+
 ### Current agent patterns
 
 The current recommended agent examples in this repo are:
@@ -54,29 +57,49 @@ The current recommended agent examples in this repo are:
 
 The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the three apps above are the clearest current patterns.
 
-### Phase 1: Seeding
+### Example groups
 
-The first Phase 1 additions are meant to prove there is value in installing shared agent primitives rather than rebuilding them:
+Some examples in this repo focus on core reusable building blocks:
 
 - `web-page-extract`: fetch and normalize a page into metadata, links, and cleaned content
 - `markdown-chunk`: split text into deterministic chunks with heading context
 - `csv-query`: filter, sort, group, and aggregate CSV data
 - `json-transform`: apply reusable transformations to JSON objects and arrays
 
-### Phase 2: Integrations
-
-The next additions prove AgentPM can package tools for external systems people already use:
+Some focus on external system integrations:
 
 - `github-issues`: list, create, comment on, and update GitHub issues
 - `slack-post-message`: post or update Slack messages for notifications and agent status updates
 
-### Phase 3: Retrieval and Documents
-
-The final three tools deepen the knowledge and research story:
+And some focus on retrieval and document-heavy workflows:
 
 - `robots-aware-crawl`: bounded multi-page crawling with robots.txt awareness
 - `document-convert`: normalize local documents into markdown or text
 - `table-extract`: turn HTML or CSV tables into structured rows and columns
+
+### Interoperability surfaces
+
+AgentPM tools in this repo can be used through several different surfaces:
+
+- SDK loading inside agent apps with the Node and Python SDKs
+- shell execution with `agentpm run`
+- local MCP exposure with `agentpm serve --mcp`
+- starter Skill scaffolds with `agentpm export --skill`
+
+Example flow using the published `@zack/slack-post-message` tool:
+
+```bash
+agentpm install @zack/slack-post-message
+agentpm run @zack/slack-post-message --input '{"action":"post_message","channel":"C123456","text":"hello from AgentPM"}'
+agentpm serve --mcp --tool @zack/slack-post-message
+agentpm export --skill @zack/slack-post-message
+```
+
+That is the main interoperability idea behind this repo:
+
+- package once with AgentPM
+- install and run through AgentPM
+- expose the same packaged artifact to MCP clients or Skill-based workflows when needed
 
 ### Quick workspace setup
 ```bash
@@ -107,7 +130,7 @@ Node example tools prefer bundling so the runtime artifact is a small, explicit 
 
 The point here is the same: publish the thing you actually want executed. That keeps installation simpler and makes the packaged tool easier to reason about.
 
-### Running the Phase 1 tests
+### Running the core building block tests
 
 ```bash
 cd tools-node/web-page-extract && npm test
@@ -116,14 +139,14 @@ cd tools-python/csv-query && python -m unittest discover -s tests -p 'test_*.py'
 cd tools-python/json-transform && python -m unittest discover -s tests -p 'test_*.py'
 ```
 
-### Running the Phase 2 tests
+### Running the integration tool tests
 
 ```bash
 cd tools-node/github-issues && npm test
 cd tools-node/slack-post-message && npm test
 ```
 
-### Running the Phase 3 tests
+### Running the retrieval and document tests
 
 ```bash
 cd tools-node/robots-aware-crawl && npm test
