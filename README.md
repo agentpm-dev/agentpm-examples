@@ -12,6 +12,14 @@ A mono-repo of concrete examples showing how to:
 - Publish them to **AgentPM** with an `agent.json` manifest,
 - Load and run them from **agent apps** using several different orchestration styles.
 
+The current examples repo is centered on **manifest-driven local agent apps**:
+
+- each app keeps a local `agent.json`
+- `agentpm install` resolves that manifest into `.agentpm/tools`
+- the app loads tools from the SDK
+
+Published agent packages are documented in the public docs and tracked for a follow-up examples update, but this repo does not yet ship a released installed-agent app example.
+
 Each tool is intentionally simple to highlight integration, not performance.
 
 ### Contents
@@ -100,6 +108,25 @@ That is the main interoperability idea behind this repo:
 - package once with AgentPM
 - install and run through AgentPM
 - expose the same packaged artifact to MCP clients or Skill-based workflows when needed
+
+### Install workflows shown in this repo
+
+This repo currently demonstrates:
+
+- **manifest-driven install**
+  - local `agent.json`
+  - `agentpm install`
+  - tools land in `.agentpm/tools/...`
+  - local manifest is not copied into `.agentpm/agents`
+
+The public docs also describe:
+
+- **direct package install**
+  - `agentpm install @namespace/agent-name@version`
+  - registry agent lands in `.agentpm/agents/...`
+  - resolved tools land in `.agentpm/tools/...`
+
+That second workflow is intentionally tracked separately for a later examples update once the released CLI/SDK versions are available together.
 
 ### Quick workspace setup
 ```bash

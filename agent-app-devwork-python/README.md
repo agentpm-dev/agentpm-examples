@@ -4,7 +4,7 @@ Interactive local GitHub maintainer copilot built on the AgentPM Python SDK and 
 
 ## What it does
 
-This app loads the published tool specs listed in its local `agent.json`, turns them into callable structured tools, and runs a graph-driven devwork loop.
+This app loads the tool specs listed in its local `agent.json`, turns them into callable structured tools, and runs a graph-driven devwork loop.
 
 It is designed to show a different agent style from the other examples:
 
@@ -68,6 +68,13 @@ agentpm install
 ```
 
 That installs the tool set defined in `agent.json` into the app-local `.agentpm/` directory.
+
+With the current install layout:
+
+- tool packages install under `.agentpm/tools/<namespace>/<name>/<version>/`
+- the local app manifest stays at `./agent.json`
+- the local manifest is **not** copied into `.agentpm/agents`
+- `agent.lock` is written in lockfile v2 format
 
 ## Environment
 

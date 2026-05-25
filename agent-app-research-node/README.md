@@ -4,7 +4,7 @@ Interactive local research console built on the AgentPM Node SDK.
 
 ## What it does
 
-This app loads the published tool specs listed in its local `agent.json`, turns them into callable tool definitions, and runs an interactive research loop. It is intentionally local-only and not meant to represent what a published AgentPM agent will look like.
+This app loads the tool specs listed in its local `agent.json`, turns them into callable tool definitions, and runs an interactive research loop. It is intentionally local-only and not meant to represent a registry-installed agent package.
 
 The app is designed to make tool orchestration obvious:
 
@@ -73,6 +73,13 @@ agentpm install
 ```
 
 That installs the tool set defined in `agent.json` into the app-local `.agentpm/` directory.
+
+With the current install layout:
+
+- tool packages install under `.agentpm/tools/<namespace>/<name>/<version>/`
+- the local app manifest stays at `./agent.json`
+- the local manifest is **not** copied into `.agentpm/agents`
+- `agent.lock` is written in lockfile v2 format
 
 ## Environment
 

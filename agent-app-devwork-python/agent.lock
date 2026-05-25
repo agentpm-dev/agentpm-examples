@@ -1,14 +1,34 @@
 {
-  "dependencies": {
-    "@zack/github-issues": {
+  "generated": "2026-05-25T00:00:00Z",
+  "lockfile_version": 2,
+  "packages": {
+    "tool:@zack/github-issues@0.1.1": {
       "integrity": "b04c929385df7ceb78ab459f9c2104006f286d57f372fc1afa8ec77db00e8935",
+      "kind": "tool",
+      "name": "@zack/github-issues",
       "version": "0.1.1"
     },
-    "@zack/summarize-text": {
+    "tool:@zack/summarize-text@0.1.8": {
       "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "kind": "tool",
+      "name": "@zack/summarize-text",
       "version": "0.1.8"
     }
   },
-  "generated": "2026-04-25T04:15:54.514797Z",
-  "lockfile_version": 1
+  "roots": {
+    "local:agent": {
+      "name": "devwork-copilot",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/github-issues@0.1.1",
+        "tool:@zack/summarize-text@0.1.8"
+      ],
+      "version": "0.1.0"
+    }
+  }
 }

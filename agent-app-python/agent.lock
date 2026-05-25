@@ -1,26 +1,55 @@
 {
-  "dependencies": {
-    "@zack/resize-image": {
+  "generated": "2026-05-25T00:00:00Z",
+  "lockfile_version": 2,
+  "packages": {
+    "tool:@zack/resize-image@0.1.7": {
       "integrity": "49b0c95e4675a59768f79e1c29646e0b4c39bf37bd0039c83461e8ebdedd6f5e",
+      "kind": "tool",
+      "name": "@zack/resize-image",
       "version": "0.1.7"
     },
-    "@zack/sentiment-analysis": {
+    "tool:@zack/sentiment-analysis@0.1.4": {
       "integrity": "326ee51679de226a27d14d548030cd0a329805c93eaff8a719c0209c20955d84",
+      "kind": "tool",
+      "name": "@zack/sentiment-analysis",
       "version": "0.1.4"
     },
-    "@zack/summarize-text": {
+    "tool:@zack/summarize-text@0.1.8": {
       "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "kind": "tool",
+      "name": "@zack/summarize-text",
       "version": "0.1.8"
     },
-    "@zack/translate-text": {
+    "tool:@zack/translate-text@0.1.4": {
       "integrity": "bf8fc61a0224f9a4b5af87c080fbebae936c23a54a4cde3b93f546c499bb0d0c",
+      "kind": "tool",
+      "name": "@zack/translate-text",
       "version": "0.1.4"
     },
-    "@zack/wikipedia-scrape": {
+    "tool:@zack/wikipedia-scrape@0.1.5": {
       "integrity": "5d26de3f25b4cb81ed7fc54ebb2eb4b81bb0b499f873c67abfb7ef4733d26c87",
+      "kind": "tool",
+      "name": "@zack/wikipedia-scrape",
       "version": "0.1.5"
     }
   },
-  "generated": "2025-11-16T17:47:04.813867Z",
-  "lockfile_version": 1
+  "roots": {
+    "local:agent": {
+      "name": "research-assistant",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/wikipedia-scrape@0.1.5",
+        "tool:@zack/translate-text@0.1.4",
+        "tool:@zack/resize-image@0.1.7",
+        "tool:@zack/sentiment-analysis@0.1.4",
+        "tool:@zack/summarize-text@0.1.8"
+      ],
+      "version": "0.1.0"
+    }
+  }
 }

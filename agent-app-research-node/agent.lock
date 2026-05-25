@@ -1,34 +1,69 @@
 {
-  "dependencies": {
-    "@zack/document-convert": {
+  "generated": "2026-05-25T00:00:00Z",
+  "lockfile_version": 2,
+  "packages": {
+    "tool:@zack/document-convert@0.1.0": {
       "integrity": "fccd8ba3dc971262fcf5f3fe06822c28d8db26810f374526bc5fe6be9f27ab0c",
+      "kind": "tool",
+      "name": "@zack/document-convert",
       "version": "0.1.0"
     },
-    "@zack/markdown-chunk": {
+    "tool:@zack/markdown-chunk@0.1.0": {
       "integrity": "e544a8b48841920822067e7297ab247edce29d1e1dcc5d4ded190b873cdddf91",
+      "kind": "tool",
+      "name": "@zack/markdown-chunk",
       "version": "0.1.0"
     },
-    "@zack/robots-aware-crawl": {
+    "tool:@zack/robots-aware-crawl@0.1.0": {
       "integrity": "b19d14c48499af6a485d7daff082aacfd86273266049c1b426541f0c81b9a24f",
+      "kind": "tool",
+      "name": "@zack/robots-aware-crawl",
       "version": "0.1.0"
     },
-    "@zack/summarize-text": {
+    "tool:@zack/summarize-text@0.1.8": {
       "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "kind": "tool",
+      "name": "@zack/summarize-text",
       "version": "0.1.8"
     },
-    "@zack/table-extract": {
+    "tool:@zack/table-extract@0.1.0": {
       "integrity": "4bbe74ea78e38c7e73269e9404d5b671620d3bb63eb8ae91900a8fa9e863771a",
+      "kind": "tool",
+      "name": "@zack/table-extract",
       "version": "0.1.0"
     },
-    "@zack/translate-text": {
+    "tool:@zack/translate-text@0.1.4": {
       "integrity": "bf8fc61a0224f9a4b5af87c080fbebae936c23a54a4cde3b93f546c499bb0d0c",
+      "kind": "tool",
+      "name": "@zack/translate-text",
       "version": "0.1.4"
     },
-    "@zack/web-page-extract": {
+    "tool:@zack/web-page-extract@0.1.2": {
       "integrity": "f3a90b433029008ae48ca91304941d9284477b97e5fd665d3f05ff4c12895568",
+      "kind": "tool",
+      "name": "@zack/web-page-extract",
       "version": "0.1.2"
     }
   },
-  "generated": "2026-04-25T02:04:41.800326Z",
-  "lockfile_version": 1
+  "roots": {
+    "local:agent": {
+      "name": "research-console",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/web-page-extract@0.1.2",
+        "tool:@zack/robots-aware-crawl@0.1.0",
+        "tool:@zack/document-convert@0.1.0",
+        "tool:@zack/table-extract@0.1.0",
+        "tool:@zack/markdown-chunk@0.1.0",
+        "tool:@zack/summarize-text@0.1.8",
+        "tool:@zack/translate-text@0.1.4"
+      ],
+      "version": "0.1.0"
+    }
+  }
 }

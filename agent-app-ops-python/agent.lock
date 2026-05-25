@@ -1,22 +1,48 @@
 {
-  "dependencies": {
-    "@zack/csv-query": {
+  "generated": "2026-05-25T00:00:00Z",
+  "lockfile_version": 2,
+  "packages": {
+    "tool:@zack/csv-query@0.1.4": {
       "integrity": "908e9f963a91d7ce24d61f6c7c5e339d36a658f2c7e806589cfbc01b45f760c2",
+      "kind": "tool",
+      "name": "@zack/csv-query",
       "version": "0.1.4"
     },
-    "@zack/github-issues": {
+    "tool:@zack/github-issues@0.1.1": {
       "integrity": "b04c929385df7ceb78ab459f9c2104006f286d57f372fc1afa8ec77db00e8935",
+      "kind": "tool",
+      "name": "@zack/github-issues",
       "version": "0.1.1"
     },
-    "@zack/json-transform": {
+    "tool:@zack/json-transform@0.1.0": {
       "integrity": "d217cd3555aeea0f1b5baad3674b03a90d562f3bb2ce6ad0d57e08ea6265a76f",
+      "kind": "tool",
+      "name": "@zack/json-transform",
       "version": "0.1.0"
     },
-    "@zack/slack-post-message": {
+    "tool:@zack/slack-post-message@0.1.1": {
       "integrity": "b72d2c239da44b1e1dfd40b8a6a0a53f958d29ba26f55d9625e85e1652426991",
+      "kind": "tool",
+      "name": "@zack/slack-post-message",
       "version": "0.1.1"
     }
   },
-  "generated": "2026-04-25T02:37:08.609791Z",
-  "lockfile_version": 1
+  "roots": {
+    "local:agent": {
+      "name": "ops-console",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/github-issues@0.1.1",
+        "tool:@zack/slack-post-message@0.1.1",
+        "tool:@zack/csv-query@0.1.4",
+        "tool:@zack/json-transform@0.1.0"
+      ],
+      "version": "0.1.0"
+    }
+  }
 }
