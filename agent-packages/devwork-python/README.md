@@ -1,0 +1,15 @@
+# devwork-copilot
+
+`devwork-copilot` is a published AgentPM agent package for maintainer and repository review workflows in Python.
+
+It composes tools for:
+- reviewing GitHub issues
+- summarizing issue queues and maintainer context
+
+Example prompts:
+- Review the latest GitHub issues for a repository, group them by theme, and summarize the highest-priority work.
+- Read a set of repository issues and produce a concise maintainer briefing with action items and open questions.
+
+## Local development
+
+The source code for this agent package can be found [here](https://github.com/agentpm-dev/agentpm-examples/tree/main/agent-packages/devwork-python)

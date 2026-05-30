@@ -13,5 +13,19 @@
       "name": "@zack/summarize-text",
       "version": "0.1.8"
     }
-  ]
+  ],
+  "examples": [
+    {
+      "title": "Summarize an issue queue",
+      "prompt": "Review the latest GitHub issues for a repository, group them by theme, and summarize the highest-priority work."
+    },
+    {
+      "title": "Prepare maintainer notes",
+      "prompt": "Read a set of repository issues and produce a concise maintainer briefing with action items and open questions."
+    }
+  ],
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
 }

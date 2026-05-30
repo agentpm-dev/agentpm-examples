@@ -1,0 +1,39 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "agent",
+  "name": "ops-console",
+  "version": "0.1.0",
+  "description": "Operations assistant for reviewing issues, querying data, transforming JSON payloads, and drafting Slack-ready updates.",
+  "tools": [
+    {
+      "name": "@zack/github-issues",
+      "version": "0.1.1"
+    },
+    {
+      "name": "@zack/slack-post-message",
+      "version": "0.1.1"
+    },
+    {
+      "name": "@zack/csv-query",
+      "version": "0.1.4"
+    },
+    {
+      "name": "@zack/json-transform",
+      "version": "0.1.0"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Prepare an ops update",
+      "prompt": "Query recent operational data, transform it into a clean summary, and draft a Slack update for the team."
+    },
+    {
+      "title": "Review incident follow-up",
+      "prompt": "Inspect recent issues, combine them with structured data, and produce a short operational briefing with next steps."
+    }
+  ],
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

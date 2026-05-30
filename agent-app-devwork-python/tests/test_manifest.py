@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import json
 import unittest
 from pathlib import Path
 
-from app.tooling import build_args_model
+from app.tooling import AGENT_SPEC, build_args_model
 from app.workflow import is_write_tool_call
 
 
@@ -12,13 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ManifestTests(unittest.TestCase):
-    def test_manifest_references_tools_with_versions(self) -> None:
-        manifest = json.loads((ROOT / "agent.json").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["kind"], "agent")
-        self.assertGreaterEqual(len(manifest["tools"]), 2)
-        for entry in manifest["tools"]:
-            self.assertIsInstance(entry["name"], str)
-            self.assertIsInstance(entry["version"], str)
+    def test_app_uses_published_devwork_copilot_agent(self) -> None:
+        source = (ROOT / "app" / "tooling.py").read_text(encoding="utf-8")
+        self.assertEqual(AGENT_SPEC, "@zack/devwork-copilot@0.1.0")
+        self.assertIn('load_agent(AGENT_SPEC)', source)
+        self.assertIn('loaded_agent.get("resolvedTools", [])', source)
+
+    def test_app_no_longer_requires_local_agent_manifest(self) -> None:
+        self.assertFalse((ROOT / "agent.json").exists())
 
     def test_build_args_model_marks_non_required_fields_optional(self) -> None:
         schema = {

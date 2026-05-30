@@ -1,7 +1,13 @@
 {
-  "generated": "2026-05-25T00:00:00Z",
+  "generated": "2026-05-30T02:45:54.066445Z",
   "lockfile_version": 2,
   "packages": {
+    "agent:@zack/devwork-copilot@0.1.0": {
+      "integrity": "7ce9509a6c675bb09b27d359f5ffa87f4ad93e57256834e85eda40b7d516039d",
+      "kind": "agent",
+      "name": "@zack/devwork-copilot",
+      "version": "0.1.0"
+    },
     "tool:@zack/github-issues@0.1.1": {
       "integrity": "b04c929385df7ceb78ab459f9c2104006f286d57f372fc1afa8ec77db00e8935",
       "kind": "tool",
@@ -16,8 +22,7 @@
     }
   },
   "roots": {
-    "local:agent": {
-      "name": "devwork-copilot",
+    "agent:@zack/devwork-copilot@0.1.0": {
       "reserved": {
         "knowledge": [],
         "memory": [],
@@ -27,8 +32,7 @@
       "tools": [
         "tool:@zack/github-issues@0.1.1",
         "tool:@zack/summarize-text@0.1.8"
-      ],
-      "version": "0.1.0"
+      ]
     }
   }
 }

@@ -1,7 +1,13 @@
 {
-  "generated": "2026-05-25T00:00:00Z",
+  "generated": "2026-05-30T02:21:30.641009Z",
   "lockfile_version": 2,
   "packages": {
+    "agent:@zack/ops-console@0.1.0": {
+      "integrity": "71b72a59c11d5d40e5c069c7a46520bf88bfa74e95869f569b0e0604a5723490",
+      "kind": "agent",
+      "name": "@zack/ops-console",
+      "version": "0.1.0"
+    },
     "tool:@zack/csv-query@0.1.4": {
       "integrity": "908e9f963a91d7ce24d61f6c7c5e339d36a658f2c7e806589cfbc01b45f760c2",
       "kind": "tool",
@@ -28,8 +34,7 @@
     }
   },
   "roots": {
-    "local:agent": {
-      "name": "ops-console",
+    "agent:@zack/ops-console@0.1.0": {
       "reserved": {
         "knowledge": [],
         "memory": [],
@@ -41,8 +46,7 @@
         "tool:@zack/slack-post-message@0.1.1",
         "tool:@zack/csv-query@0.1.4",
         "tool:@zack/json-transform@0.1.0"
-      ],
-      "version": "0.1.0"
+      ]
     }
   }
 }

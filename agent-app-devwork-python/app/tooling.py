@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
 from typing import Any
 
-from agentpm import load
+from agentpm import load, load_agent
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
+AGENT_SPEC = "@zack/devwork-copilot@0.1.0"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -21,16 +21,8 @@ def collect_string_env() -> dict[str, str]:
     }
 
 
-def read_agent_manifest() -> dict[str, Any]:
-    manifest_path = Path.cwd() / "agent.json"
-    return json.loads(manifest_path.read_text(encoding="utf-8"))
-
-
-def _spec_from_entry(entry: str | dict[str, Any]) -> str:
-    if isinstance(entry, str):
-        return entry
-    version = entry.get("version")
-    return entry["name"] if not version else f'{entry["name"]}@{version}'
+def _spec_from_resolved_tool(entry: dict[str, Any]) -> str:
+    return f'{entry["name"]}@{entry["version"]}'
 
 
 def _schema_type_to_python(prop: dict[str, Any]) -> tuple[Any, Field]:
@@ -103,14 +95,14 @@ def _rich_description(meta: dict[str, Any]) -> str:
     return description
 
 
-def load_langchain_tools() -> tuple[list[StructuredTool], list[dict[str, Any]]]:
-    manifest = read_agent_manifest()
+def load_langchain_tools() -> tuple[dict[str, Any], list[StructuredTool], list[dict[str, Any]]]:
+    loaded_agent = load_agent(AGENT_SPEC)
     loaded_tools: list[StructuredTool] = []
     metas: list[dict[str, Any]] = []
     env = collect_string_env()
 
-    for entry in manifest.get("tools", []):
-        spec = _spec_from_entry(entry)
+    for entry in loaded_agent.get("resolvedTools", []):
+        spec = _spec_from_resolved_tool(entry)
         loaded = load(spec, with_meta=True, env=env)
         func = loaded["func"]
         meta = loaded["meta"]
@@ -139,4 +131,4 @@ def load_langchain_tools() -> tuple[list[StructuredTool], list[dict[str, Any]]]:
         loaded_tools.append(tool)
         metas.append(meta)
 
-    return loaded_tools, metas
+    return loaded_agent, loaded_tools, metas

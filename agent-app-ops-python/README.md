@@ -4,39 +4,42 @@ Interactive local ops console built on the AgentPM Python SDK and a LangChain to
 
 ## What it does
 
-This app loads the tool specs listed in its local `agent.json`, turns them into LangChain structured tools, and runs an interactive ops loop. It is intentionally local-only and not meant to represent a registry-installed agent package.
+This app installs the published `ops-console` agent package, loads it with the AgentPM Python SDK, and uses the tools resolved for that agent to run an interactive operations workflow.
 
-The app is designed to make framework-driven orchestration obvious:
+Published agent package:
 
-- it keeps running and accepts multiple prompts
-- LangChain decides which tools to call
-- it prints tool start events and arguments
-- it prints summarized tool outputs
-- it keeps chat history until you reset it
+- `@zack/ops-console@0.1.0`
+
+Package source:
+
+- [`agent-packages/ops-python`](https://github.com/agentpm-dev/agentpm-examples/tree/main/agent-packages/ops-python)
 
 ## Pattern
+
+This example shows a real app that:
+
+- installs a published agent package
+- loads that agent with `load_agent(...)`
+- reads the resolved tool refs from the agent
+- loads those tools with `load(...)`
+- runs an interactive operations workflow against real installed packages
 
 - orchestration style: LangChain-managed tools agent
 - runtime: Python
 - best for: showing a framework-managed agent loop over operational tools like GitHub, Slack, CSV, and JSON transforms
 
-## Tooling model
+## Expected agent install
 
-- tools are installed with `agentpm install` from this directory
-- tools are loaded dynamically from `agent.json`
-- the app uses the AgentPM Python SDK to invoke installed tools as functions
-- LangChain handles the tool-calling loop and final answer generation
+From this app directory, install the published agent package:
 
-## Tool set
+```bash
+agentpm install @zack/ops-console@0.1.0
+```
 
-The default `agent.json` is aimed at operational workflows:
+That should install:
 
-- `@zack/github-issues`
-- `@zack/slack-post-message`
-- `@zack/csv-query`
-- `@zack/json-transform`
-
-You can change the tool list in `agent.json` and rerun `agentpm install`.
+- the agent artifact under `.agentpm/agents/...`
+- the resolved tool artifacts under `.agentpm/tools/...`
 
 ## Setup
 
@@ -45,33 +48,6 @@ From this app directory:
 ```bash
 uv sync
 ```
-
-## Install and run
-
-From this app directory:
-
-```bash
-agentpm install
-cp .env.example .env.local
-uv run python -m dotenv -f .env.local run -- python -m app.main
-```
-
-## Install AgentPM tools
-
-From this app directory:
-
-```bash
-agentpm install
-```
-
-That installs the tool set defined in `agent.json` into the app-local `.agentpm/` directory.
-
-With the current install layout:
-
-- tool packages install under `.agentpm/tools/<namespace>/<name>/<version>/`
-- the local app manifest stays at `./agent.json`
-- the local manifest is **not** copied into `.agentpm/agents`
-- `agent.lock` is written in lockfile v2 format
 
 ## Environment
 
@@ -91,7 +67,7 @@ Set:
 ## Run in dev mode
 
 ```bash
-cd /Users/zackhine/projects/agentpm-project/agentpm-examples/agent-app-ops-python
+cd agent-app-ops-python
 uv run python -m dotenv -f .env.local run -- python -m app.main
 ```
 
@@ -102,7 +78,7 @@ This Python app does not have a separate build step. `uv sync` is the setup step
 ## Run tests
 
 ```bash
-cd /Users/zackhine/projects/agentpm-project/agentpm-examples/agent-app-ops-python
+cd agent-app-ops-python
 uv run python -m unittest discover -s tests -p 'test_*.py'
 ```
 

@@ -1,19 +1,20 @@
-import "dotenv/config";
-
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
+import dotenv from "dotenv";
 import OpenAI from "openai";
-import { load, type JsonValue, type ToolMeta } from "@agentpm/sdk";
+import { load, loadAgent, type JsonValue, type ResolvedAgentToolRef, type ToolMeta } from "@agentpm/sdk";
 
-type AgentToolSpec = string | { name: string; version?: string };
+const DOTENV_LOCAL_PATH = resolve(process.cwd(), ".env.local");
+const DOTENV_PATH = resolve(process.cwd(), ".env");
 
-type AgentManifest = {
-  name: string;
-  tools: AgentToolSpec[];
-};
+if (existsSync(DOTENV_LOCAL_PATH)) {
+  dotenv.config({ path: DOTENV_LOCAL_PATH });
+} else {
+  dotenv.config({ path: DOTENV_PATH });
+}
 
 type LoadedTool = {
   spec: string;
@@ -29,6 +30,7 @@ type ConversationMessage =
 const MAX_TOOL_RESULT_CHARS = 8000;
 const MAX_LOG_RESULT_CHARS = 1800;
 const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const AGENT_SPEC = "@zack/research-console@0.1.1";
 
 function collectStringEnv(): Record<string, string> {
   return Object.fromEntries(
@@ -36,9 +38,7 @@ function collectStringEnv(): Record<string, string> {
   );
 }
 
-function specFromEntry(entry: AgentToolSpec): string {
-  if (typeof entry === "string") return entry;
-  if (!entry.version) return entry.name;
+function specFromResolvedTool(entry: ResolvedAgentToolRef): string {
   return `${entry.name}@${entry.version}`;
 }
 
@@ -70,6 +70,7 @@ function stringifyForModel(value: unknown, maxChars = MAX_TOOL_RESULT_CHARS): st
 
 function printBanner(manifestName: string, tools: LoadedTool[]) {
   console.log(`\nResearch Console: ${manifestName}`);
+  console.log(`Agent package: ${AGENT_SPEC}`);
   console.log(`Model: ${MODEL}`);
   console.log(`Loaded tools: ${tools.length}`);
   for (const tool of tools) {
@@ -78,18 +79,13 @@ function printBanner(manifestName: string, tools: LoadedTool[]) {
   console.log("\nCommands: /help /tools /reset /quit\n");
 }
 
-async function readAgentManifest(): Promise<AgentManifest> {
-  const manifestPath = resolve(process.cwd(), "agent.json");
-  const raw = await readFile(manifestPath, "utf8");
-  return JSON.parse(raw) as AgentManifest;
-}
-
-async function loadToolsFromManifest(manifest: AgentManifest): Promise<LoadedTool[]> {
+async function loadToolsFromAgentSpec(agentSpec: string): Promise<{ manifestName: string; tools: LoadedTool[] }> {
   const env = collectStringEnv();
+  const agent = await loadAgent(agentSpec);
   const tools: LoadedTool[] = [];
 
-  for (const entry of manifest.tools) {
-    const spec = specFromEntry(entry);
+  for (const entry of agent.resolvedTools) {
+    const spec = specFromResolvedTool(entry);
     const loaded = await load(spec, { withMeta: true, env });
     tools.push({
       spec,
@@ -98,7 +94,10 @@ async function loadToolsFromManifest(manifest: AgentManifest): Promise<LoadedToo
     });
   }
 
-  return tools;
+  return {
+    manifestName: agent.manifest.name,
+    tools,
+  };
 }
 
 const SYSTEM_PROMPT = [
@@ -205,11 +204,10 @@ async function main() {
   }
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const manifest = await readAgentManifest();
-  const tools = await loadToolsFromManifest(manifest);
+  const { manifestName, tools } = await loadToolsFromAgentSpec(AGENT_SPEC);
   const history: ConversationMessage[] = [{ role: "system", content: SYSTEM_PROMPT }];
 
-  printBanner(manifest.name, tools);
+  printBanner(manifestName, tools);
 
   const rl = createInterface({ input, output });
   try {
@@ -223,7 +221,7 @@ async function main() {
         continue;
       }
       if (line === "/tools") {
-        printBanner(manifest.name, tools);
+        printBanner(manifestName, tools);
         continue;
       }
       if (line === "/reset") {

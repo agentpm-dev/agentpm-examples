@@ -12,13 +12,10 @@ A mono-repo of concrete examples showing how to:
 - Publish them to **AgentPM** with an `agent.json` manifest,
 - Load and run them from **agent apps** using several different orchestration styles.
 
-The current examples repo is centered on **manifest-driven local agent apps**:
+The current examples repo now shows both sides of the agent workflow:
 
-- each app keeps a local `agent.json`
-- `agentpm install` resolves that manifest into `.agentpm/tools`
-- the app loads tools from the SDK
-
-Published agent packages are documented in the public docs and tracked for a follow-up examples update, but this repo does not yet ship a released installed-agent app example.
+- `agent-packages/*` contains the publishable source manifests for example agents
+- the newer `agent-app-*` directories show real apps that install those published agent packages and consume them through the SDKs
 
 Each tool is intentionally simple to highlight integration, not performance.
 
@@ -46,6 +43,11 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-app-python`](agent-app-python/)
     - [`agent-app-node`](agent-app-node/)
 
+- **Agent packages**
+    - [`agent-packages/research-node`](agent-packages/research-node/)
+    - [`agent-packages/ops-python`](agent-packages/ops-python/)
+    - [`agent-packages/devwork-python`](agent-packages/devwork-python/)
+
 - **Skill workflow example**
     - [`skill-workflow-slack-post-message`](skill-workflow-slack-post-message/)
 
@@ -55,12 +57,15 @@ The current recommended agent examples in this repo are:
 
 - `agent-app-research-node`
   - Manual OpenAI tool calling loop
+  - Consumes the published `@zack/research-console` agent package
   - Best for learning the core mechanics of tool-calling agents
 - `agent-app-ops-python`
   - LangChain-managed tools agent
+  - Consumes the published `@zack/ops-console` agent package
   - Best for showing a higher-level framework loop over installed AgentPM tools
 - `agent-app-devwork-python`
   - LangGraph workflow with explicit approval gating
+  - Consumes the published `@zack/devwork-copilot` agent package
   - Best for showing stateful workflows and safe write actions
 
 The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the three apps above are the clearest current patterns.
@@ -113,20 +118,15 @@ That is the main interoperability idea behind this repo:
 
 This repo currently demonstrates:
 
-- **manifest-driven install**
-  - local `agent.json`
-  - `agentpm install`
-  - tools land in `.agentpm/tools/...`
-  - local manifest is not copied into `.agentpm/agents`
-
-The public docs also describe:
-
-- **direct package install**
+- **direct package install for agent apps**
   - `agentpm install @namespace/agent-name@version`
-  - registry agent lands in `.agentpm/agents/...`
+  - the published agent lands in `.agentpm/agents/...`
   - resolved tools land in `.agentpm/tools/...`
+  - the app loads the installed agent with the SDK and then loads its resolved tools
 
-That second workflow is intentionally tracked separately for a later examples update once the released CLI/SDK versions are available together.
+- **manifest/package authoring**
+  - `agent-packages/*` contains the source manifests used to publish the example agents
+  - tool examples continue to show direct manifest authoring and publishing with `agent.json`
 
 ### Quick workspace setup
 ```bash
@@ -184,7 +184,7 @@ cd tools-python/table-extract && python -m unittest discover -s tests -p 'test_*
 ### Running the current agent apps
 
 ```bash
-cd agent-app-research-node && agentpm install && pnpm dev
-cd agent-app-ops-python && agentpm install && uv run python -m dotenv -f .env.local run -- python -m app.main
-cd agent-app-devwork-python && agentpm install && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd agent-app-research-node && agentpm install @zack/research-console@0.1.1 && pnpm dev
+cd agent-app-ops-python && agentpm install @zack/ops-console@0.1.0 && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.0 && uv run python -m dotenv -f .env.local run -- python -m app.main
 ```

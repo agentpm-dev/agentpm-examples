@@ -4,12 +4,13 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from app.callbacks import DevworkVerboseHandler
 from app.settings import OPENAI_API_KEY, OPENAI_MODEL
-from app.tooling import load_langchain_tools, read_agent_manifest
+from app.tooling import AGENT_SPEC, load_langchain_tools
 from app.workflow import DevworkState, build_graph
 
 
 def print_banner(manifest_name: str, metas: list[dict]) -> None:
     print(f"\nDevwork Copilot: {manifest_name}")
+    print(f"Agent package: {AGENT_SPEC}")
     print(f"Model: {OPENAI_MODEL}")
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
@@ -41,12 +42,11 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    manifest = read_agent_manifest()
-    tools, metas = load_langchain_tools()
+    loaded_agent, tools, metas = load_langchain_tools()
     graph = build_graph(tools)
     state: DevworkState = {"messages": [], "pending_tool_calls": None}
 
-    print_banner(manifest["name"], metas)
+    print_banner(loaded_agent["manifest"]["name"], metas)
 
     while True:
         try:
@@ -63,7 +63,7 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(manifest["name"], metas)
+            print_banner(loaded_agent["manifest"]["name"], metas)
             continue
         if line == "/reset":
             state = {"messages": [], "pending_tool_calls": None}
