@@ -2,19 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { access } from "node:fs/promises";
 
-test("agent manifest references tools with versions", async () => {
-  const raw = await readFile(resolve(process.cwd(), "agent.json"), "utf8");
-  const manifest = JSON.parse(raw);
-  assert.equal(manifest.kind, "agent");
-  assert.ok(Array.isArray(manifest.tools));
-  assert.ok(manifest.tools.length >= 4);
-  for (const entry of manifest.tools) {
-    if (typeof entry === "string") {
-      assert.match(entry, /@.+@.+/);
-    } else {
-      assert.equal(typeof entry.name, "string");
-      assert.equal(typeof entry.version, "string");
-    }
-  }
+test("research app uses the published research-console agent package", async () => {
+  const source = await readFile(resolve(process.cwd(), "src/main.ts"), "utf8");
+  assert.match(source, /const AGENT_SPEC = "@zack\/research-console@0\.1\.1"/);
+  assert.match(source, /loadAgent\(agentSpec\)/);
+  assert.match(source, /agent\.resolvedTools/);
+  assert.match(source, /load\(spec, \{ withMeta: true, env \}\)/);
+});
+
+test("research app no longer expects a local agent.json", async () => {
+  await assert.rejects(() => access(resolve(process.cwd(), "agent.json")));
 });

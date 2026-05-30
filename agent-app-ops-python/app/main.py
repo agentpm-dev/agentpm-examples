@@ -6,11 +6,12 @@ from langchain_openai import ChatOpenAI
 
 from app.callbacks import OpsVerboseHandler
 from app.settings import OPENAI_API_KEY, OPENAI_MODEL
-from app.tooling import load_langchain_tools, read_agent_manifest
+from app.tooling import AGENT_SPEC, load_langchain_tools
 
 
 def print_banner(manifest_name: str, metas: list[dict]) -> None:
     print(f"\nOps Console: {manifest_name}")
+    print(f"Agent package: {AGENT_SPEC}")
     print(f"Model: {OPENAI_MODEL}")
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
@@ -27,7 +28,7 @@ def print_help() -> None:
 
 
 def build_agent():
-    tools, metas = load_langchain_tools()
+    loaded_agent, tools, metas = load_langchain_tools()
     system_prompt = (
         "You are a pragmatic operations assistant running inside a local AgentPM example app. "
         "Use tools when they materially improve the answer. "
@@ -42,7 +43,7 @@ def build_agent():
         tools=tools,
         system_prompt=system_prompt,
     )
-    return agent, metas
+    return loaded_agent, agent, metas
 
 
 def extract_final_text(result: dict) -> str:
@@ -64,11 +65,10 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    manifest = read_agent_manifest()
-    agent, metas = build_agent()
+    loaded_agent, agent, metas = build_agent()
     history: list[BaseMessage] = []
 
-    print_banner(manifest["name"], metas)
+    print_banner(loaded_agent["manifest"]["name"], metas)
 
     while True:
         try:
@@ -85,7 +85,7 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(manifest["name"], metas)
+            print_banner(loaded_agent["manifest"]["name"], metas)
             continue
         if line == "/reset":
             history.clear()

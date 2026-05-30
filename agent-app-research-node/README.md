@@ -4,41 +4,42 @@ Interactive local research console built on the AgentPM Node SDK.
 
 ## What it does
 
-This app loads the published tool specs listed in its local `agent.json`, turns them into callable tool definitions, and runs an interactive research loop. It is intentionally local-only and not meant to represent what a published AgentPM agent will look like.
+This app installs the published `research-console` agent package, loads it with the AgentPM Node SDK, and uses the tools resolved for that agent to run an interactive research workflow.
 
-The app is designed to make tool orchestration obvious:
+Published agent package:
 
-- it keeps running and accepts multiple prompts
-- it shows which tools the model picked
-- it prints tool arguments before each call
-- it prints a summarized view of each tool result
+- `@zack/research-console@0.1.1`
+
+Package source:
+
+- [`agent-packages/research-node`](https://github.com/agentpm-dev/agentpm-examples/tree/main/agent-packages/research-node)
 
 ## Pattern
+
+This example shows a real app that:
+
+- installs a published agent package
+- loads that agent with `loadAgent(...)`
+- reads the resolved tool refs from the agent
+- loads those tools with `load(...)`
+- runs an interactive research workflow against real installed packages
 
 - orchestration style: manual OpenAI tool-calling loop
 - runtime: Node
 - best for: learning the core tool-calling mechanics without much framework abstraction
 
-## Tooling model
+## Expected agent install
 
-- tools are installed with `agentpm install` from this directory
-- tools are loaded dynamically from `agent.json`
-- the app uses the AgentPM Node SDK to invoke installed tools as functions
-- the orchestration loop uses the OpenAI API directly for function/tool calling
+From this app directory, install the published agent package:
 
-## Tool set
+```bash
+agentpm install @zack/research-console@0.1.1
+```
 
-The default `agent.json` is aimed at research workflows:
+That should install:
 
-- `@zack/web-page-extract`
-- `@zack/robots-aware-crawl`
-- `@zack/document-convert`
-- `@zack/table-extract`
-- `@zack/markdown-chunk`
-- `@zack/summarize-text`
-- `@zack/translate-text`
-
-You can change the tool list in `agent.json` and rerun `agentpm install`.
+- the agent artifact under `.agentpm/agents/...`
+- the resolved tool artifacts under `.agentpm/tools/...`
 
 ## Setup
 
@@ -53,26 +54,6 @@ Or from this app directory:
 ```bash
 pnpm install
 ```
-
-## Install and run
-
-From this app directory:
-
-```bash
-agentpm install
-cp .env.example .env.local
-pnpm dev
-```
-
-## Install AgentPM tools
-
-From this app directory:
-
-```bash
-agentpm install
-```
-
-That installs the tool set defined in `agent.json` into the app-local `.agentpm/` directory.
 
 ## Environment
 
@@ -90,14 +71,14 @@ Set:
 ## Run in dev mode
 
 ```bash
-cd /Users/zackhine/projects/agentpm-project/agentpm-examples/agent-app-research-node
+cd agent-app-research-node
 pnpm dev
 ```
 
 ## Build and run
 
 ```bash
-cd /Users/zackhine/projects/agentpm-project/agentpm-examples/agent-app-research-node
+cd agent-app-research-node
 pnpm build
 pnpm start
 ```
@@ -122,4 +103,3 @@ pnpm start
 - This app is intentionally simple and sturdy, not framework-heavy.
 - It keeps conversational history across prompts until you run `/reset`.
 - Tool results are truncated in the model context and in logs so the terminal stays readable.
-- If you want the clearest example of how AgentPM tools map into raw model tool calls, start here.

@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "research-console",
-  "version": "0.1.0",
-  "description": "Interactive local research console that loads AgentPM-installed tools and uses them through the Node SDK.",
+  "version": "0.1.1",
+  "description": "Research assistant for crawling public sources, extracting structured content, and producing concise summaries.",
   "tools": [
     {
       "name": "@zack/web-page-extract",
@@ -33,5 +33,19 @@
       "name": "@zack/translate-text",
       "version": "0.1.4"
     }
-  ]
+  ],
+  "examples": [
+    {
+      "title": "Summarize a webpage",
+      "prompt": "Fetch a public article, extract the main content, and return a concise summary with key takeaways."
+    },
+    {
+      "title": "Research a source set",
+      "prompt": "Crawl a small set of public pages, convert useful documents, extract tables where relevant, and produce a structured research brief."
+    }
+  ],
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
 }
