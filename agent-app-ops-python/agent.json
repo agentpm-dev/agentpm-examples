@@ -1,0 +1,16 @@
+{
+  "description": "Generated from triage-worker-python@0.1.0.",
+  "kind": "agent",
+  "knowledge": [],
+  "memory": [],
+  "name": "agent-app-ops-python",
+  "profiles": [],
+  "skills": [],
+  "tools": [
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    }
+  ],
+  "version": "0.1.0"
+}

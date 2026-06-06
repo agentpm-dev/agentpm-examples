@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "triage-worker-python",
+  "version": "0.1.0",
+  "description": "Python SDK starter for a local triage worker that combines a published AgentPM agent with one extra direct tool.",
+  "template": {
+    "display_name": "Python Triage Worker",
+    "use_case": "team-ops",
+    "execution_surfaces": [
+      "python-sdk"
+    ],
+    "stack": [
+      "python"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "triage-worker"
+      },
+      {
+        "name": "worker_label",
+        "description": "Human-readable label used in the generated README and terminal banner.",
+        "required": true
+      },
+      {
+        "name": "team_name",
+        "description": "Team name referenced in the generated README, prompts, and system instructions.",
+        "required": true,
+        "default": "Operations"
+      },
+      {
+        "name": "input_path",
+        "description": "Default local incident fixture path referenced in the generated README and runtime prompt examples.",
+        "required": true,
+        "default": "fixtures/incidents.csv"
+      }
+    ],
+    "dependencies": {
+      "tools": [
+        {
+          "name": "@zack/summarize-text",
+          "version": "0.1.8"
+        }
+      ],
+      "agents": [
+        {
+          "name": "@zack/ops-console",
+          "version": "0.1.0"
+        }
+      ]
+    },
+    "entrypoints": [
+      {
+        "label": "Install Python dependencies",
+        "command": "uv sync"
+      },
+      {
+        "label": "Create local env file",
+        "command": "cp .env.example .env.local"
+      },
+      {
+        "label": "Run the triage worker",
+        "command": "uv run python -m dotenv -f .env.local run -- python -m app.main"
+      },
+      {
+        "label": "Run the scaffold tests",
+        "command": "uv run python -m unittest discover -s tests -p 'test_*.py'"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

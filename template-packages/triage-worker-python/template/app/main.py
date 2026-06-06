@@ -9,9 +9,9 @@ from app.settings import OPENAI_API_KEY, OPENAI_MODEL
 from app.tooling import AGENT_SPEC, load_langchain_tools
 
 
-WORKER_LABEL = "zack-worker"
-TEAM_NAME = "Operations"
-DEFAULT_INPUT_PATH = "fixtures/incidents.csv"
+WORKER_LABEL = "{{ worker_label }}"
+TEAM_NAME = "{{ team_name }}"
+DEFAULT_INPUT_PATH = "{{ input_path }}"
 FIXTURE_SCHEMA_HINT = (
     f"The CSV fixture at {DEFAULT_INPUT_PATH} uses exactly these columns: "
     "incident_id, service, severity, status, owner, opened_at, region, summary. "

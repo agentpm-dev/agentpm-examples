@@ -1,6 +1,6 @@
-# agent-app-ops-python
+# {{ project_name }}
 
-zack-worker is a local Python SDK triage console for the Operations team.
+{{ worker_label }} is a local Python SDK triage console for the {{ team_name }} team.
 
 It was generated from the published `@zack/triage-worker-python` workflow template and shows two AgentPM dependency paths in one app:
 
@@ -12,7 +12,7 @@ It was generated from the published `@zack/triage-worker-python` workflow templa
 This scaffold is designed around two progressively richer paths:
 
 - fixture-first triage:
-  - start with the bundled local incident file at `fixtures/incidents.csv`
+  - start with the bundled local incident file at `{{ input_path }}`
   - verify the worker can summarize, prioritize, and draft updates without any external credentials
 - GitHub and Slack follow-on:
   - once `GITHUB_TOKEN` and optionally `SLACK_BOT_TOKEN` are set, ask the same worker to compare the local incident picture with live GitHub issues or draft/send Slack-ready updates
@@ -31,7 +31,6 @@ This app:
 ## Setup
 
 ```bash
-agentpm install
 uv sync
 cp .env.example .env.local
 ```
@@ -49,14 +48,12 @@ Set:
 uv run python -m dotenv -f .env.local run -- python -m app.main
 ```
 
-`agentpm install` restores the published agent root and direct tool dependency into `.agentpm/` from the checked-in `agent.json`, `agent.lock`, and `agentpm.workspace.json`.
-
 ## Fixture-first workflow
 
 This scaffold includes a local incident fixture at:
 
 ```text
-fixtures/incidents.csv
+{{ input_path }}
 ```
 
 That gives you a low-friction path to try the worker before you wire it to live systems.
@@ -80,17 +77,16 @@ When using `csv-query` against this fixture:
 
 ## Example prompts
 
-- `Look at fixtures/incidents.csv, identify the highest-severity open incidents, and give me a short Operations triage summary.`
-- `Use the local incidents fixture at fixtures/incidents.csv, draft a calm status update for the Operations team, and do not send it anywhere yet.`
-- `Summarize the main operational risks in fixtures/incidents.csv and tell me which follow-up items should happen first.`
-- `Using the columns incident_id, severity, status, opened_at, and summary from fixtures/incidents.csv, summarize the most urgent open incidents.`
-- `If GitHub credentials are available, list open issues in agentpm-dev/agentpm-examples and compare them to the incidents in fixtures/incidents.csv.`
-- `If GitHub credentials are available, compare the incidents in fixtures/incidents.csv to open repo issues and tell me what looks under-reported.`
-- `If Slack credentials are available, draft a Slack update from the incidents in fixtures/incidents.csv but do not send it yet.`
+- `Look at {{ input_path }}, identify the highest-severity open incidents, and give me a short {{ team_name }} triage summary.`
+- `Use the local incidents fixture at {{ input_path }}, draft a calm status update for the {{ team_name }} team, and do not send it anywhere yet.`
+- `Summarize the main operational risks in {{ input_path }} and tell me which follow-up items should happen first.`
+- `Using the columns incident_id, severity, status, opened_at, and summary from {{ input_path }}, summarize the most urgent open incidents.`
+- `If GitHub credentials are available, list open issues in agentpm-dev/agentpm-examples and compare them to the incidents in {{ input_path }}.`
+- `If GitHub credentials are available, compare the incidents in {{ input_path }} to open repo issues and tell me what looks under-reported.`
+- `If Slack credentials are available, draft a Slack update from the incidents in {{ input_path }} but do not send it yet.`
 
 ## Tests
 
 ```bash
-agentpm install
 uv run python -m unittest discover -s tests -p 'test_*.py'
 ```

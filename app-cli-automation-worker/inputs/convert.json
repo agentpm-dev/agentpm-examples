@@ -1,0 +1,5 @@
+{
+  "path": "sample-inputs/daily-notes.md",
+  "to_format": "markdown",
+  "extract_metadata": true
+}

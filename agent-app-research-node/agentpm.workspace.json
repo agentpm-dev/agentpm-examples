@@ -1,0 +1,10 @@
+{
+  "manifests": [
+    "agent.json"
+  ],
+  "package_roots": {
+    "agents": [],
+    "tools": []
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,40 @@
+{
+  "description": "Generated from research-assistant-node@0.1.0.",
+  "kind": "agent",
+  "knowledge": [],
+  "memory": [],
+  "name": "agent-app-research-node",
+  "profiles": [],
+  "skills": [],
+  "tools": [
+    {
+      "name": "@zack/web-page-extract",
+      "version": "0.1.2"
+    },
+    {
+      "name": "@zack/robots-aware-crawl",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/document-convert",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/table-extract",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/markdown-chunk",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    },
+    {
+      "name": "@zack/translate-text",
+      "version": "0.1.4"
+    }
+  ],
+  "version": "0.1.0"
+}

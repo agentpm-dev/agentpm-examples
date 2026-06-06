@@ -15,7 +15,8 @@ A mono-repo of concrete examples showing how to:
 The current examples repo now shows both sides of the agent workflow:
 
 - `agent-packages/*` contains the publishable source manifests for example agents
-- the newer `agent-app-*` directories show real apps that install those published agent packages and consume them through the SDKs
+- `template-packages/*` contains the publishable source manifests for official workflow templates
+- the newer `agent-app-*` directories show real apps that either install published agent packages or are generated from published workflow templates and then consumed through the SDKs
 
 Each tool is intentionally simple to highlight integration, not performance.
 
@@ -40,6 +41,7 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-app-research-node`](agent-app-research-node/)
     - [`agent-app-ops-python`](agent-app-ops-python/)
     - [`agent-app-devwork-python`](agent-app-devwork-python/)
+    - [`app-cli-automation-worker`](app-cli-automation-worker/)
     - [`agent-app-python`](agent-app-python/)
     - [`agent-app-node`](agent-app-node/)
 
@@ -47,6 +49,11 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-packages/research-node`](agent-packages/research-node/)
     - [`agent-packages/ops-python`](agent-packages/ops-python/)
     - [`agent-packages/devwork-python`](agent-packages/devwork-python/)
+
+- **Workflow templates**
+    - [`template-packages/research-assistant-node`](template-packages/research-assistant-node/)
+    - [`template-packages/triage-worker-python`](template-packages/triage-worker-python/)
+    - [`template-packages/cli-automation-worker`](template-packages/cli-automation-worker/)
 
 - **Skill workflow example**
     - [`skill-workflow-slack-post-message`](skill-workflow-slack-post-message/)
@@ -57,18 +64,22 @@ The current recommended agent examples in this repo are:
 
 - `agent-app-research-node`
   - Manual OpenAI tool calling loop
-  - Consumes the published `@zack/research-console` agent package
-  - Best for learning the core mechanics of tool-calling agents
+  - Generated from the published `@zack/research-assistant-node` workflow template
+  - Best for learning the core mechanics of tool-calling agents in a generated local app
 - `agent-app-ops-python`
   - LangChain-managed tools agent
-  - Consumes the published `@zack/ops-console` agent package
-  - Best for showing a higher-level framework loop over installed AgentPM tools
+  - Generated from the published `@zack/triage-worker-python` workflow template
+  - Best for showing a Python template-generated app that mixes a published agent root with one direct local-manifest tool
 - `agent-app-devwork-python`
   - LangGraph workflow with explicit approval gating
   - Consumes the published `@zack/devwork-copilot` agent package
   - Best for showing stateful workflows and safe write actions
+- `app-cli-automation-worker`
+  - Shell-first `agentpm run` workflow
+  - Generated from the published `@zack/cli-automation-worker` workflow template
+  - Best for showing file-based CLI automation without writing SDK code
 
-The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the three apps above are the clearest current patterns.
+The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the four apps above are the clearest current patterns.
 
 ### Example groups
 
@@ -124,8 +135,14 @@ This repo currently demonstrates:
   - resolved tools land in `.agentpm/tools/...`
   - the app loads the installed agent with the SDK and then loads its resolved tools
 
+- **template-generated app bootstrap**
+  - `agentpm new @namespace/template-name target-dir`
+  - the generated app receives a root `agent.json`, `agent.lock`, `agentpm.workspace.json`, and `.agentpm/template.json`
+  - the app then loads the installed tools declared in the generated local manifest
+
 - **manifest/package authoring**
   - `agent-packages/*` contains the source manifests used to publish the example agents
+  - `template-packages/*` contains the source manifests used to publish official workflow templates
   - tool examples continue to show direct manifest authoring and publishing with `agent.json`
 
 ### Quick workspace setup
@@ -184,7 +201,8 @@ cd tools-python/table-extract && python -m unittest discover -s tests -p 'test_*
 ### Running the current agent apps
 
 ```bash
-cd agent-app-research-node && agentpm install @zack/research-console@0.1.1 && pnpm dev
-cd agent-app-ops-python && agentpm install @zack/ops-console@0.1.0 && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd agent-app-research-node && pnpm dev
+cd agent-app-ops-python && agentpm install && uv sync && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.0 && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd app-cli-automation-worker && cp .env.example .env.local && agentpm install && bash scripts/run-daily-brief.sh
 ```
