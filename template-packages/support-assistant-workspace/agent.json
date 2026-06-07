@@ -1,0 +1,73 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "support-assistant-workspace",
+  "version": "0.1.0",
+  "description": "Multi-agent workspace starter that combines one published agent root with local generated agent manifests.",
+  "template": {
+    "display_name": "Support Assistant Workspace",
+    "use_case": "internal-support",
+    "execution_surfaces": [
+      "python-sdk"
+    ],
+    "stack": [
+      "python"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "support-assistant-workspace"
+      },
+      {
+        "name": "workspace_label",
+        "description": "Human-readable label used in the generated README and code comments.",
+        "required": true
+      },
+      {
+        "name": "sample_thread_path",
+        "description": "Default local support thread used in the generated workspace example.",
+        "required": true,
+        "default": "sample-inputs/support-thread.md"
+      }
+    ],
+    "dependencies": {
+      "tools": [
+        {
+          "name": "@zack/summarize-text",
+          "version": "0.1.8"
+        }
+      ],
+      "agents": [
+        {
+          "name": "@zack/ops-console",
+          "version": "0.1.0"
+        }
+      ]
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.example .env.local"
+      },
+      {
+        "label": "Install Python app dependencies",
+        "command": "uv sync"
+      },
+      {
+        "label": "Run the workspace example",
+        "command": "uv run python app/main.py"
+      },
+      {
+        "label": "Review workspace topology",
+        "command": "cat agentpm.workspace.json"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

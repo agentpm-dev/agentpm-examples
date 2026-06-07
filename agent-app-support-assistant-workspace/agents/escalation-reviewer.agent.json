@@ -1,0 +1,16 @@
+{
+  "kind": "agent",
+  "name": "escalation-reviewer",
+  "version": "0.1.0",
+  "description": "Local generated agent for escalation review in zack-workspace.",
+  "tools": [
+    {
+      "name": "@zack/sentiment-analysis",
+      "version": "0.1.5"
+    }
+  ],
+  "skills": [],
+  "knowledge": [],
+  "memory": [],
+  "profiles": []
+}

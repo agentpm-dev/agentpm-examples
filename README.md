@@ -40,6 +40,7 @@ Each tool is intentionally simple to highlight integration, not performance.
 - **Agents**
     - [`agent-app-research-node`](agent-app-research-node/)
     - [`agent-app-ops-python`](agent-app-ops-python/)
+    - [`agent-app-support-assistant-workspace`](agent-app-support-assistant-workspace/)
     - [`agent-app-devwork-python`](agent-app-devwork-python/)
     - [`app-cli-automation-worker`](app-cli-automation-worker/)
     - [`app-mcp-tool-server`](app-mcp-tool-server/)
@@ -56,6 +57,7 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`template-packages/triage-worker-python`](template-packages/triage-worker-python/)
     - [`template-packages/cli-automation-worker`](template-packages/cli-automation-worker/)
     - [`template-packages/mcp-tool-server`](template-packages/mcp-tool-server/)
+    - [`template-packages/support-assistant-workspace`](template-packages/support-assistant-workspace/)
 
 - **Skill workflow example**
     - [`skill-workflow-slack-post-message`](skill-workflow-slack-post-message/)
@@ -72,6 +74,10 @@ The current recommended agent examples in this repo are:
   - LangChain-managed tools agent
   - Generated from the published `@zack/triage-worker-python` workflow template
   - Best for showing a Python template-generated app that mixes a published agent root with one direct local-manifest tool
+- `agent-app-support-assistant-workspace`
+  - Multi-manifest Python workspace
+  - Generated from the published `@zack/support-assistant-workspace` workflow template
+  - Best for showing the real AgentPM workspace shape with one published agent root plus local generated `agents/*.agent.json`
 - `agent-app-devwork-python`
   - LangGraph workflow with explicit approval gating
   - Consumes the published `@zack/devwork-copilot` agent package
@@ -85,7 +91,7 @@ The current recommended agent examples in this repo are:
   - Generated from the published `@zack/mcp-tool-server` workflow template
   - Best for showing how AgentPM can expose a curated pinned tool set over MCP without extra app code
 
-The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the five apps above are the clearest current patterns.
+The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the six apps above are the clearest current patterns.
 
 ### Example groups
 
@@ -209,6 +215,7 @@ cd tools-python/table-extract && python -m unittest discover -s tests -p 'test_*
 ```bash
 cd agent-app-research-node && pnpm dev
 cd agent-app-ops-python && agentpm install && uv sync && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd agent-app-support-assistant-workspace && cp .env.example .env.local && agentpm install && uv sync && uv run python app/main.py
 cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.0 && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd app-cli-automation-worker && cp .env.example .env.local && agentpm install && bash scripts/run-daily-brief.sh
 cd app-mcp-tool-server && cp .env.example .env.local && agentpm install && set -a && source .env.local && set +a && agentpm serve --mcp
