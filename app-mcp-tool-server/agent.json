@@ -1,0 +1,24 @@
+{
+  "description": "Generated from mcp-tool-server@0.1.0.",
+  "kind": "agent",
+  "knowledge": [],
+  "memory": [],
+  "name": "app-mcp-tool-server",
+  "profiles": [],
+  "skills": [],
+  "tools": [
+    {
+      "name": "@zack/document-convert",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    },
+    {
+      "name": "@zack/translate-text",
+      "version": "0.1.4"
+    }
+  ],
+  "version": "0.1.0"
+}

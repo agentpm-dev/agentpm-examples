@@ -42,6 +42,7 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-app-ops-python`](agent-app-ops-python/)
     - [`agent-app-devwork-python`](agent-app-devwork-python/)
     - [`app-cli-automation-worker`](app-cli-automation-worker/)
+    - [`app-mcp-tool-server`](app-mcp-tool-server/)
     - [`agent-app-python`](agent-app-python/)
     - [`agent-app-node`](agent-app-node/)
 
@@ -54,6 +55,7 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`template-packages/research-assistant-node`](template-packages/research-assistant-node/)
     - [`template-packages/triage-worker-python`](template-packages/triage-worker-python/)
     - [`template-packages/cli-automation-worker`](template-packages/cli-automation-worker/)
+    - [`template-packages/mcp-tool-server`](template-packages/mcp-tool-server/)
 
 - **Skill workflow example**
     - [`skill-workflow-slack-post-message`](skill-workflow-slack-post-message/)
@@ -78,8 +80,12 @@ The current recommended agent examples in this repo are:
   - Shell-first `agentpm run` workflow
   - Generated from the published `@zack/cli-automation-worker` workflow template
   - Best for showing file-based CLI automation without writing SDK code
+- `app-mcp-tool-server`
+  - Local HTTP MCP server
+  - Generated from the published `@zack/mcp-tool-server` workflow template
+  - Best for showing how AgentPM can expose a curated pinned tool set over MCP without extra app code
 
-The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the four apps above are the clearest current patterns.
+The older `agent-app-node` and `agent-app-python` directories are still present as earlier examples, but the five apps above are the clearest current patterns.
 
 ### Example groups
 
@@ -205,4 +211,5 @@ cd agent-app-research-node && pnpm dev
 cd agent-app-ops-python && agentpm install && uv sync && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.0 && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd app-cli-automation-worker && cp .env.example .env.local && agentpm install && bash scripts/run-daily-brief.sh
+cd app-mcp-tool-server && cp .env.example .env.local && agentpm install && set -a && source .env.local && set +a && agentpm serve --mcp
 ```
