@@ -1,0 +1,68 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "mcp-tool-server",
+  "version": "0.1.0",
+  "description": "Starter MCP tool server backed by a curated local AgentPM tool set.",
+  "template": {
+    "display_name": "MCP Tool Server",
+    "use_case": "mcp",
+    "execution_surfaces": [
+      "agentpm-serve-mcp"
+    ],
+    "stack": [
+      "mcp"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "mcp-tool-server"
+      },
+      {
+        "name": "server_label",
+        "description": "Human-readable label used in the generated README and sample MCP requests.",
+        "required": true
+      },
+      {
+        "name": "sample_doc_path",
+        "description": "Sample local document path used in the generated README tool-call examples.",
+        "required": true,
+        "default": "sample-inputs/hello.md"
+      }
+    ],
+    "dependencies": {
+      "tools": [
+        {
+          "name": "@zack/document-convert",
+          "version": "0.1.0"
+        },
+        {
+          "name": "@zack/summarize-text",
+          "version": "0.1.8"
+        },
+        {
+          "name": "@zack/translate-text",
+          "version": "0.1.4"
+        }
+      ],
+      "agents": []
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.example .env.local"
+      },
+      {
+        "label": "Start the MCP server",
+        "command": "agentpm serve --mcp"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

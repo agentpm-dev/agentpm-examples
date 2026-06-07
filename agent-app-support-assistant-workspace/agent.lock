@@ -1,0 +1,109 @@
+{
+  "generated": "2026-06-07T16:46:04.992763Z",
+  "lockfile_version": 2,
+  "packages": {
+    "agent:@zack/ops-console@0.1.0": {
+      "integrity": "71b72a59c11d5d40e5c069c7a46520bf88bfa74e95869f569b0e0604a5723490",
+      "kind": "agent",
+      "name": "@zack/ops-console",
+      "version": "0.1.0"
+    },
+    "tool:@zack/csv-query@0.1.4": {
+      "integrity": "908e9f963a91d7ce24d61f6c7c5e339d36a658f2c7e806589cfbc01b45f760c2",
+      "kind": "tool",
+      "name": "@zack/csv-query",
+      "version": "0.1.4"
+    },
+    "tool:@zack/github-issues@0.1.1": {
+      "integrity": "b04c929385df7ceb78ab459f9c2104006f286d57f372fc1afa8ec77db00e8935",
+      "kind": "tool",
+      "name": "@zack/github-issues",
+      "version": "0.1.1"
+    },
+    "tool:@zack/json-transform@0.1.0": {
+      "integrity": "d217cd3555aeea0f1b5baad3674b03a90d562f3bb2ce6ad0d57e08ea6265a76f",
+      "kind": "tool",
+      "name": "@zack/json-transform",
+      "version": "0.1.0"
+    },
+    "tool:@zack/sentiment-analysis@0.1.5": {
+      "integrity": "547740c9669705e243d1c46c634f8373d64fcad8e57619d697108291de020c76",
+      "kind": "tool",
+      "name": "@zack/sentiment-analysis",
+      "version": "0.1.5"
+    },
+    "tool:@zack/slack-post-message@0.1.1": {
+      "integrity": "b72d2c239da44b1e1dfd40b8a6a0a53f958d29ba26f55d9625e85e1652426991",
+      "kind": "tool",
+      "name": "@zack/slack-post-message",
+      "version": "0.1.1"
+    },
+    "tool:@zack/summarize-text@0.1.8": {
+      "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "kind": "tool",
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    },
+    "tool:@zack/translate-text@0.1.4": {
+      "integrity": "bf8fc61a0224f9a4b5af87c080fbebae936c23a54a4cde3b93f546c499bb0d0c",
+      "kind": "tool",
+      "name": "@zack/translate-text",
+      "version": "0.1.4"
+    }
+  },
+  "roots": {
+    "agent:@zack/ops-console@0.1.0": {
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/github-issues@0.1.1",
+        "tool:@zack/slack-post-message@0.1.1",
+        "tool:@zack/csv-query@0.1.4",
+        "tool:@zack/json-transform@0.1.0"
+      ]
+    },
+    "local:agent": {
+      "name": "agent-app-support-assistant-workspace",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/summarize-text@0.1.8"
+      ],
+      "version": "0.1.0"
+    },
+    "local:agent:agents/answer-drafter.agent.json": {
+      "name": "answer-drafter",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/translate-text@0.1.4"
+      ],
+      "version": "0.1.0"
+    },
+    "local:agent:agents/escalation-reviewer.agent.json": {
+      "name": "escalation-reviewer",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/sentiment-analysis@0.1.5"
+      ],
+      "version": "0.1.0"
+    }
+  }
+}

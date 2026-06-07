@@ -1,0 +1,20 @@
+{
+  "description": "Generated from cli-automation-worker@0.1.0.",
+  "kind": "agent",
+  "knowledge": [],
+  "memory": [],
+  "name": "app-cli-automation-worker",
+  "profiles": [],
+  "skills": [],
+  "tools": [
+    {
+      "name": "@zack/document-convert",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    }
+  ],
+  "version": "0.1.0"
+}

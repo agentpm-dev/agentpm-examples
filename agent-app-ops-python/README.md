@@ -1,59 +1,38 @@
 # agent-app-ops-python
 
-Interactive local ops console built on the AgentPM Python SDK and a LangChain tools agent.
+zack-worker is a local Python SDK triage console for the Operations team.
 
-## What it does
+It was generated from the published `@zack/triage-worker-python` workflow template and shows two AgentPM dependency paths in one app:
 
-This app installs the published `ops-console` agent package, loads it with the AgentPM Python SDK, and uses the tools resolved for that agent to run an interactive operations workflow.
+- a published agent package root recorded in `agentpm.workspace.json`
+- one extra direct tool declared in the generated root `agent.json`
 
-Published agent package:
+## How to use this app
 
-- `@zack/ops-console@0.1.0`
+This scaffold is designed around two progressively richer paths:
 
-Package source:
+- fixture-first triage:
+  - start with the bundled local incident file at `fixtures/incidents.csv`
+  - verify the worker can summarize, prioritize, and draft updates without any external credentials
+- GitHub and Slack follow-on:
+  - once `GITHUB_TOKEN` and optionally `SLACK_BOT_TOKEN` are set, ask the same worker to compare the local incident picture with live GitHub issues or draft/send Slack-ready updates
 
-- [`agent-packages/ops-python`](https://github.com/agentpm-dev/agentpm-examples/tree/main/agent-packages/ops-python)
+The code does not use separate hard-coded modes. It always loads the same installed tools and uses your prompt to decide whether to stay local or bring in live GitHub/Slack context.
 
-## Pattern
+## What this app does
 
-This example shows a real app that:
+This app:
 
-- installs a published agent package
-- loads that agent with `load_agent(...)`
-- reads the resolved tool refs from the agent
-- loads those tools with `load(...)`
-- runs an interactive operations workflow against real installed packages
-
-- orchestration style: LangChain-managed tools agent
-- runtime: Python
-- best for: showing a framework-managed agent loop over operational tools like GitHub, Slack, CSV, and JSON transforms
-
-## Expected agent install
-
-From this app directory, install the published agent package:
-
-```bash
-agentpm install @zack/ops-console@0.1.0
-```
-
-That should install:
-
-- the agent artifact under `.agentpm/agents/...`
-- the resolved tool artifacts under `.agentpm/tools/...`
+- loads the published `@zack/ops-console` agent package with the AgentPM Python SDK
+- reads the agent's resolved tools and loads them dynamically
+- separately loads the direct `@zack/summarize-text` tool from the generated local manifest
+- runs an interactive LangChain-managed triage loop over local incident data, GitHub issues, JSON transforms, and optional Slack updates
 
 ## Setup
 
-From this app directory:
-
 ```bash
+agentpm install
 uv sync
-```
-
-## Environment
-
-Create a local env file:
-
-```bash
 cp .env.example .env.local
 ```
 
@@ -61,44 +40,57 @@ Set:
 
 - `OPENAI_API_KEY`
 - optionally `OPENAI_MODEL`
-- `GITHUB_TOKEN` if you want the agent to read or update GitHub issues
-- `SLACK_BOT_TOKEN` if you want the agent to post or update Slack messages
+- optionally `GITHUB_TOKEN` if you want live GitHub issue access
+- optionally `SLACK_BOT_TOKEN` if you want to send Slack updates
 
-## Run in dev mode
+## Run
 
 ```bash
-cd agent-app-ops-python
 uv run python -m dotenv -f .env.local run -- python -m app.main
 ```
 
-## Build
+`agentpm install` restores the published agent root and direct tool dependency into `.agentpm/` from the checked-in `agent.json`, `agent.lock`, and `agentpm.workspace.json`.
 
-This Python app does not have a separate build step. `uv sync` is the setup step, and `uv run python -m dotenv -f .env.local run -- python -m app.main` runs the app directly.
+## Fixture-first workflow
 
-## Run tests
+This scaffold includes a local incident fixture at:
 
-```bash
-cd agent-app-ops-python
-uv run python -m unittest discover -s tests -p 'test_*.py'
+```text
+fixtures/incidents.csv
 ```
 
-## REPL commands
+That gives you a low-friction path to try the worker before you wire it to live systems.
 
-- `/help`: show commands
-- `/tools`: list loaded tools
-- `/reset`: clear conversation history
-- `/quit`: exit
+The fixture columns are:
+
+- `incident_id`
+- `service`
+- `severity`
+- `status`
+- `owner`
+- `opened_at`
+- `region`
+- `summary`
+
+When using `csv-query` against this fixture:
+
+- use those exact column names
+- use filter ops like `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, or `contains`
+- do not use symbolic operators like `=`
 
 ## Example prompts
 
-- `List the open issues in agentpm-dev/agentpm-examples and summarize the main themes.`
-- `Look at open issues in agentpm-dev/agentpm-examples, group them by label if possible, and draft a Slack update but do not send it yet.`
-- `Query ./fixtures/incidents.csv for rows with severity above 2, transform the result into a compact status payload, and show me the JSON.`
-- `Post this exact message to Slack channel C1234567890: "Daily triage complete. 4 issues need follow-up."`
+- `Look at fixtures/incidents.csv, identify the highest-severity open incidents, and give me a short Operations triage summary.`
+- `Use the local incidents fixture at fixtures/incidents.csv, draft a calm status update for the Operations team, and do not send it anywhere yet.`
+- `Summarize the main operational risks in fixtures/incidents.csv and tell me which follow-up items should happen first.`
+- `Using the columns incident_id, severity, status, opened_at, and summary from fixtures/incidents.csv, summarize the most urgent open incidents.`
+- `If GitHub credentials are available, list open issues in agentpm-dev/agentpm-examples and compare them to the incidents in fixtures/incidents.csv.`
+- `If GitHub credentials are available, compare the incidents in fixtures/incidents.csv to open repo issues and tell me what looks under-reported.`
+- `If Slack credentials are available, draft a Slack update from the incidents in fixtures/incidents.csv but do not send it yet.`
 
-## Notes
+## Tests
 
-- This app intentionally uses a framework-managed tool loop so it contrasts with the manual OpenAI tool-calls flow in `agent-app-research-node`.
-- The prompt tells the model not to write to Slack or GitHub unless the user clearly asked for it.
-- Tool results are truncated in logs so the terminal stays readable.
-- For file-based prompts, absolute paths are more reliable than relative paths because tools run as subprocesses.
+```bash
+agentpm install
+uv run python -m unittest discover -s tests -p 'test_*.py'
+```

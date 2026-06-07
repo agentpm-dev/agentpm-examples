@@ -1,0 +1,16 @@
+{
+  "kind": "agent",
+  "name": "answer-drafter",
+  "version": "0.1.0",
+  "description": "Local generated agent for drafting concise support responses in {{ workspace_label }}.",
+  "tools": [
+    {
+      "name": "@zack/translate-text",
+      "version": "0.1.4"
+    }
+  ],
+  "skills": [],
+  "knowledge": [],
+  "memory": [],
+  "profiles": []
+}

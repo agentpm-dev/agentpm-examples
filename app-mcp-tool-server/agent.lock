@@ -1,0 +1,41 @@
+{
+  "generated": "2026-06-07T01:11:15.985970Z",
+  "lockfile_version": 2,
+  "packages": {
+    "tool:@zack/document-convert@0.1.0": {
+      "integrity": "fccd8ba3dc971262fcf5f3fe06822c28d8db26810f374526bc5fe6be9f27ab0c",
+      "kind": "tool",
+      "name": "@zack/document-convert",
+      "version": "0.1.0"
+    },
+    "tool:@zack/summarize-text@0.1.8": {
+      "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
+      "kind": "tool",
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    },
+    "tool:@zack/translate-text@0.1.4": {
+      "integrity": "bf8fc61a0224f9a4b5af87c080fbebae936c23a54a4cde3b93f546c499bb0d0c",
+      "kind": "tool",
+      "name": "@zack/translate-text",
+      "version": "0.1.4"
+    }
+  },
+  "roots": {
+    "local:agent": {
+      "name": "app-mcp-tool-server",
+      "reserved": {
+        "knowledge": [],
+        "memory": [],
+        "profiles": [],
+        "skills": []
+      },
+      "tools": [
+        "tool:@zack/document-convert@0.1.0",
+        "tool:@zack/summarize-text@0.1.8",
+        "tool:@zack/translate-text@0.1.4"
+      ],
+      "version": "0.1.0"
+    }
+  }
+}

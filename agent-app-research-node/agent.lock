@@ -1,13 +1,7 @@
 {
-  "generated": "2026-05-30T02:04:20.559952Z",
+  "generated": "2026-06-06T17:12:50.648737Z",
   "lockfile_version": 2,
   "packages": {
-    "agent:@zack/research-console@0.1.1": {
-      "integrity": "114935516bbddaa5f4e9b2295728ccea8b635c0d47c32d706c57d7898daf67dd",
-      "kind": "agent",
-      "name": "@zack/research-console",
-      "version": "0.1.1"
-    },
     "tool:@zack/document-convert@0.1.0": {
       "integrity": "fccd8ba3dc971262fcf5f3fe06822c28d8db26810f374526bc5fe6be9f27ab0c",
       "kind": "tool",
@@ -52,7 +46,8 @@
     }
   },
   "roots": {
-    "agent:@zack/research-console@0.1.1": {
+    "local:agent": {
+      "name": "agent-app-research-node",
       "reserved": {
         "knowledge": [],
         "memory": [],
@@ -67,7 +62,8 @@
         "tool:@zack/markdown-chunk@0.1.0",
         "tool:@zack/summarize-text@0.1.8",
         "tool:@zack/translate-text@0.1.4"
-      ]
+      ],
+      "version": "0.1.0"
     }
   }
 }

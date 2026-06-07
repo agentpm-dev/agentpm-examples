@@ -1,12 +1,11 @@
 [project]
-name = "agentpm-examples-agent-app-ops-python"
+name = "agent-app-ops-python"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
     "agentpm>=0.1.6",
     "langchain>=0.2.16",
     "langchain-openai>=0.2.5",
-    "openai>=1.51.0",
     "pydantic>=2.7.0",
     "python-dotenv[cli]>=1.1.1",
 ]

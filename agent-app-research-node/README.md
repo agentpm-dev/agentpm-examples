@@ -1,45 +1,40 @@
 # agent-app-research-node
 
-Interactive local research console built on the AgentPM Node SDK.
+Interactive local research assistant built on the AgentPM Node SDK.
 
 ## What it does
 
-This app installs the published `research-console` agent package, loads it with the AgentPM Node SDK, and uses the tools resolved for that agent to run an interactive research workflow.
+This app was generated from the published `research-assistant-node` workflow template and then checked into this repo as the canonical Node SDK research example.
 
-Published agent package:
+It loads the tools declared in the generated `agent.json`, then runs an interactive research workflow against real installed AgentPM packages.
 
-- `@zack/research-console@0.1.1`
+Published template package:
 
-Package source:
+- `@zack/research-assistant-node@0.1.0`
 
-- [`agent-packages/research-node`](https://github.com/agentpm-dev/agentpm-examples/tree/main/agent-packages/research-node)
+Template source:
+
+- [`template-packages/research-assistant-node`](https://github.com/agentpm-dev/agentpm-examples/tree/main/template-packages/research-assistant-node)
 
 ## Pattern
 
 This example shows a real app that:
 
-- installs a published agent package
-- loads that agent with `loadAgent(...)`
-- reads the resolved tool refs from the agent
-- loads those tools with `load(...)`
+- is generated with `agentpm new`
+- installs tool dependencies through the generated `agent.json`
+- loads those installed tools with `load(...)`
 - runs an interactive research workflow against real installed packages
 
 - orchestration style: manual OpenAI tool-calling loop
 - runtime: Node
-- best for: learning the core tool-calling mechanics without much framework abstraction
+- best for: learning the core tool-calling mechanics with a generated local app rather than a published agent package
 
-## Expected agent install
+It is a good fit if you want to:
 
-From this app directory, install the published agent package:
-
-```bash
-agentpm install @zack/research-console@0.1.1
-```
-
-That should install:
-
-- the agent artifact under `.agentpm/agents/...`
-- the resolved tool artifacts under `.agentpm/tools/...`
+- fetch and extract webpage content
+- crawl a small public source set
+- convert local documents into markdown or text
+- summarize and translate results
 
 ## Setup
 
@@ -57,6 +52,8 @@ pnpm install
 
 ## Environment
 
+Install Node dependencies:
+
 Create a local env file:
 
 ```bash
@@ -71,14 +68,12 @@ Set:
 ## Run in dev mode
 
 ```bash
-cd agent-app-research-node
 pnpm dev
 ```
 
 ## Build and run
 
 ```bash
-cd agent-app-research-node
 pnpm build
 pnpm start
 ```
@@ -100,6 +95,7 @@ pnpm start
 
 ## Notes
 
-- This app is intentionally simple and sturdy, not framework-heavy.
-- It keeps conversational history across prompts until you run `/reset`.
-- Tool results are truncated in the model context and in logs so the terminal stays readable.
+- This checked-in example was originally scaffolded with `agentpm new`.
+- `agentpm new` already installed the declared tool dependencies and wrote `agent.lock`.
+- If you later edit `agent.json`, rerun `agentpm install` to regenerate `agent.lock`.
+- This app keeps conversational history across prompts until you run `/reset`.

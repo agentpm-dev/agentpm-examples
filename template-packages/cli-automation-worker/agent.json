@@ -1,0 +1,74 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "cli-automation-worker",
+  "version": "0.1.0",
+  "description": "Shell-first automation starter that chains AgentPM tools with agentpm run --input-file.",
+  "template": {
+    "display_name": "CLI Automation Worker",
+    "use_case": "automation",
+    "execution_surfaces": [
+      "agentpm-run"
+    ],
+    "stack": [
+      "shell"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "cli-automation-worker"
+      },
+      {
+        "name": "workflow_label",
+        "description": "Human-readable label used in the generated README and output report.",
+        "required": true
+      },
+      {
+        "name": "source_path",
+        "description": "Default local source document processed by the generated automation script.",
+        "required": true,
+        "default": "sample-inputs/daily-notes.md"
+      },
+      {
+        "name": "output_path",
+        "description": "Default markdown report path written by the generated automation script.",
+        "required": true,
+        "default": "outputs/daily-brief.md"
+      }
+    ],
+    "dependencies": {
+      "tools": [
+        {
+          "name": "@zack/document-convert",
+          "version": "0.1.0"
+        },
+        {
+          "name": "@zack/summarize-text",
+          "version": "0.1.8"
+        }
+      ],
+      "agents": []
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.example .env.local"
+      },
+      {
+        "label": "Run the automation worker",
+        "command": "bash scripts/run-daily-brief.sh"
+      },
+      {
+        "label": "Review the generated brief",
+        "command": "cat {{ output_path }}"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

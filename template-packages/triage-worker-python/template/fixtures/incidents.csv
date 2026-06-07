@@ -1,0 +1,9 @@
+incident_id,service,severity,status,owner,opened_at,region,summary
+INC-1001,api-gateway,1,resolved,alex,2026-04-21T08:15:00Z,us-west-2,Short spike in 5xx responses after deploy
+INC-1002,billing-worker,3,investigating,morgan,2026-04-22T02:40:00Z,us-east-1,Invoice generation backlog exceeded normal threshold
+INC-1003,slack-notifier,2,monitoring,casey,2026-04-22T11:05:00Z,us-central-1,Delayed outbound Slack notifications for status updates
+INC-1004,github-sync,4,mitigated,jordan,2026-04-23T04:20:00Z,us-east-1,Issue sync job failed for multiple repos after token rotation
+INC-1005,analytics-pipeline,3,open,taylor,2026-04-23T14:55:00Z,us-west-2,Daily aggregation job missed SLA and downstream dashboard is stale
+INC-1006,search-indexer,2,resolved,riley,2026-04-23T19:30:00Z,eu-west-1,Partial indexing lag for newly published documents
+INC-1007,document-convert,5,open,sam,2026-04-24T01:10:00Z,us-east-2,Large batch conversion requests are timing out and retry queue is growing
+INC-1008,customer-portal,4,investigating,avery,2026-04-24T06:45:00Z,us-west-1,Users intermittently unable to load account settings page
