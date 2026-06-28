@@ -2,14 +2,11 @@
 
 `research-console` is a published AgentPM agent package for interactive research workflows in Node.
 
-It composes tools for:
-- fetching and extracting webpage content
-- robots-aware crawling
-- document conversion
-- table extraction
-- markdown chunking
-- summarization
-- translation
+It composes skills for:
+- structured evidence gathering and research brief workflow
+
+And it keeps direct agent-level tools for:
+- translation when a brief needs multilingual output
 
 Example prompts:
 - Fetch a public article, extract the main content, and return a concise summary with key takeaways.
