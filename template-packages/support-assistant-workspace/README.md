@@ -28,7 +28,7 @@ The generated project includes:
 This template intentionally combines:
 
 - a published agent root:
-  - `@zack/ops-console@0.1.0`
+  - `@zack/ops-console@0.1.1`
 - local generated agents:
   - `answer-drafter`
   - `escalation-reviewer`

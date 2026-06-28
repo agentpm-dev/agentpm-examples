@@ -8,12 +8,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ScaffoldTests(unittest.TestCase):
-    def test_runtime_loads_tools_from_published_agent_and_generated_manifest(self) -> None:
+    def test_runtime_loads_agent_tools_then_skills_then_generated_manifest(self) -> None:
         source = (ROOT / "app" / "tooling.py").read_text(encoding="utf-8")
-        self.assertIn('AGENT_SPEC = "@zack/ops-console@0.1.0"', source)
+        self.assertIn('AGENT_SPEC = "@zack/ops-console@0.1.1"', source)
         self.assertIn('EXTRA_TOOL_NAME = "@zack/summarize-text"', source)
         self.assertIn('load_agent(AGENT_SPEC)', source)
+        self.assertIn("def _spec_from_entry(entry: dict[str, Any]) -> str:", source)
         self.assertIn('loaded_agent.get("resolvedTools", [])', source)
+        self.assertIn('load_skill(_spec_from_entry(skill_entry))', source)
+        self.assertIn('loaded_agent.get("resolvedSkills", [])', source)
+        self.assertIn('loaded_skill.get("resolvedTools", [])', source)
         self.assertIn("resolve_extra_tool_spec()", source)
         self.assertIn('load(extra_spec, with_meta=True, env=env)', source)
         self.assertIn("_normalize_csv_query_payload", source)
