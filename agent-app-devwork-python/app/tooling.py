@@ -4,13 +4,13 @@ import json
 import os
 from typing import Any
 
-from agentpm import load, load_agent
+from agentpm import load, load_agent, load_skill
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
-AGENT_SPEC = "@zack/devwork-copilot@0.1.0"
+AGENT_SPEC = "@zack/devwork-copilot@0.1.1"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -21,7 +21,7 @@ def collect_string_env() -> dict[str, str]:
     }
 
 
-def _spec_from_resolved_tool(entry: dict[str, Any]) -> str:
+def _spec_from_entry(entry: dict[str, Any]) -> str:
     return f'{entry["name"]}@{entry["version"]}'
 
 
@@ -95,14 +95,19 @@ def _rich_description(meta: dict[str, Any]) -> str:
     return description
 
 
-def load_langchain_tools() -> tuple[dict[str, Any], list[StructuredTool], list[dict[str, Any]]]:
+def load_langchain_tools() -> tuple[dict[str, Any], list[dict[str, Any]], list[StructuredTool], list[dict[str, Any]]]:
     loaded_agent = load_agent(AGENT_SPEC)
+    loaded_skills: list[dict[str, Any]] = []
     loaded_tools: list[StructuredTool] = []
     metas: list[dict[str, Any]] = []
     env = collect_string_env()
+    seen_specs: set[str] = set()
 
     for entry in loaded_agent.get("resolvedTools", []):
-        spec = _spec_from_resolved_tool(entry)
+        spec = _spec_from_entry(entry)
+        if spec in seen_specs:
+            continue
+        seen_specs.add(spec)
         loaded = load(spec, with_meta=True, env=env)
         func = loaded["func"]
         meta = loaded["meta"]
@@ -131,4 +136,40 @@ def load_langchain_tools() -> tuple[dict[str, Any], list[StructuredTool], list[d
         loaded_tools.append(tool)
         metas.append(meta)
 
-    return loaded_agent, loaded_tools, metas
+    for skill_entry in loaded_agent.get("resolvedSkills", []):
+        loaded_skill = load_skill(_spec_from_entry(skill_entry))
+        loaded_skills.append(loaded_skill)
+        for entry in loaded_skill.get("resolvedTools", []):
+            spec = _spec_from_entry(entry)
+            if spec in seen_specs:
+                continue
+            seen_specs.add(spec)
+            loaded = load(spec, with_meta=True, env=env)
+            func = loaded["func"]
+            meta = loaded["meta"]
+            tool_name = meta["name"]
+            args_model = build_args_model(tool_name, meta.get("inputs"))
+
+            def _invoke_tool(_func=func, _tool_name=tool_name, **kwargs: Any) -> str:
+                payload = {key: value for key, value in kwargs.items() if value is not None}
+                try:
+                    result = _func(payload)
+                except Exception as exc:
+                    print("[tool wrapper error]")
+                    print(f"{_tool_name}: {exc}")
+                    raise
+
+                print("[tool result]")
+                print(_stringify_result(result, 1800))
+                return _stringify_result(result)
+
+            tool = StructuredTool.from_function(
+                func=_invoke_tool,
+                name=tool_name,
+                description=_rich_description(meta),
+                args_schema=args_model,
+            )
+            loaded_tools.append(tool)
+            metas.append(meta)
+
+    return loaded_agent, loaded_skills, loaded_tools, metas

@@ -15,6 +15,7 @@ A mono-repo of concrete examples showing how to:
 The current examples repo now shows both sides of the agent workflow:
 
 - `agent-packages/*` contains the publishable source manifests for example agents
+- `skill-packages/*` contains the publishable source manifests for first-wave example skills
 - `template-packages/*` contains the publishable source manifests for official workflow templates
 - the newer `agent-app-*` directories show real apps that either install published agent packages or are generated from published workflow templates and then consumed through the SDKs
 
@@ -51,6 +52,12 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-packages/research-node`](agent-packages/research-node/)
     - [`agent-packages/ops-python`](agent-packages/ops-python/)
     - [`agent-packages/devwork-python`](agent-packages/devwork-python/)
+
+- **Skill packages**
+    - [`skill-packages/incident-handoff-checklist`](skill-packages/incident-handoff-checklist/)
+    - [`skill-packages/slack-status-update`](skill-packages/slack-status-update/)
+    - [`skill-packages/issue-triage-playbook`](skill-packages/issue-triage-playbook/)
+    - [`skill-packages/research-brief-playbook`](skill-packages/research-brief-playbook/)
 
 - **Workflow templates**
     - [`template-packages/research-assistant-node`](template-packages/research-assistant-node/)
@@ -112,6 +119,13 @@ And some focus on retrieval and document-heavy workflows:
 - `robots-aware-crawl`: bounded multi-page crawling with robots.txt awareness
 - `document-convert`: normalize local documents into markdown or text
 - `table-extract`: turn HTML or CSV tables into structured rows and columns
+
+The new Skill packages sit one level above those tools:
+
+- `incident-handoff-checklist`: procedural-only operational continuity
+- `slack-status-update`: how to turn findings into concise Slack communication
+- `issue-triage-playbook`: how to inspect a GitHub queue and recommend follow-through
+- `research-brief-playbook`: how to move from collected evidence to a usable research brief
 
 ### Interoperability surfaces
 

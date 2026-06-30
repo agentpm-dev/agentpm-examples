@@ -7,7 +7,7 @@ It generates a local project that:
 - installs the published `@zack/ops-console` agent package through AgentPM
 - installs one extra direct tool through the generated root `agent.json`
 - loads the published agent with the AgentPM Python SDK
-- reads that agent's `resolvedTools` list and loads those tools at runtime
+- reads that agent's direct `resolvedTools`, then loads the published Skills from `resolvedSkills` and each Skill's `resolvedTools` at runtime
 - separately loads the extra direct tool from the generated local manifest
 
 ## Runtime story
@@ -54,13 +54,15 @@ This template currently uses:
 This template intentionally demonstrates both dependency paths:
 
 - published agent root:
-  - `@zack/ops-console@0.1.0`
+  - `@zack/ops-console@0.1.1`
 - extra direct tool:
   - `@zack/summarize-text@0.1.8`
 
 That means the published agent package still matters here:
 
-- it brings in GitHub, CSV, JSON-transform, and Slack capabilities through `resolvedTools`
+- it brings in direct operational tools like CSV and JSON-transform through `resolvedTools`
+- it also brings in incident handoff, Slack update, and issue triage Skills through `resolvedSkills`
+- those Skills then bring in GitHub and Slack-related capabilities through their resolved tools
 - the extra direct tool shows how a generated app can also keep one local manifest-owned dependency alongside that published agent root
 
 ## Local development

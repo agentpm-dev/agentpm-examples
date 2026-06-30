@@ -20,12 +20,18 @@ FIXTURE_SCHEMA_HINT = (
 )
 
 
-def print_banner(manifest_name: str, metas: list[dict]) -> None:
+def print_banner(manifest_name: str, loaded_skills: list[dict], metas: list[dict]) -> None:
     print(f"\n{WORKER_LABEL}: {manifest_name}")
     print(f"Agent package: {AGENT_SPEC}")
     print(f"Team: {TEAM_NAME}")
     print(f"Default fixture: {DEFAULT_INPUT_PATH}")
     print(f"Model: {OPENAI_MODEL}")
+    print(f"Loaded skills: {len(loaded_skills)}")
+    for loaded_skill in loaded_skills:
+        print(
+            f"- {loaded_skill.get('name')}@{loaded_skill.get('version')}: "
+            f"{loaded_skill.get('description') or 'No description'}"
+        )
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
         print(f"- {meta.get('name')}@{meta.get('version')}: {meta.get('description') or 'No description'}")
@@ -47,8 +53,26 @@ def augment_user_prompt(line: str) -> str:
     return line
 
 
+def render_skill_manuals(loaded_skills: list[dict]) -> str:
+    sections: list[str] = []
+    for loaded_skill in loaded_skills:
+        content = loaded_skill.get("entrypointContent")
+        if not isinstance(content, str) or not content.strip():
+            continue
+        sections.append(
+            "\n".join(
+                [
+                    f"Skill: {loaded_skill.get('name')}@{loaded_skill.get('version')}",
+                    content.strip(),
+                ]
+            )
+        )
+    return "\n\n".join(sections)
+
+
 def build_agent():
-    loaded_agent, tools, metas = load_langchain_tools()
+    loaded_agent, loaded_skills, tools, metas = load_langchain_tools()
+    skill_manuals = render_skill_manuals(loaded_skills)
     system_prompt = (
         f"You are {WORKER_LABEL}, a pragmatic local triage assistant for the {TEAM_NAME} team. "
         f"Start with the local incident fixture at {DEFAULT_INPUT_PATH} when the user asks for triage or status review. "
@@ -61,13 +85,18 @@ def build_agent():
         "If the user asks for a draft or preview, do not perform the write action. "
         "Keep answers concise but operationally useful."
     )
+    if skill_manuals:
+        system_prompt += (
+            "\n\nFollow these packaged operations manuals when they are relevant to the user's request:\n\n"
+            f"{skill_manuals}"
+        )
 
     agent = create_agent(
         model=ChatOpenAI(model=OPENAI_MODEL, temperature=0.2, api_key=OPENAI_API_KEY),
         tools=tools,
         system_prompt=system_prompt,
     )
-    return loaded_agent, agent, metas
+    return loaded_agent, loaded_skills, agent, metas
 
 
 def extract_final_text(result: dict) -> str:
@@ -89,10 +118,10 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    loaded_agent, agent, metas = build_agent()
+    loaded_agent, loaded_skills, agent, metas = build_agent()
     history: list[BaseMessage] = []
 
-    print_banner(loaded_agent["manifest"]["name"], metas)
+    print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas)
 
     while True:
         try:
@@ -109,7 +138,7 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(loaded_agent["manifest"]["name"], metas)
+            print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas)
             continue
         if line == "/reset":
             history.clear()

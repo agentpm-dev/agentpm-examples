@@ -5,14 +5,14 @@ import os
 from pathlib import Path
 from typing import Any
 
-from agentpm import load, load_agent
+from agentpm import load, load_agent, load_skill
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
 ROOT = Path(__file__).resolve().parents[1]
-AGENT_SPEC = "@zack/ops-console@0.1.0"
+AGENT_SPEC = "@zack/ops-console@0.1.1"
 EXTRA_TOOL_NAME = "@zack/summarize-text"
 
 
@@ -46,7 +46,7 @@ def resolve_extra_tool_spec() -> str:
     raise RuntimeError(f"Generated manifest is missing expected direct tool {EXTRA_TOOL_NAME}.")
 
 
-def _spec_from_resolved_tool(entry: dict[str, Any]) -> str:
+def _spec_from_entry(entry: dict[str, Any]) -> str:
     return f'{entry["name"]}@{entry["version"]}'
 
 
@@ -184,23 +184,42 @@ def _wrap_loaded_tool(func: Any, tool_name: str, meta: dict[str, Any]) -> Struct
     )
 
 
-def load_langchain_tools() -> tuple[dict[str, Any], list[StructuredTool], list[dict[str, Any]]]:
+def load_langchain_tools() -> tuple[dict[str, Any], list[dict[str, Any]], list[StructuredTool], list[dict[str, Any]]]:
     loaded_agent = load_agent(AGENT_SPEC)
+    loaded_skills: list[dict[str, Any]] = []
     loaded_tools: list[StructuredTool] = []
     metas: list[dict[str, Any]] = []
     env = collect_string_env()
+    seen_specs: set[str] = set()
 
     for entry in loaded_agent.get("resolvedTools", []):
-        spec = _spec_from_resolved_tool(entry)
+        spec = _spec_from_entry(entry)
+        if spec in seen_specs:
+            continue
+        seen_specs.add(spec)
         loaded = load(spec, with_meta=True, env=env)
         meta = loaded["meta"]
         loaded_tools.append(_wrap_loaded_tool(loaded["func"], meta["name"], meta))
         metas.append(meta)
 
-    extra_spec = resolve_extra_tool_spec()
-    extra_loaded = load(extra_spec, with_meta=True, env=env)
-    extra_meta = extra_loaded["meta"]
-    loaded_tools.append(_wrap_loaded_tool(extra_loaded["func"], extra_meta["name"], extra_meta))
-    metas.append(extra_meta)
+    for skill_entry in loaded_agent.get("resolvedSkills", []):
+        loaded_skill = load_skill(_spec_from_entry(skill_entry))
+        loaded_skills.append(loaded_skill)
+        for entry in loaded_skill.get("resolvedTools", []):
+            spec = _spec_from_entry(entry)
+            if spec in seen_specs:
+                continue
+            seen_specs.add(spec)
+            loaded = load(spec, with_meta=True, env=env)
+            meta = loaded["meta"]
+            loaded_tools.append(_wrap_loaded_tool(loaded["func"], meta["name"], meta))
+            metas.append(meta)
 
-    return loaded_agent, loaded_tools, metas
+    extra_spec = resolve_extra_tool_spec()
+    if extra_spec not in seen_specs:
+        extra_loaded = load(extra_spec, with_meta=True, env=env)
+        extra_meta = extra_loaded["meta"]
+        loaded_tools.append(_wrap_loaded_tool(extra_loaded["func"], extra_meta["name"], extra_meta))
+        metas.append(extra_meta)
+
+    return loaded_agent, loaded_skills, loaded_tools, metas

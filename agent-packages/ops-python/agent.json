@@ -2,17 +2,23 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "ops-console",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Operations assistant for reviewing issues, querying data, transforming JSON payloads, and drafting Slack-ready updates.",
+  "skills": [
+    {
+      "name": "@zack/incident-handoff-checklist",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/slack-status-update",
+      "version": "0.1.0"
+    },
+    {
+      "name": "@zack/issue-triage-playbook",
+      "version": "0.1.0"
+    }
+  ],
   "tools": [
-    {
-      "name": "@zack/github-issues",
-      "version": "0.1.1"
-    },
-    {
-      "name": "@zack/slack-post-message",
-      "version": "0.1.1"
-    },
     {
       "name": "@zack/csv-query",
       "version": "0.1.4"

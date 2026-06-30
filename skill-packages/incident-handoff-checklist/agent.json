@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "skill",
+  "name": "incident-handoff-checklist",
+  "version": "0.1.0",
+  "description": "Operational handoff checklist for incident updates, shift changes, and follow-through tracking.",
+  "tools": [],
+  "skill": {
+    "entrypoint": "SKILL.md",
+    "references": [
+      "references/handoff-template.md"
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

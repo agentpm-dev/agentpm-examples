@@ -6,7 +6,7 @@ import { stdin as input, stdout as output } from "node:process";
 
 import dotenv from "dotenv";
 import OpenAI from "openai";
-import { load, type JsonValue, type ToolMeta } from "@agentpm/sdk";
+import { load, loadSkill, type JsonValue, type ToolMeta } from "@agentpm/sdk";
 
 const DOTENV_LOCAL_PATH = resolve(process.cwd(), ".env.local");
 const DOTENV_PATH = resolve(process.cwd(), ".env");
@@ -23,6 +23,14 @@ type LoadedTool = {
   invoke: (input: JsonValue) => Promise<JsonValue>;
 };
 
+type LoadedSkill = {
+  name: string;
+  version: string;
+  description?: string;
+  entrypointContent: string;
+  resolvedTools: Array<{ name: string; version: string }>;
+};
+
 type ConversationMessage =
   | { role: "system"; content: string }
   | { role: "user"; content: string }
@@ -32,6 +40,7 @@ type PackageReference = string | { name: string; version?: string };
 type AgentManifest = {
   name: string;
   tools?: PackageReference[];
+  skills?: PackageReference[];
 };
 
 const MAX_TOOL_RESULT_CHARS = 8000;
@@ -87,6 +96,20 @@ function printBanner(manifestName: string, tools: LoadedTool[]) {
   console.log("\nCommands: /help /tools /reset /quit\n");
 }
 
+function printBannerWithSkills(manifestName: string, skills: LoadedSkill[], tools: LoadedTool[]) {
+  console.log(`\nResearch Assistant: ${manifestName}`);
+  console.log(`Model: ${MODEL}`);
+  console.log(`Loaded skills: ${skills.length}`);
+  for (const skill of skills) {
+    console.log(`- ${skill.name}@${skill.version}: ${skill.description ?? "No description"}`);
+  }
+  console.log(`Loaded tools: ${tools.length}`);
+  for (const tool of tools) {
+    console.log(`- ${tool.meta.name}@${tool.meta.version}: ${tool.meta.description ?? "No description"}`);
+  }
+  console.log("\nCommands: /help /tools /reset /quit\n");
+}
+
 async function readLocalManifest(): Promise<AgentManifest> {
   const manifestPath = resolve(process.cwd(), "agent.json");
   const raw = await readFile(manifestPath, "utf8");
@@ -97,14 +120,24 @@ async function readLocalManifest(): Promise<AgentManifest> {
   return parsed;
 }
 
-async function loadToolsFromLocalManifest(): Promise<{ manifestName: string; tools: LoadedTool[] }> {
+function renderSkillManuals(skills: LoadedSkill[]): string {
+  return skills
+    .map((skill) => [`Skill: ${skill.name}@${skill.version}`, skill.entrypointContent.trim()].join("\n"))
+    .join("\n\n");
+}
+
+async function loadToolsFromLocalManifest(): Promise<{ manifestName: string; skills: LoadedSkill[]; tools: LoadedTool[] }> {
   const manifest = await readLocalManifest();
   const env = collectStringEnv();
-  const refs = manifest.tools ?? [];
+  const directRefs = manifest.tools ?? [];
+  const skillRefs = manifest.skills ?? [];
   const tools: LoadedTool[] = [];
+  const skills: LoadedSkill[] = [];
+  const seenSpecs = new Set<string>();
 
-  for (const ref of refs) {
+  for (const ref of directRefs) {
     const spec = refToSpec(ref);
+    seenSpecs.add(spec);
     const loaded = await load(spec, { withMeta: true, env });
     tools.push({
       spec,
@@ -113,24 +146,44 @@ async function loadToolsFromLocalManifest(): Promise<{ manifestName: string; too
     });
   }
 
+  for (const ref of skillRefs) {
+    const spec = refToSpec(ref);
+    const loadedSkill = await loadSkill(spec);
+    skills.push(loadedSkill);
+
+    for (const entry of loadedSkill.resolvedTools) {
+      const toolSpec = `${entry.name}@${entry.version}`;
+      if (seenSpecs.has(toolSpec)) continue;
+      seenSpecs.add(toolSpec);
+      const loaded = await load(toolSpec, { withMeta: true, env });
+      tools.push({
+        spec: toolSpec,
+        meta: loaded.meta,
+        invoke: loaded.func,
+      });
+    }
+  }
+
   return {
     manifestName: manifest.name,
+    skills,
     tools,
   };
 }
 
-const SYSTEM_PROMPT = [
+const SYSTEM_PROMPT_LINES = [
   "You are a pragmatic research assistant running inside a local AgentPM example app.",
   "Use tools when they materially improve the answer.",
   "Prefer direct evidence from fetched pages or documents over unsupported claims.",
   "Be concise but specific.",
   "When a user asks for research, use the available tools rather than pretending you already have the source material.",
   "After using tools, synthesize the result in plain language.",
-].join(" ");
+];
 
 async function runAgentTurn(
   client: OpenAI,
   tools: LoadedTool[],
+  systemPrompt: string,
   history: ConversationMessage[],
   userPrompt: string,
 ): Promise<string> {
@@ -138,6 +191,7 @@ async function runAgentTurn(
   const toolDefinitions = tools.map((tool) => formatToolParameters(tool.meta));
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    { role: "system", content: systemPrompt },
     ...history.map((message) => ({ role: message.role, content: message.content })),
     { role: "user", content: userPrompt },
   ];
@@ -223,10 +277,14 @@ async function main() {
   }
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const { manifestName, tools } = await loadToolsFromLocalManifest();
-  const history: ConversationMessage[] = [{ role: "system", content: SYSTEM_PROMPT }];
+  const { manifestName, skills, tools } = await loadToolsFromLocalManifest();
+  const skillManuals = renderSkillManuals(skills);
+  const systemPrompt = skillManuals
+    ? `${SYSTEM_PROMPT_LINES.join(" ")}\n\nFollow these packaged research procedures when they are relevant to the user's request:\n\n${skillManuals}`
+    : SYSTEM_PROMPT_LINES.join(" ");
+  const history: ConversationMessage[] = [];
 
-  printBanner(manifestName, tools);
+  printBannerWithSkills(manifestName, skills, tools);
 
   const rl = createInterface({ input, output });
   try {
@@ -240,7 +298,7 @@ async function main() {
         continue;
       }
       if (line === "/tools") {
-        printBanner(manifestName, tools);
+        printBannerWithSkills(manifestName, skills, tools);
         continue;
       }
       if (line === "/reset") {
@@ -251,7 +309,7 @@ async function main() {
 
       console.log("\n[thinking]\n");
       try {
-        const answer = await runAgentTurn(client, tools, history, line);
+        const answer = await runAgentTurn(client, tools, systemPrompt, history, line);
         console.log("\n[assistant]\n");
         console.log(answer);
         console.log("");

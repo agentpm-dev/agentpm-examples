@@ -24,7 +24,7 @@ The code does not use separate hard-coded modes. It always loads the same instal
 This app:
 
 - loads the published `@zack/ops-console` agent package with the AgentPM Python SDK
-- reads the agent's resolved tools and loads them dynamically
+- reads the agent's direct resolved tools, then loads its resolved Skill packages and the Skills' resolved tools dynamically
 - separately loads the direct `@zack/summarize-text` tool from the generated local manifest
 - runs an interactive LangChain-managed triage loop over local incident data, GitHub issues, JSON transforms, and optional Slack updates
 
