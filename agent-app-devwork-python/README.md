@@ -4,11 +4,11 @@ Interactive local GitHub maintainer copilot built on the AgentPM Python SDK and 
 
 ## What it does
 
-This app installs the published `devwork-copilot` agent package, loads it with the AgentPM Python SDK, and uses the tools resolved for that agent inside a graph-driven devwork loop.
+This app installs the published `devwork-copilot` agent package, loads it with the AgentPM Python SDK, and uses the direct tools and Skill-backed tools resolved for that agent inside a graph-driven devwork loop.
 
 Published agent package:
 
-- `@zack/devwork-copilot@0.1.0`
+- `@zack/devwork-copilot@0.1.1`
 
 Package source:
 
@@ -20,8 +20,9 @@ This example shows a real app that:
 
 - installs a published agent package
 - loads that agent with `load_agent(...)`
-- reads the resolved tool refs from the agent
-- loads those tools with `load(...)`
+- reads direct `resolvedTools` from the agent
+- reads `resolvedSkills`, loads those Skills with `load_skill(...)`, and then loads each Skill's `resolvedTools`
+- feeds the loaded Skill manual into the workflow prompt
 - runs a stateful maintainer workflow against real installed packages
 
 - orchestration style: LangGraph state machine with guarded transitions
@@ -33,12 +34,13 @@ This example shows a real app that:
 From this app directory, install the published agent package:
 
 ```bash
-agentpm install @zack/devwork-copilot@0.1.0
+agentpm install @zack/devwork-copilot@0.1.1
 ```
 
 That should install:
 
 - the agent artifact under `.agentpm/agents/...`
+- the resolved Skill artifact under `.agentpm/skills/...`
 - the resolved tool artifacts under `.agentpm/tools/...`
 
 ## Setup
@@ -101,3 +103,4 @@ For write requests, the app should stop and ask for `/approve` before executing 
 - GitHub write actions are gated behind explicit user approval.
 - The graph keeps local conversational state across turns until `/reset`.
 - Tool calls and tool outputs are logged so the execution path is easy to inspect.
+- The current published agent package brings in `issue-triage-playbook`, so the workflow prompt includes the packaged triage manual as part of its maintainer guidance.

@@ -24,7 +24,9 @@ The code does not use separate hard-coded modes. It always loads the same instal
 This app:
 
 - loads the published `@zack/ops-console` agent package with the AgentPM Python SDK
-- reads the agent's resolved tools and loads them dynamically
+- reads the agent's direct `resolvedTools`
+- reads the agent's `resolvedSkills`, loads those Skill packages with `load_skill(...)`, and then loads each Skill's `resolvedTools`
+- feeds the loaded Skill manuals into the agent prompt so the runtime follows the packaged procedures as well as the packaged tool graph
 - separately loads the direct `@zack/summarize-text` tool from the generated local manifest
 - runs an interactive LangChain-managed triage loop over local incident data, GitHub issues, JSON transforms, and optional Slack updates
 
@@ -50,6 +52,12 @@ uv run python -m dotenv -f .env.local run -- python -m app.main
 ```
 
 `agentpm install` restores the published agent root and direct tool dependency into `.agentpm/` from the checked-in `agent.json`, `agent.lock`, and `agentpm.workspace.json`.
+
+With the current published `@zack/ops-console` package, that means:
+
+- direct agent tools like `csv-query` and `json-transform` load from the agent's own `resolvedTools`
+- Skill packages like incident handoff, Slack status updates, and issue triage load from `resolvedSkills`
+- tool-backed Skills then contribute their own resolved tool refs such as GitHub issue access and Slack posting
 
 ## Fixture-first workflow
 

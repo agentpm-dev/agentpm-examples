@@ -1,24 +1,30 @@
 {
-  "generated": "2026-06-06T17:12:50.648737Z",
-  "lockfile_version": 2,
+  "generated": "2026-06-30T01:06:07.072534Z",
+  "lockfile_version": 3,
   "packages": {
+    "skill:@zack/research-brief-playbook@0.1.0": {
+      "integrity": "489df46676a08fb7cdbed860345c8107623b3cd0456e721329e0a9820b8086a2",
+      "kind": "skill",
+      "name": "@zack/research-brief-playbook",
+      "version": "0.1.0"
+    },
     "tool:@zack/document-convert@0.1.0": {
       "integrity": "fccd8ba3dc971262fcf5f3fe06822c28d8db26810f374526bc5fe6be9f27ab0c",
       "kind": "tool",
       "name": "@zack/document-convert",
       "version": "0.1.0"
     },
-    "tool:@zack/markdown-chunk@0.1.0": {
-      "integrity": "e544a8b48841920822067e7297ab247edce29d1e1dcc5d4ded190b873cdddf91",
+    "tool:@zack/markdown-chunk@0.1.1": {
+      "integrity": "95a8663baaa6252bab161e80d50e57507d84a7a918e3617675748cd033fdba53",
       "kind": "tool",
       "name": "@zack/markdown-chunk",
-      "version": "0.1.0"
+      "version": "0.1.1"
     },
-    "tool:@zack/robots-aware-crawl@0.1.0": {
-      "integrity": "b19d14c48499af6a485d7daff082aacfd86273266049c1b426541f0c81b9a24f",
+    "tool:@zack/robots-aware-crawl@0.1.1": {
+      "integrity": "e3aecf574722e11ab38332db8c53a06fff2bb6aa25314515df6296ffefba5404",
       "kind": "tool",
       "name": "@zack/robots-aware-crawl",
-      "version": "0.1.0"
+      "version": "0.1.1"
     },
     "tool:@zack/summarize-text@0.1.8": {
       "integrity": "faab650ac3dde0debdff93aaa9bd6e08bef830640847308f6caa0127d6d4513d",
@@ -48,19 +54,10 @@
   "roots": {
     "local:agent": {
       "name": "agent-app-research-node",
-      "reserved": {
-        "knowledge": [],
-        "memory": [],
-        "profiles": [],
-        "skills": []
-      },
+      "skills": [
+        "skill:@zack/research-brief-playbook@0.1.0"
+      ],
       "tools": [
-        "tool:@zack/web-page-extract@0.1.2",
-        "tool:@zack/robots-aware-crawl@0.1.0",
-        "tool:@zack/document-convert@0.1.0",
-        "tool:@zack/table-extract@0.1.0",
-        "tool:@zack/markdown-chunk@0.1.0",
-        "tool:@zack/summarize-text@0.1.8",
         "tool:@zack/translate-text@0.1.4"
       ],
       "version": "0.1.0"

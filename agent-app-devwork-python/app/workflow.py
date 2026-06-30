@@ -36,20 +36,26 @@ def latest_user_text(state: DevworkState) -> str:
     return ""
 
 
-def build_graph(tools: list[Any]):
+def build_graph(tools: list[Any], skill_manuals: str = ""):
     llm = ChatOpenAI(model=OPENAI_MODEL, temperature=0.2, api_key=OPENAI_API_KEY).bind_tools(tools)
     tool_node = ToolNode(tools)
 
     def assistant_node(state: DevworkState) -> dict[str, Any]:
         print("[node] assistant")
-        system = AIMessage(
-            content=(
-                "You are a pragmatic GitHub maintainer copilot running inside a local AgentPM example app. "
-                "Use tools when they materially improve the answer. "
-                "Prefer reading GitHub issue data instead of guessing. "
-                "If the user seems to want a draft comment or tentative plan, prepare the draft but do not execute a write action. "
-                "GitHub write actions must be explicitly approved before execution."
+        system_content = (
+            "You are a pragmatic GitHub maintainer copilot running inside a local AgentPM example app. "
+            "Use tools when they materially improve the answer. "
+            "Prefer reading GitHub issue data instead of guessing. "
+            "If the user seems to want a draft comment or tentative plan, prepare the draft but do not execute a write action. "
+            "GitHub write actions must be explicitly approved before execution."
+        )
+        if skill_manuals:
+            system_content += (
+                "\n\nFollow these packaged maintainer procedures when they are relevant to the user's request:\n\n"
+                f"{skill_manuals}"
             )
+        system = AIMessage(
+            content=system_content
         )
         response = llm.invoke([system, *state["messages"]])
         return {"messages": [response]}

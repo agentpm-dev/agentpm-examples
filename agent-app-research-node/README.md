@@ -21,8 +21,10 @@ Template source:
 This example shows a real app that:
 
 - is generated with `agentpm new`
-- installs tool dependencies through the generated `agent.json`
-- loads those installed tools with `load(...)`
+- installs one local Skill dependency plus one remaining direct tool through the generated `agent.json`
+- loads the installed Skill with `loadSkill(...)`
+- loads the Skill's resolved tools plus the remaining direct tool with `load(...)`
+- feeds the Skill manual into the system prompt so the research procedure is packaged alongside the tool graph
 - runs an interactive research workflow against real installed packages
 
 - orchestration style: manual OpenAI tool-calling loop
@@ -97,5 +99,6 @@ pnpm start
 
 - This checked-in example was originally scaffolded with `agentpm new`.
 - `agentpm new` already installed the declared tool dependencies and wrote `agent.lock`.
+- The current local app manifest depends on `@zack/research-brief-playbook@0.1.0` plus a direct `@zack/translate-text` tool.
 - If you later edit `agent.json`, rerun `agentpm install` to regenerate `agent.lock`.
 - This app keeps conversational history across prompts until you run `/reset`.

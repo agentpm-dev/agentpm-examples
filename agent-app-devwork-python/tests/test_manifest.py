@@ -13,9 +13,13 @@ ROOT = Path(__file__).resolve().parents[1]
 class ManifestTests(unittest.TestCase):
     def test_app_uses_published_devwork_copilot_agent(self) -> None:
         source = (ROOT / "app" / "tooling.py").read_text(encoding="utf-8")
-        self.assertEqual(AGENT_SPEC, "@zack/devwork-copilot@0.1.0")
+        self.assertEqual(AGENT_SPEC, "@zack/devwork-copilot@0.1.1")
         self.assertIn('load_agent(AGENT_SPEC)', source)
         self.assertIn('loaded_agent.get("resolvedTools", [])', source)
+        self.assertIn('from agentpm import load, load_agent, load_skill', source)
+        self.assertIn('loaded_agent.get("resolvedSkills", [])', source)
+        self.assertIn('loaded_skill = load_skill(_spec_from_entry(skill_entry))', source)
+        self.assertIn('loaded_skill.get("resolvedTools", [])', source)
 
     def test_app_no_longer_requires_local_agent_manifest(self) -> None:
         self.assertFalse((ROOT / "agent.json").exists())
@@ -45,6 +49,13 @@ class ManifestTests(unittest.TestCase):
                 }
             )
         )
+
+    def test_workflow_prompt_includes_packaged_skill_manuals(self) -> None:
+        source = (ROOT / "app" / "main.py").read_text(encoding="utf-8")
+        workflow_source = (ROOT / "app" / "workflow.py").read_text(encoding="utf-8")
+        self.assertIn("render_skill_manuals", source)
+        self.assertIn("build_graph(tools, render_skill_manuals(loaded_skills))", source)
+        self.assertIn("Follow these packaged maintainer procedures", workflow_source)
         self.assertFalse(
             is_write_tool_call(
                 {

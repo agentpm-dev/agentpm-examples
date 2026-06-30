@@ -1,11 +1,23 @@
 {
-  "generated": "2026-05-30T02:45:54.066445Z",
-  "lockfile_version": 2,
+  "generated": "2026-06-30T00:55:52.908145Z",
+  "lockfile_version": 3,
   "packages": {
     "agent:@zack/devwork-copilot@0.1.0": {
       "integrity": "7ce9509a6c675bb09b27d359f5ffa87f4ad93e57256834e85eda40b7d516039d",
       "kind": "agent",
       "name": "@zack/devwork-copilot",
+      "version": "0.1.0"
+    },
+    "agent:@zack/devwork-copilot@0.1.1": {
+      "integrity": "d0f7f84d1f9eb1669227ee7c2017bd89baed6a1258e78135b7b5d5a5d92a4556",
+      "kind": "agent",
+      "name": "@zack/devwork-copilot",
+      "version": "0.1.1"
+    },
+    "skill:@zack/issue-triage-playbook@0.1.0": {
+      "integrity": "eef04a5b31ca7c474a05fb3f326d147aefa00ecc3bbbdd90ea1934022952a231",
+      "kind": "skill",
+      "name": "@zack/issue-triage-playbook",
       "version": "0.1.0"
     },
     "tool:@zack/github-issues@0.1.1": {
@@ -23,14 +35,16 @@
   },
   "roots": {
     "agent:@zack/devwork-copilot@0.1.0": {
-      "reserved": {
-        "knowledge": [],
-        "memory": [],
-        "profiles": [],
-        "skills": []
-      },
       "tools": [
         "tool:@zack/github-issues@0.1.1",
+        "tool:@zack/summarize-text@0.1.8"
+      ]
+    },
+    "agent:@zack/devwork-copilot@0.1.1": {
+      "skills": [
+        "skill:@zack/issue-triage-playbook@0.1.0"
+      ],
+      "tools": [
         "tool:@zack/summarize-text@0.1.8"
       ]
     }

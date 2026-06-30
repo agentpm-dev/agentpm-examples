@@ -3,7 +3,7 @@ name = "{{ project_name }}"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "agentpm>=0.1.7",
+    "agentpm>=0.1.8",
     "python-dotenv[cli]>=1.1.1",
 ]
 
