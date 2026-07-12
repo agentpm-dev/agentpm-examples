@@ -4,13 +4,13 @@ import json
 import os
 from typing import Any
 
-from agentpm import load, load_agent, load_skill
+from agentpm import load, load_agent, load_knowledge, load_skill
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
-AGENT_SPEC = "@zack/devwork-copilot@0.1.1"
+AGENT_SPEC = "@zack/devwork-copilot@0.1.2"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -95,9 +95,16 @@ def _rich_description(meta: dict[str, Any]) -> str:
     return description
 
 
-def load_langchain_tools() -> tuple[dict[str, Any], list[dict[str, Any]], list[StructuredTool], list[dict[str, Any]]]:
+def load_langchain_tools() -> tuple[
+    dict[str, Any],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[StructuredTool],
+    list[dict[str, Any]],
+]:
     loaded_agent = load_agent(AGENT_SPEC)
     loaded_skills: list[dict[str, Any]] = []
+    loaded_knowledge: list[dict[str, Any]] = []
     loaded_tools: list[StructuredTool] = []
     metas: list[dict[str, Any]] = []
     env = collect_string_env()
@@ -172,4 +179,7 @@ def load_langchain_tools() -> tuple[dict[str, Any], list[dict[str, Any]], list[S
             loaded_tools.append(tool)
             metas.append(meta)
 
-    return loaded_agent, loaded_skills, loaded_tools, metas
+    for knowledge_entry in loaded_agent.get("resolvedKnowledge", []):
+        loaded_knowledge.append(load_knowledge(_spec_from_entry(knowledge_entry)))
+
+    return loaded_agent, loaded_skills, loaded_knowledge, loaded_tools, metas

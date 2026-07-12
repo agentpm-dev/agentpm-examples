@@ -1,0 +1,189 @@
+---
+title: Interoperability Flow
+section: Examples
+order: 26
+description: Install a tool once, then run it from the shell, expose it over MCP, and export a starter Skill scaffold.
+next: examples/example-project
+---
+
+# Interoperability Flow
+
+This walkthrough shows the current interoperability story:
+
+1. Install a packaged tool with AgentPM.
+2. Run it directly from the shell with `agentpm run`.
+3. Expose it through the built-in MCP adapter with `agentpm serve --mcp`.
+4. Export a starter Skill scaffold with `agentpm export --skill`.
+
+The principle is:
+
+> Author and package with AgentPM. Expose through ecosystem adapters when needed.
+
+## Goal
+
+Use one installed tool as the source of truth for:
+
+- shell execution
+- MCP exposure
+- Skill scaffold generation
+
+The example below uses `@zack/capitalize`, but the same flow applies to other installed tools.
+
+## Prerequisites
+
+- A project with an `agent.json`
+- AgentPM installed
+
+## Step 1: Install the tool
+
+```bash
+agentpm install @zack/capitalize
+```
+
+This prepares the tool under:
+
+```text
+.agentpm/tools/<namespace>/<name>/<version>
+```
+
+and records the resolved version in:
+
+```text
+agent.lock
+```
+
+## Step 2: Run the tool directly
+
+Use the version pinned in `agent.lock`:
+
+```bash
+agentpm run @zack/capitalize --input '{"text":"hello world"}'
+```
+
+Example result:
+
+```json
+{"upper":"HELLO WORLD"}
+```
+
+You can also provide JSON through stdin:
+
+```bash
+echo '{"text":"hello world"}' | agentpm run @zack/capitalize
+```
+
+or through a file:
+
+```bash
+agentpm run @zack/capitalize --input-file payload.json
+```
+
+## Step 3: Expose the same tool through MCP
+
+Start the built-in MCP adapter:
+
+```bash
+agentpm serve --mcp
+```
+
+Default bind:
+
+```text
+127.0.0.1:7331
+```
+
+By default, AgentPM exposes every tool pinned in `agent.lock`.
+
+You can verify the tool list directly:
+
+```bash
+curl -X POST http://127.0.0.1:7331/mcp \
+  -H 'content-type: application/json' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/list",
+    "params": {}
+  }'
+```
+
+And call the tool:
+
+```bash
+curl -X POST http://127.0.0.1:7331/mcp \
+  -H 'content-type: application/json' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "zack__capitalize",
+      "arguments": {
+        "text": "hello world"
+      }
+    }
+  }'
+```
+
+<Callout type="info" title="Adapter boundary">
+  MCP is the first built-in ecosystem adapter. Tool metadata and execution still come from AgentPM's canonical install + runner model rather than a separate MCP-specific runtime.
+</Callout>
+
+<Callout type="info" title="Future work">
+  Public third-party adapters, including WASM-loaded plugins, are future work. Today, AgentPM ships the built-in MCP adapter.
+</Callout>
+
+## Step 4: Export a starter Skill scaffold
+
+Generate a starter Skill from the installed tool metadata:
+
+```bash
+agentpm export --skill @zack/capitalize
+```
+
+Default output:
+
+```text
+skills/capitalize/
+  SKILL.md
+  references/
+    tool-contract.md
+    examples.md
+  scripts/
+    run.sh
+```
+
+The generated files keep progressive disclosure:
+
+- `SKILL.md` stays concise and workflow-oriented.
+- `references/tool-contract.md` holds deeper manifest-derived details.
+- `references/examples.md` holds starter invocation examples.
+- `scripts/run.sh` delegates back to `agentpm run`.
+
+The scaffold is intentionally a starting point, not a polished final workflow artifact.
+
+<Callout type="info" title="Optional manifest">
+  Add `--manifest` if you want the export to include a starter `kind: "skill"` `agent.json` that you can edit into a publishable Skill package.
+</Callout>
+
+Example:
+
+```bash
+agentpm export --skill @zack/capitalize --manifest --force
+```
+
+## End-to-end summary
+
+```bash
+agentpm install @zack/capitalize
+agentpm run @zack/capitalize --input '{"text":"hello world"}'
+agentpm serve --mcp
+agentpm export --skill @zack/capitalize
+```
+
+That is the intended interoperability story today:
+
+- AgentPM stays the source of truth for packaging and execution.
+- `run` makes tools shell-friendly.
+- `serve --mcp` makes them available to MCP-compatible clients.
+- `export --skill` generates a starter workflow scaffold without changing the tool contract.

@@ -1,0 +1,52 @@
+---
+title: Introduction
+section: agent.json
+order: 13
+description: What the manifest is, why it matters, and how the schema keeps things predictable.
+next: agent.json/tools
+---
+
+# Introduction
+
+What the manifest is, why it matters, and how the schema keeps things predictable.
+
+## What is `agent.json`?
+
+`agent.json` is the **single source of truth** for an AgentPM package or project. It describes:
+- **Kind** — a **tool** (single runnable package), a **skill** (procedural package), a **knowledge** package (prepared context or retrieval corpus), an **agent** (composes tools, skills, and knowledge), or a **template** (generates a project scaffold).
+- **Behavior & interface** — names, versions, entrypoint, inputs/outputs, files, env vars.
+- **Operational details** — runtime, timeouts, auth modes, and more.
+
+AgentPM surfaces read this file to know how to validate, install, publish, or generate from the package.
+
+## Why it’s important
+
+- **Determinism**: Installs and executions are reproducible across machines and CI.
+- **Discoverability**: The registry renders docs straight from the manifest.
+- **Safety & trust**: Lint/publish validations enforce schema correctness and semantic checks.
+
+## The schema (high level)
+
+The manifest is validated against a JSON Schema:
+```pgsql
+https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json
+```
+
+At a glance:
+- **File**: `agentpm.manifest.schema.json`
+- **Kinds**: `tool`, `skill`, `knowledge`, `agent`, and `template`
+- **Strictness**: `additionalProperties: false` — **unknown fields are rejected**
+
+<Callout type="tip" title="Tip">
+  Use agentpm init to scaffold a minimal, valid `agent.json` for any supported kind. We’ll dive into exact fields for tools, skills, knowledge packages, agents, and templates on the next pages.
+</Callout>
+
+## Design notes
+- **Strict by default**: Unknown fields are rejected (`additionalProperties: false`).
+- **SemVer enforced**: `version` must match a SemVer-compatible regex.
+- **Paths**: `files[]` are repo-relative paths or globs.
+
+## Versioning & stability
+- The schema file is versioned in the repo. Breaking changes will be published under a new filename (e.g., `agentpm.manifest.schema.v2.json`) and reflected in docs.
+- Generators should point `$schema` to a tag or commit for stability (e.g., a released tag).
+- The CLI will validate manifests against the bundled schema version it supports as it evolves.

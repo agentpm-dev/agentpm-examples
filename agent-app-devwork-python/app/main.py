@@ -8,7 +8,12 @@ from app.tooling import AGENT_SPEC, load_langchain_tools
 from app.workflow import DevworkState, build_graph
 
 
-def print_banner(manifest_name: str, loaded_skills: list[dict], metas: list[dict]) -> None:
+def print_banner(
+    manifest_name: str,
+    loaded_skills: list[dict],
+    loaded_knowledge: list[dict],
+    metas: list[dict],
+) -> None:
     print(f"\nDevwork Copilot: {manifest_name}")
     print(f"Agent package: {AGENT_SPEC}")
     print(f"Model: {OPENAI_MODEL}")
@@ -17,6 +22,18 @@ def print_banner(manifest_name: str, loaded_skills: list[dict], metas: list[dict
         print(
             f"- {loaded_skill.get('name')}@{loaded_skill.get('version')}: "
             f"{loaded_skill.get('description') or 'No description'}"
+        )
+    print(f"Loaded knowledge packages: {len(loaded_knowledge)}")
+    for loaded_item in loaded_knowledge:
+        mode = loaded_item.get("knowledge", {}).get("mode") or "unknown"
+        chunks_path = loaded_item.get("chunksPath")
+        vectors_path = loaded_item.get("vectorsPath")
+        detail = f"mode={mode}"
+        if chunks_path and vectors_path:
+            detail += f", chunks={chunks_path}, vectors={vectors_path}"
+        print(
+            f"- {loaded_item.get('name')}@{loaded_item.get('version')}: "
+            f"{loaded_item.get('description') or 'No description'} ({detail})"
         )
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
@@ -65,11 +82,11 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    loaded_agent, loaded_skills, tools, metas = load_langchain_tools()
+    loaded_agent, loaded_skills, loaded_knowledge, tools, metas = load_langchain_tools()
     graph = build_graph(tools, render_skill_manuals(loaded_skills))
     state: DevworkState = {"messages": [], "pending_tool_calls": None}
 
-    print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas)
+    print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, metas)
 
     while True:
         try:
@@ -86,7 +103,7 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas)
+            print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, metas)
             continue
         if line == "/reset":
             state = {"messages": [], "pending_tool_calls": None}

@@ -1,0 +1,21 @@
+{
+  "agentpm_version": "0.1.18",
+  "algorithm": "exact",
+  "built_at": "2026-07-12T17:39:41Z",
+  "chunk_count": 6,
+  "chunks_path": "knowledge/chunks.jsonl",
+  "dimensions": 4,
+  "embedding_id": "default",
+  "format_version": 1,
+  "metric": "cosine",
+  "normalized": true,
+  "source_chunks_hash": "sha256:e24285483542ef8c7ec2ef342135b6dda98628f3b559a8a219f44ab0aea720f2",
+  "source_corpus_hash": "sha256:164e1bccccf6809bc1a1ef2051ce88970e51a6d58b6cd0050bdf8c5e0710d440",
+  "source_count": 3,
+  "source_sources_hash": "sha256:1a4d4a1131e625f381fb47c0bdd7e227d79f88e703961bf713ecbbe9d45e55f7",
+  "source_vectors_hash": "sha256:5098bdaab66105f28f921075b57d5d440a15c631199b347b3ff942f9165236f6",
+  "sources_path": "knowledge/sources.jsonl",
+  "type": "agentpm-local",
+  "vector_count": 6,
+  "vectors_path": "knowledge/embeddings/default.f32"
+}

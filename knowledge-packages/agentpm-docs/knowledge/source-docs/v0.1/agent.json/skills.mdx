@@ -1,0 +1,258 @@
+---
+title: Skills
+section: agent.json
+order: 15
+description: Author reusable procedural packages that capture playbooks, checklists, and reasoning guides around tools.
+next: agent.json/knowledge
+---
+
+# Skills
+
+Author reusable procedural packages that capture playbooks, checklists, and reasoning guides around tools.
+
+## What is a skill?
+
+A `kind: "skill"` package is reusable **operational know-how**. A skill is not a runnable SDK tool by itself. Instead, it packages:
+
+- a primary manual, usually `SKILL.md`
+- optional reference files and helper scripts
+- optional tool dependencies declared in top-level `tools[]`
+- descriptive compatibility metadata for discovery and export surfaces
+
+Skills can be:
+
+- pure process artifacts with no tools at all
+- tool-backed playbooks that describe how and when to use one or more packaged tools
+- reusable workflow guidance that an agent runtime, host app, or human can inspect after install
+
+## When to use a Skill
+
+Use a **Skill** when the thing you want to version is the **procedure** around work:
+
+- how to approach a task
+- what order to do things in
+- what checks or guardrails belong around tool usage
+- what references and helper scripts belong with that workflow
+
+Choose a **Tool** when you are packaging a directly executable capability with a concrete `entrypoint`, runtime, and IO contract.
+
+Choose an **Agent** when you are packaging a reusable composed unit that depends on tools and/or skills and is meant to be installed as a larger package.
+
+Choose a **Template** when you are packaging a starter project or starter system that someone will generate into a new directory and then customize.
+
+Rule of thumb:
+
+- **Tool** = "do this action"
+- **Skill** = "follow this procedure"
+- **Agent** = "compose these dependencies into a reusable package"
+- **Template** = "start a new project from this scaffold"
+
+If the main value is executable code invoked through the SDKs, it should be a **Tool**. If the main value is the manual, references, scripts, and tool-backed workflow around that code, it should be a **Skill**.
+
+## Scaffold a skill
+
+```bash
+agentpm init --kind skill --name incident-commander --description "Incident response coordination playbook"
+```
+
+Creates:
+
+```text
+incident-commander/
+  agent.json
+  SKILL.md
+```
+
+Generated skeleton (`agent.json`):
+
+```json
+{
+  "kind": "skill",
+  "name": "incident-commander",
+  "version": "0.1.0",
+  "description": "Incident response coordination playbook",
+  "tools": [],
+  "skill": {
+    "entrypoint": "SKILL.md"
+  }
+}
+```
+
+## Tool-backed example
+
+```json
+{
+  "kind": "skill",
+  "name": "slack-incident-update",
+  "version": "0.1.0",
+  "description": "A playbook for posting structured incident updates to Slack.",
+  "tools": [
+    {
+      "name": "@zack/slack-post-message",
+      "version": "0.1.1"
+    }
+  ],
+  "skill": {
+    "entrypoint": "SKILL.md",
+    "references": [
+      "references/tool-contract.md",
+      "references/examples.md"
+    ],
+    "scripts": [
+      "scripts/run.sh"
+    ],
+    "compatibility": {
+      "model_families": ["gpt-5"],
+      "runtimes": ["agentpm-run", "shell"],
+      "environments": ["prod"]
+    }
+  }
+}
+```
+
+## Field reference
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `$schema` | string | no | Optional schema URI |
+| `kind` | enum | **yes** | Must be `"skill"` |
+| `name` | string | **yes** | Package name |
+| `version` | semver | **yes** | SemVer string |
+| `description` | string | **yes** | Human-readable summary |
+| `tools` | array | **yes** | Tool package refs; may be empty (`[]`) |
+| `skill.entrypoint` | string | **yes** | Primary manual file path, usually `SKILL.md` |
+| `skill.references` | string[] | no | Supporting authored reference files |
+| `skill.scripts` | string[] | no | Helper scripts packaged with the skill |
+| `skill.compatibility` | object | no | Descriptive metadata only; not runtime-enforced |
+| `readme` | string | no | Optional separate README path |
+| `license` | object | no | Optional SPDX/license file metadata |
+
+## Top-level `tools`
+
+Skills declare tool dependencies with the same top-level `tools[]` field that agents use.
+
+That means:
+
+- a skill may depend on zero or more tools
+- the `tools` field is still required in the manifest, even when it is just `[]`
+- `agentpm install` in a local skill project resolves those tools
+- installed and published skills can expose resolved tool refs through the SDKs
+
+String and object forms both work:
+
+```json
+{
+  "tools": [
+    "@zack/slack-post-message@0.1.1",
+    { "name": "@zack/incident-severity", "version": "^0.2.0" }
+  ]
+}
+```
+
+## `skill.entrypoint`, references, scripts, and compatibility
+
+### `skill.entrypoint`
+
+This is the primary manual file for the skill. It is required.
+
+Typical value:
+
+```json
+{
+  "skill": {
+    "entrypoint": "SKILL.md"
+  }
+}
+```
+
+### `skill.references`
+
+Use this for deeper supporting material you want packaged and installed with the skill:
+
+- tool contract notes
+- prompt examples
+- operating procedures
+- rollout checklists
+
+### `skill.scripts`
+
+Use this for helper scripts that support the skill package. These are packaged as files, but the skill itself is still not treated as an executable SDK object.
+
+### `skill.compatibility`
+
+Compatibility is descriptive metadata only. It is useful for:
+
+- registry discovery
+- export and adaptation hints
+- humans deciding where a skill fits
+
+Supported compatibility arrays include:
+
+- `model_families`
+- `runtimes`
+- `environments`
+
+It is **not** enforced at runtime.
+
+## Safe path rules
+
+All declared skill paths must be safe relative paths inside the package root.
+
+These are rejected:
+
+- absolute paths
+- paths containing `..`
+- Windows drive roots
+- UNC paths
+
+Examples of invalid values:
+
+```json
+{ "skill": { "entrypoint": "../SKILL.md" } }
+{ "skill": { "entrypoint": "/tmp/SKILL.md" } }
+{ "skill": { "references": ["references/../../secret.md"] } }
+```
+
+## Packaging rules
+
+Skill packaging is manifest-driven. A skill artifact contains only:
+
+- `agent.json`
+- the declared `skill.entrypoint`
+- anything listed in `skill.references[]`
+- anything listed in `skill.scripts[]`
+- optional `readme` file when declared
+- optional `license` file when declared
+
+Important behavior:
+
+- AgentPM preserves declared relative paths in the tarball
+- AgentPM does **not** crawl Markdown links
+- undeclared files are **not** included automatically
+
+## Dependency rules
+
+- agents may depend on skills
+- skills may depend on tools
+- templates may declare skill dependencies
+- skills may **not** depend on skills
+
+So a skill manifest must not add a top-level `skills[]` field as a resolved dependency surface.
+
+## Typical workflow
+
+```bash
+agentpm init --kind skill --name incident-commander --description "Incident response coordination playbook"
+agentpm lint
+agentpm publish --dry-run
+```
+
+If the Skill declares `tools[]`, run `agentpm install` when you want those tool dependencies resolved locally for development or testing. It is not required just to package and publish the Skill.
+
+For tool-derived scaffolds, use:
+
+```bash
+agentpm export --skill @zack/slack-post-message --manifest --force
+```
+
+That gives you a publishable starter you can edit into a first-class skill package.

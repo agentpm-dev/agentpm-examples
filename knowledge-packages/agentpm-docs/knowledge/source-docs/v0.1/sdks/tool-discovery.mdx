@@ -1,0 +1,89 @@
+---
+title: Package Discovery
+section: SDKs
+order: 21
+description: Where the SDK looks for installed tools, skills, and installed agents on disk.
+next: security/mfa
+---
+
+# Package Discovery
+
+Where the SDK looks for installed tools, skills, and installed agents on disk.
+
+## Goal
+
+Understand the resolution order and on-disk layout so you can control where tools, skills, and installed agents are loaded from.
+
+## Resolution order
+
+The SDK searches for a tool in this order:
+1. **`AGENTPM_TOOL_DIR` (env var)** – Highest priority override.
+2. **Project-local**: `./.agentpm/tools` – Typically created by `agentpm install`.
+3. **User-local**: `~/.agentpm/tools` – Shared across projects for convenience.
+
+ You can also override per call:
+ - Node: `load(spec, { toolDirOverride: "/path/to/tools" })`
+ - Python: `load(spec, tool_dir_override="/path/to/tools")`
+
+For installed agent packages, the SDK searches in this order:
+1. **`AGENTPM_AGENT_DIR` (env var)** – Highest priority override for installed agents.
+2. **Project-local**: `./.agentpm/agents`
+3. **User-local**: `~/.agentpm/agents`
+
+You can also override per call:
+- Node: `loadAgent(spec, { agentDirOverride: "/path/to/agents" })`
+- Python: `load_agent(spec, agent_dir_override="/path/to/agents")`
+
+For installed skill packages, the SDK searches in this order:
+1. **`AGENTPM_SKILL_DIR` (env var)** – Highest priority override for installed skills.
+2. **Project-local**: `./.agentpm/skills`
+3. **User-local**: `~/.agentpm/skills`
+
+You can also override per call:
+- Node: `loadSkill(spec, { skillDirOverride: "/path/to/skills" })`
+- Python: `load_skill(spec, skill_dir_override="/path/to/skills")`
+
+## Directory layout
+
+Each tool is stored under an namespace/name/version path:
+```bash
+.agentpm/
+  tools/
+    @zack/summarize/
+      0.1.0/
+        agent.json
+        dist/...
+        prompts/...
+        (other packaged files…)
+```
+
+- The SDK reads the `agent.json` inside the version folder to determine how to execute the tool.
+- Multiple versions can coexist under the same tool directory; the spec you pass to `load()` picks the version.
+
+Installed registry agent packages live under the parallel `agents` layout:
+
+```bash
+.agentpm/
+  agents/
+    @zack/support-agent/
+      0.1.0/
+        agent.json
+        README.md
+```
+
+- `loadAgent()` / `load_agent()` resolve from the installed agent directory plus the matching root entry in `agent.lock`.
+
+Installed registry skill packages live under the parallel `skills` layout:
+
+```bash
+.agentpm/
+  skills/
+    @zack/incident-commander/
+      0.1.0/
+        agent.json
+        SKILL.md
+        references/...
+        scripts/...
+```
+
+- `loadSkill()` / `load_skill()` resolve from the installed skill directory plus the matching root entry in `agent.lock`.

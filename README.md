@@ -15,6 +15,7 @@ A mono-repo of concrete examples showing how to:
 The current examples repo now shows both sides of the agent workflow:
 
 - `agent-packages/*` contains the publishable source manifests for example agents
+- `knowledge-packages/*` contains the publishable source manifests for first-wave example Knowledge packages
 - `skill-packages/*` contains the publishable source manifests for first-wave example skills
 - `template-packages/*` contains the publishable source manifests for official workflow templates
 - the newer `agent-app-*` directories show real apps that either install published agent packages or are generated from published workflow templates and then consumed through the SDKs
@@ -52,6 +53,11 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`agent-packages/research-node`](agent-packages/research-node/)
     - [`agent-packages/ops-python`](agent-packages/ops-python/)
     - [`agent-packages/devwork-python`](agent-packages/devwork-python/)
+
+- **Knowledge packages**
+    - [`knowledge-packages/support-response-handbook`](knowledge-packages/support-response-handbook/)
+    - [`knowledge-packages/devwork-maintainer-guide`](knowledge-packages/devwork-maintainer-guide/)
+    - [`knowledge-packages/agentpm-docs`](knowledge-packages/agentpm-docs/)
 
 - **Skill packages**
     - [`skill-packages/incident-handoff-checklist`](skill-packages/incident-handoff-checklist/)
@@ -230,7 +236,7 @@ cd tools-python/table-extract && python -m unittest discover -s tests -p 'test_*
 cd agent-app-research-node && pnpm dev
 cd agent-app-ops-python && agentpm install && uv sync && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd agent-app-support-assistant-workspace && cp .env.example .env.local && agentpm install && uv sync && uv run python app/main.py
-cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.0 && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.2 && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd app-cli-automation-worker && cp .env.example .env.local && agentpm install && bash scripts/run-daily-brief.sh
 cd app-mcp-tool-server && cp .env.example .env.local && agentpm install && set -a && source .env.local && set +a && agentpm serve --mcp
 ```

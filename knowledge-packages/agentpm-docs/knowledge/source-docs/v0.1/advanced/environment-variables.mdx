@@ -1,0 +1,123 @@
+---
+title: Environment Variables
+section: Advanced
+order: 25
+description: Pass secrets and runtime knobs to tools running in managed subprocesses.
+next: advanced/mixed-runtimes-with-docker
+---
+
+# Environment Variables
+
+Pass secrets and runtime knobs to tools running in managed subprocesses.
+
+## Why env vars?
+
+Many tools depend on external services (e.g., OpenAI, Jira, DBs) or need runtime knobs (timeouts, memory hints). Because tools run **outside** your app (in a subprocess), you pass these settings via **environment variables**.
+
+## How env is constructed (merge order)
+
+When the SDK launches a tool, it builds the subprocess environment by merging:
+1. **Base/isolated vars** (HOME, TMPDIR, etc. set by the SDK)
+2. **`entrypoint.env` from `agent.json`** (static pairs the tool chooses to include)
+3. **Env passed to `load()`** (per-call)
+
+Later entries win on key conflicts.
+- **Node**: `buildEnv(entrypoint.env, opts.env, HOME, TMPDIR)`
+- **Python**: `_build_env(entrypoint.env, env, HOME, TMPDIR)`
+
+<Callout type="tip" title="Required env vars are enforced by the SDK">
+  If a tool declares required environment variables without a default, the SDK load() function will fail immediately when that variable is missing. Provide the value by passing it per-call via load().
+</Callout>
+
+<Callout type="info" title="Note">
+  The SDK does not read your app’s process env for tool variables. Only entrypoint.env and the env you pass to load() are merged into the subprocess.
+</Callout>
+
+## Set env vars per call (SDK)
+
+### Node
+
+```ts
+import { load } from '@agentpm/sdk';
+
+const summarize = await load('@zack/summarize@0.1.3', {
+  env: { OPENAI_API_KEY: process.env.OPENAI_API_KEY! },
+  timeoutMs: 30_000,
+});
+
+const out = await summarize({ text: '...' });
+```
+
+### Python
+
+```py
+from agentpm import load
+import os
+
+summarize = load(
+    "@zack/summarize@0.1.3",
+    env={ "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"] },
+    timeout=30.0,
+)
+
+out = summarize({ "text": "..." })
+```
+
+## Runtime knobs you can control via env
+
+These variables are **SDK-level knobs**, not tool inputs. They’re read from the **host process environment** (before the subprocess is spawned), so **do not** pass them via `load(... env=...)`. Set them on the running process instead.
+
+- In **Node**, the SDK reads them from `process.env`.
+- In **Python**, the SDK reads them from `os.getenv(...)`.
+
+**Examples**:
+```bash
+# macOS/Linux
+export AGENTPM_DEBUG=1
+export AGENTPM_NODE=/usr/local/bin/node
+export AGENTPM_TOOL_DIR=/opt/tools
+```
+
+```powershell
+# Windows (PowerShell)
+$env:AGENTPM_DEBUG = "1"
+$env:AGENTPM_PYTHON = "C:\Python311\python.exe"
+$env:AGENTPM_TOOL_DIR = "D:\agentpm\tools"
+```
+
+- **General (both SDKs)**
+    - `AGENTPM_TOOL_DIR` — Override where tools are discovered (highest priority). Useful for local testing or custom layouts.
+    - `AGENTPM_DEBUG=1` — Verbose SDK logging (prints resolution, PATH checks, spawn args).
+    - `AGENTPM_NODE / AGENTPM_PYTHON` — **Interpreter override**. If the manifest’s `entrypoint.command` implies Node or Python, these let you force the exact binary, e.g.:
+        - macOS/Linux:
+            - `export AGENTPM_NODE=/usr/local/bin/node`
+            - `export AGENTPM_PYTHON=/usr/local/bin/python3.11`
+        - Windows (PowerShell):
+            - `$env:AGENTPM_NODE="C:\Program Files\nodejs\node.exe"`
+            - `$env:AGENTPM_PYTHON="C:\Python311\python.exe"`
+
+- **Node tools**
+    - `AGENTPM_NODE_OLD_SPACE_MB` — Sets `--max-old-space-size` (default: `256`). Increase for memory-intensive tools.
+    - `AGENTPM_NODE_JITLESS=1` — Add `--jitless` automatically (or include the flag in `entrypoint.args`).
+- **Python tools**
+    - SDK injects `-I -B` automatically (isolated mode, no `.pyc`). No env needed.
+    - `AGENTPM_RLIMIT_AS_MB` — Optional address-space cap applied by the Python SDK’s POSIX rlimits helper (disabled on macOS and when running Node tools). Set to a positive integer MB to enable (e.g., `2048`).
+
+<Callout type="info" title="Precedence recap (both SDKs)">
+  entrypoint.env < env passed to load(). Later sources override earlier ones.
+</Callout>
+
+## Best practices
+
+- **Keep secrets out of the repo**. Don’t hardcode keys in `agent.json`. Load from your secret manager/CI and pass via env.
+- **Document expectations**. In your tool README/description, list required env vars and accepted values.
+- **Validate early**. If a key is missing, fail fast with a clear error to stderr.
+- **Prefer scoped keys**. Names like `MYTOOL_API_KEY` reduce collisions across tools.
+- **Combine with timeouts**. Pair env-based knobs with timeoutMs/timeout so misconfigurations don’t hang runs.
+
+## Troubleshooting
+
+- **Interpreter not picking up env?** Log `process.env.KEY` (Node) or `os.getenv("KEY")` (Python) inside the tool—**to stderr**—to confirm visibility.
+- **Conflicting values**. Remember later sources override earlier ones. If a value isn’t taking effect, check if your process env is overriding it.
+- **OOM/slow runs (Node)**. Raise `AGENTPM_NODE_OLD_SPACE_MB` or add your own `--max-old-space-size=....` Consider `AGENTPM_NODE_JITLESS=1` only if you know you need it.
+- **Too much output (Python SDK)**. Combined stdout+stderr > **10MB** will fail the run. Keep logs concise; reserve stdout for the single JSON result.

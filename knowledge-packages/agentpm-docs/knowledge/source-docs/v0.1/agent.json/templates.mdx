@@ -1,0 +1,242 @@
+---
+title: Templates
+section: agent.json
+order: 18
+description: Author workflow templates that generate editable AgentPM workspaces.
+next: publish-a-tool/init
+---
+
+# Templates
+
+Author workflow templates that generate editable AgentPM workspaces.
+
+## What is a template?
+
+A `kind: "template"` manifest describes a scaffold package, not a runnable tool or a single installed agent.
+
+Templates are used by:
+
+```bash
+agentpm new <template-ref> [target-dir]
+```
+
+They define:
+
+- what files are copied/rendered into a generated project
+- what tool and agent dependencies should be installed into that project
+- what variables are available during generation
+- what next-step commands should be shown after scaffolding
+
+## Scaffold a template
+
+```bash
+agentpm init --kind template --name research-template --description "Bootstrap a research workflow"
+```
+
+This creates:
+
+```text
+research-template/
+  agent.json
+  template/
+    README.md
+```
+
+`agentpm init --kind template` scaffolds the template package shell only. It does **not** create consumer output like `template/agent.json`.
+
+## Minimal example
+
+```json
+{
+  "kind": "template",
+  "name": "research-template",
+  "version": "0.1.0",
+  "description": "Bootstrap a research workflow",
+  "template": {
+    "display_name": "Research Template",
+    "use_case": "starter",
+    "execution_surfaces": ["python-sdk", "agentpm-run"],
+    "stack": ["python"],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "research-template"
+      }
+    ],
+    "dependencies": {
+      "tools": ["@zack/fetch-content", "@zack/summarize"],
+      "agents": []
+    },
+    "entrypoints": [
+      {
+        "label": "Run the generated app",
+        "command": "python -m app.main"
+      }
+    ]
+  }
+}
+```
+
+## Key fields
+
+### `template.files_root`
+
+`template.files_root` points to the scaffold tree inside the template package.
+
+Example:
+
+```text
+my-template/
+  agent.json
+  template/
+    README.md
+    .env.example
+    app/
+      main.py
+```
+
+AgentPM copies and renders files from `template/` into the target project.
+
+<Callout type="warning" title="Do not place a root agent.json in template.files_root">
+  `agentpm new` synthesizes the generated project’s root `agent.json`. Template authors should not place a root `agent.json` inside `template.files_root`.
+</Callout>
+
+### `template.variables`
+
+Variables are generation-time scaffold inputs.
+
+- names use lowercase snake_case
+- values can come from `--var`, defaults, or interactive prompts
+- unknown placeholder text may be preserved literally if it is not a declared variable match
+
+Use variables for scaffold text like project names or example titles, not for runtime secrets.
+
+### `template.dependencies.tools`
+
+These are direct runnable tool dependencies for the generated project.
+
+- they are installed into the generated workspace
+- they contribute to the generated `agent.lock`
+- direct tool dependencies often end up represented in the generated root `agent.json`
+
+### `template.dependencies.agents`
+
+These are direct agent package roots for the generated workspace.
+
+- they are installed as workspace/package roots
+- they do **not** add recursive `agents[]` support to normal `kind: "agent"` manifests
+- they are recorded in `agentpm.workspace.json` when needed
+
+Templates may depend on multiple agents. Normal agent manifests still may not depend on agents.
+
+### `template.dependencies.skills`
+
+Templates may also declare direct skill dependencies for the generated project:
+
+- they install into the generated workspace
+- they contribute first-class `skills` relationships to the generated lockfile
+- they typically end up represented in the generated root `agent.json → skills[]`
+
+### `template.entrypoints`
+
+These define the next-step commands AgentPM shows after generation.
+
+Example:
+
+```json
+[
+  { "label": "Review generated scaffold", "command": "cat README.md" },
+  { "label": "Run the app", "command": "python -m app.main" }
+]
+```
+
+## Generated project layout
+
+Depending on the template, `agentpm new` may generate:
+
+```text
+my-project/
+  agent.json
+  agents/
+    reviewer.agent.json
+  agentpm.workspace.json
+  agent.lock
+  .agentpm/
+    template.json
+```
+
+Meaning:
+
+- `agent.json` — primary/default local agent manifest
+- `agents/*.agent.json` — additional local generated agents
+- `agentpm.workspace.json` — committed workspace topology
+- `agent.lock` — runnable dependency lockfile
+- `.agentpm/template.json` — template origin metadata
+
+## The `agents/` convention
+
+If a template wants to generate additional local agent manifests, place them under:
+
+```text
+template/
+  agents/
+    triage.agent.json
+    reviewer.agent.json
+```
+
+AgentPM treats `agents/` as the canonical location for extra local generated agents.
+
+## Editable generated manifests
+
+Generated manifests should be straightforward for users to edit later.
+
+In practice:
+
+- `agentpm new` synthesizes the root `agent.json`
+- extra local generated agents, when present, live under `agents/`
+- users can edit those generated manifests after scaffolding
+
+After generation, users should be able to edit the generated manifests and rerun:
+
+```bash
+agentpm install
+```
+
+to regenerate `agent.lock`.
+
+## README split
+
+Template authors should maintain two separate READMEs:
+
+- root `README.md` — explains the template package in the registry
+- `template/README.md` (or the chosen `files_root` README) — explains the generated project
+
+The scaffold README may include render-variable examples intended for generated-project users.
+
+## Skills, knowledge, memory, and profiles
+
+Templates can generate projects that include all of those fields, but only some of them are first-class dependency types today.
+
+Today:
+
+- normal `kind: "agent"` manifests directly resolve `tools[]`, `skills[]`, and `knowledge[]`
+- template manifests directly resolve `template.dependencies.tools`, `template.dependencies.agents`, `template.dependencies.skills`, and `template.dependencies.knowledge`
+- template-level agent dependencies are supported as workspace roots
+- `memory` and `profiles` remain future-facing metadata
+
+## Typical workflow
+
+```bash
+agentpm init --kind template --name my-template --description "My workflow template"
+cd my-template
+# edit agent.json and files under template/
+agentpm lint --strict
+agentpm new . ../my-template-test
+cd ../my-template-test
+# run the generated project's documented entrypoint
+cd ../my-template
+agentpm publish
+```

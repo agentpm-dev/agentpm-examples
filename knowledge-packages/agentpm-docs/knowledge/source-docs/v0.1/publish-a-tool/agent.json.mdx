@@ -1,0 +1,145 @@
+---
+title: agent.json
+section: Publish a tool
+order: 15
+description: Fill in the minimal fields your tool needs to package and publish.
+next: publish-a-tool/publish
+---
+
+# agent.json
+
+Fill in the minimal fields your tool needs to package and publish.
+
+## Goal
+
+Start from the skeleton created on the previous page and complete the **entrypoint**, **files**, and **IO schemas** so `publish` can succeed.
+
+## Starting point (from init)
+
+```json
+{
+  "kind": "tool",
+  "name": "summarize",
+  "version": "0.1.0",
+  "description": "Summarize input text",
+  "files": [],
+  "entrypoint": { "command": "", "args": [] },
+  "inputs": {},
+  "outputs": {}
+}
+```
+
+## 1) Entrypoint (interpreter + script)
+
+Tell AgentPM how to run your tool in a managed subprocess.
+```json
+"entrypoint": {
+  "command": "node",                 // node | nodejs | python | python3 (or absolute path)
+  "args": ["dist/summarize.js"],     // script/module path (repo-relative)
+  "cwd": ".",                        // optional
+  "timeout_ms": 60000,               // optional (recommended)
+  "env": { }                         // optional; names only, values set at runtime
+},
+"runtime": {
+  "type": "node",
+  "version": "20"                    // MAJOR or full semver your tool expects
+}
+```
+
+<Callout type="tip" title="Lint check">
+  runtime.type must match the interpreter implied by entrypoint.command (e.g., node ↔ node, python3 ↔ python).
+</Callout>
+
+## 2) Files (everything the tool needs at runtime)
+
+Include built code and any assets the entrypoint references.
+```json
+"files": [
+  "dist/**",
+  "prompts/*.md"
+]
+```
+
+- Paths are repo-relative; globs/dirs allowed.
+- The published tarball preserves relative path
+- Make sure `entrypoint.args` points to a file included here.
+
+## 3) Inputs & outputs (JSON Schema, Draft 2020-12)
+
+Define the **request** your tool accepts and the **response** it returns. Any valid schema is allowed; here’s a clear, minimal pattern:
+```json
+"inputs": {
+  "type": "object",
+  "properties": {
+    "text": { "type": "string", "description": "Text to summarize" },
+    "max_sentences": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Default: 3" }
+  },
+  "required": ["text"],
+  "additionalProperties": false
+},
+"outputs": {
+  "type": "object",
+  "properties": {
+    "summary": { "type": "string" }
+  },
+  "required": ["summary"],
+  "additionalProperties": false
+}
+```
+
+- Use `additionalProperties:false` to catch typos early.
+- If you apply defaults internally (e.g., `max_sentences=3`), mention them in the field description.
+
+## 4) Minimal publishable manifest (complete example)
+
+Here’s the **smallest practical** `agent.json` for our summarize tool:
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "tool",
+  "name": "summarize",
+  "version": "0.1.0",
+  "description": "Summarize input text",
+  "files": [
+    "dist/**",
+    "prompts/*.md"
+  ],
+  "entrypoint": {
+    "command": "node",
+    "args": ["dist/summarize.js"],
+    "cwd": ".",
+    "timeout_ms": 60000,
+    "env": {}
+  },
+  "runtime": {
+    "type": "node",
+    "version": "20"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "text": { "type": "string", "description": "Text to summarize" },
+      "max_sentences": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Default: 3" }
+    },
+    "required": ["text"],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string" }
+    },
+    "required": ["summary"],
+    "additionalProperties": false
+  }
+}
+```
+
+## Quick validation before publishing
+
+```bash
+agentpm lint --strict        # schema + semantic checks
+agentpm publish --dry-run    # builds the tar.gz without uploading
+```
+
+On the next page you’ll run the actual `agentpm publish` to upload.

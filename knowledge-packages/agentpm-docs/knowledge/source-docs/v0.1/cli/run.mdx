@@ -1,0 +1,93 @@
+---
+title: run
+section: CLI
+order: 10
+description: Execute an installed AgentPM tool with JSON input from stdin, an inline string, or a file.
+next: cli/serve
+---
+
+# run
+
+Execute an installed AgentPM tool from the shell without going through an SDK.
+
+## Overview
+
+`agentpm run` resolves an installed prepared tool from `.agentpm/tools`, loads its `agent.json`, and executes it with JSON input.
+
+### Command synopsis
+```bash
+agentpm run <spec> [--input <JSON>] [--input-file <path>] [--timeout-ms <ms>]
+```
+
+### Arguments
+- **`spec`**. Tool spec to execute. Supported forms:
+  - `@namespace/name`
+  - `@namespace/name@0.1.0`
+  - `@namespace/name@latest`
+  - `@namespace/name@^0.1`
+- **`--input <JSON>`**. Inline JSON payload to send to the tool on stdin.
+- **`--input-file <path>`**. Read the JSON payload from a file.
+- **`--timeout-ms <ms>`**. Override the manifest timeout for this invocation only.
+
+<Callout type="info" title="Input validation scope">
+  `agentpm run` validates only that the input is valid JSON. It does not validate the payload against the tool’s manifest `inputs` schema.
+</Callout>
+
+## Examples
+
+### Use the version pinned in `agent.lock`
+```bash
+agentpm run @zack/echo-json --input '{"message":"hello"}'
+```
+
+### Execute an exact installed version
+```bash
+agentpm run @zack/echo-json@0.1.0 --input '{"message":"hello"}'
+```
+
+### Execute the highest installed prepared version
+```bash
+agentpm run @zack/echo-json@latest --input '{"message":"hello"}'
+```
+
+### Execute the highest installed version matching a semver range
+```bash
+agentpm run @zack/echo-json@^0.1 --input '{"message":"hello"}'
+```
+
+### Pipe JSON through stdin
+```bash
+echo '{"message":"hello"}' | agentpm run @zack/echo-json
+```
+
+### Read JSON from a file
+```bash
+agentpm run @zack/echo-json --input-file payload.json
+```
+
+### Override timeout for a single run
+```bash
+agentpm run @zack/slow-tool --input '{}' --timeout-ms 100
+```
+
+## Resolution behavior
+
+- Unversioned specs prefer the version pinned in `agent.lock`.
+- Exact version specs require that prepared version to be installed.
+- `latest` selects the highest installed prepared version.
+- SemVer ranges select the highest installed prepared version satisfying the range.
+
+If no matching prepared tool is installed, the command exits non-zero with a clear error.
+
+## Output behavior
+
+- Valid tool JSON is written to stdout.
+- Diagnostics and failures are written to stderr.
+- The command exits non-zero on failure.
+
+## Troubleshooting
+
+- **No JSON input provided**. Pass `--input`, `--input-file`, or pipe JSON to stdin.
+- **Tool not found**. Ensure the prepared tool exists under `.agentpm/tools/<namespace>/<name>/<version>`.
+- **Missing required environment variables**. Set the required values before invoking the tool, or rely on manifest defaults when provided.
+- **Interpreter mismatch or missing runtime**. Confirm the installed runtime matches the tool manifest and that `python` / `python3` or `node` / `nodejs` is available on PATH. `AGENTPM_PYTHON` and `AGENTPM_NODE` can override interpreter discovery.

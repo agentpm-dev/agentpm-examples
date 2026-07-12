@@ -1,0 +1,186 @@
+---
+title: new
+section: CLI
+order: 8
+description: Generate a local AgentPM workspace from a published or local workflow template.
+next: cli/publish
+---
+
+# new
+
+Generate a local AgentPM workspace from a workflow template.
+
+## Overview
+
+`agentpm new` is the template consumer command. It can scaffold from:
+
+- a published template package reference like `@namespace/name` or `@namespace/name@version`
+- a local template directory containing `agent.json`
+- a direct local `agent.json` path
+
+During scaffolding, AgentPM copies and renders files from the template, installs declared runnable dependencies, writes workspace metadata, and generates a runnable `agent.lock`.
+
+<Callout type="info" title="Security boundary">
+  `agentpm new` copies and renders files, but it does not execute template-provided scripts, generated app code, package-manager commands, or shell hooks during scaffolding.
+</Callout>
+
+## Command synopsis
+
+```bash
+agentpm new <template-ref> [target-dir] [--var <KEY=VALUE>]... [--quiet] [--token <PAT>]
+```
+
+## Arguments
+
+- **`template-ref`**. One of:
+  - a published template package like `@zack/research-template`
+  - a pinned published template like `@zack/research-template@0.1.0`
+  - a local template directory like `./my-template`
+  - a direct local manifest path like `./my-template/agent.json`
+- **`target-dir` (optional)**. Output directory for the generated project.
+- **`--var <KEY=VALUE>`**. Generation-time variable override. Repeat as needed.
+- **`--quiet`**. Reduce output noise.
+- **`--token <PAT>` (env: `AGENTPM_TOKEN`)**. Personal Access Token for registry-backed template downloads.
+
+## Discover templates
+
+Workflow templates are first-class package kinds in the registry.
+
+- Browse them in the registry search UI using the template filter.
+- Use the landing page’s “Start Fast” section to find trending templates.
+- Open a template detail page to inspect its README, execution surfaces, dependencies, and bootstrap command.
+
+## Published-template flow
+
+Generate from a published template:
+
+```bash
+agentpm new @zack/research-template my-project
+cd my-project
+# run the generated project's documented entrypoint
+```
+
+If you omit the version, AgentPM resolves the latest matching published template version and records the exact source in `.agentpm/template.json`.
+
+## Local-template flow
+
+Generate from a local template package directory:
+
+```bash
+agentpm new ./my-template ./my-template-test
+```
+
+Generate from a direct local manifest path:
+
+```bash
+agentpm new ./my-template/agent.json ./my-template-test
+```
+
+This is useful for template authoring and local verification before publish.
+
+## Variables and prompting
+
+Template variables are generation-time scaffold values, not runtime secrets.
+
+- `--var key=value` always wins.
+- Template defaults are used next.
+- `project_name` is inferred from `target-dir` when practical.
+- In an interactive terminal session, AgentPM prompts for any remaining required variables.
+- In a non-interactive session, AgentPM fails clearly if a required variable still has no value.
+
+Example:
+
+```bash
+agentpm new @zack/research-template my-project \
+  --var project_name=my-project \
+  --var report_topic="Q2 customer support trends"
+```
+
+<Callout type="warning" title="Do not use template variables for secrets">
+  Do not put API keys, tokens, passwords, or other runtime secrets in `template.variables`. Use `.env.example` plus runtime environment variables instead.
+</Callout>
+
+## What `agentpm new` writes
+
+The generated project includes:
+
+- `agent.json` — the generated root manifest
+- `agents/*.agent.json` — additional local generated agent manifests
+- `agentpm.workspace.json` — committed workspace topology
+- `agent.lock` — runnable dependency lockfile for the generated workspace
+- `.agentpm/template.json` — template origin metadata
+
+### `agentpm.workspace.json`
+
+`agentpm.workspace.json` is committed project metadata, not cache state. It describes:
+
+- local manifest roots that belong to the workspace
+- registry package roots, such as template-level agent dependencies
+
+`agentpm new` currently writes this file for generated projects in general. It is especially important for multi-root projects, extra local `agents/*.agent.json` manifests, and template-level registry agent dependencies.
+
+### `.agentpm/template.json`
+
+`.agentpm/template.json` records where the scaffold came from.
+
+- For published templates, it records the resolved package and integrity.
+- For local templates, it records `source: "local"` plus the source path.
+
+This file is origin metadata. It is not part of `agent.lock`.
+
+## Multi-agent workspaces
+
+Templates may declare:
+
+- direct tool dependencies in `template.dependencies.tools`
+- direct agent package dependencies in `template.dependencies.agents`
+- direct skill dependencies in `template.dependencies.skills`
+- direct knowledge dependencies in `template.dependencies.knowledge`
+
+They may also scaffold extra local manifests under `agents/`.
+
+Generated projects handle those separately:
+
+- the root `agent.json` remains a normal single-agent manifest and can include resolved `tools[]`, `skills[]`, and `knowledge[]`
+- extra local generated agents live under `agents/`
+- registry agent package roots are recorded in `agentpm.workspace.json`
+
+AgentPM does **not** add recursive `agents[]` dependencies to normal `kind: "agent"` manifests.
+
+## Post-generation workflow
+
+After generation:
+
+1. edit the generated manifest files as needed
+2. run `agentpm install`
+3. let AgentPM regenerate `agent.lock`
+
+For generated workspace projects:
+
+- `agentpm install` rebuilds the lock from the manifest files and workspace topology
+- `agentpm install <spec>` is not supported inside those workspace projects
+- topology changes are made by editing manifests or `agentpm.workspace.json`, then rerunning `agentpm install`
+
+## Template authoring notes
+
+Template authors should maintain two different READMEs:
+
+- root `README.md` — for the registry page and template package docs
+- `template.files_root/README.md` — for the generated project and any render-variable examples
+
+The root generated `agent.json` is owned by `agentpm new`, so template authors should not place a root `agent.json` inside `template.files_root`.
+
+If a template wants additional local generated agents, place them under:
+
+```text
+template/
+  agents/
+    reviewer.agent.json
+    triage.agent.json
+```
+
+## Errors and safety
+
+- If `target-dir` exists and is non-empty, generation fails before writing.
+- If generation fails after starting, AgentPM cleans up the partial target so the command is retryable.
+- If a local template path is missing `agent.json`, or if that manifest is not `kind: "template"`, generation fails clearly.

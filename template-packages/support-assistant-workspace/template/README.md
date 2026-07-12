@@ -12,6 +12,7 @@ The generated project includes three different role shapes:
   - synthesized by `agentpm new`
   - the primary local workspace agent
   - owns the direct `@zack/summarize-text` dependency declared by the template
+  - includes the published `@zack/support-response-handbook` Knowledge dependency declared by the template
 - published agent root
   - `@zack/ops-console`
   - recorded in `agentpm.workspace.json`
@@ -38,10 +39,16 @@ Instead, it gives you a structured project that you can extend with normal appli
 
 The template package itself only scaffolds the extra local manifests under `agents/`. The generated root `agent.json` is still synthesized by `agentpm new`.
 
+The generated root agent also carries the template's published Knowledge dependency:
+
+- `@zack/support-response-handbook`
+  - a context-mode handbook for support-response tone, escalation rules, and reusable message templates
+
 ## Suggested role breakdown
 
 - root agent:
   - support coordinator / workspace entrypoint
+  - direct owner of the installed support-response handbook context package
 - published `@zack/ops-console` agent:
   - external operational context and reusable packaged behavior
 - local `answer-drafter` agent:
@@ -84,7 +91,7 @@ The illustrative script uses that sample file so you can see the workspace in ac
 Common next steps:
 
 - edit `agents/*.agent.json` to refine local roles
-- edit the root `agent.json` to change the coordinator’s direct tools
+- edit the root `agent.json` to change the coordinator’s direct tools or Knowledge dependencies
 - run `agentpm install` after manifest edits to regenerate `agent.lock`
 - add normal application code that decides when each local or published agent role should be used
 

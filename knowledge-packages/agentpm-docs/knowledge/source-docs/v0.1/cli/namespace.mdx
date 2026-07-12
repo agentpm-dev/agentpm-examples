@@ -1,0 +1,95 @@
+---
+title: namespace
+section: CLI
+order: 16
+description: Add or revoke authorized signers (public keys) for a namespace.
+next: agent.json/introduction
+---
+
+# namespace
+
+Add or revoke authorized signers (public keys) for a namespace.
+
+## Overview
+
+`agentpm namespace` manages the **allow-list of signer public keys** on a namespace. Only registered keys may author-sign packages for that namespace.
+
+<Callout type="info" title="Token resolution order">
+    Authentication is required. Token resolution order: flag (--token) > env (AGENTPM_TOKEN) > token file (written by agentpm login).
+</Callout>
+
+### Command synopsis
+
+```bash
+agentpm namespace <command>
+
+Commands:
+  add-signer     Add a signer (public key) to a namespace
+  revoke-signer  Revoke/deactivate a signer by id
+```
+
+### Subcommands & arguments
+
+`add-signer`
+```bash
+agentpm namespace add-signer --namespace <NS> --label <LABEL> [--pubkey <FILE>] [--token <PAT>]
+```
+
+- **`--namespace <NS>`** — Required. Your namespace handle (e.g., `zack`).
+- **`--label <LABEL>`** — Required. A display label for the signer in the UI.
+- **`--pubkey <FILE>`** — Public key source. If omitted, reads from **stdin**.
+- **`--token <PAT>` (env: `AGENTPM_TOKEN`)**. Personal Access Token for headless auth (overrides env/file).
+
+**Output (example)**:
+```bash
+✅  Added signer "Zack Prod"
+```
+
+`revoke-signer`
+```bash
+agentpm namespace revoke-signer --namespace <NS> --signer-id <UUID> [--token <PAT>]
+```
+
+- **`--namespace <NS>`** — Required. Your namespace handle (e.g., `zack`).
+- **`--signer-id <UUID>`** — Required. The signer id shown in the UI.
+- **`--token <PAT>` (env: `AGENTPM_TOKEN`)**. Personal Access Token for headless auth (overrides env/file).
+
+**Output (example)**:
+```bash
+✅  Revoked signer 9a4e6d5e-...-f2b1
+```
+
+## Examples
+
+```bash
+# Register a signer using a public key file
+agentpm namespace add-signer --namespace zack --label "Prod" --pubkey pub.txt
+
+# Register a signer reading public key from stdin
+cat pub.txt | agentpm namespace add-signer --namespace zack --label "Prod"
+
+# Revoke a signer by id (from the UI)
+agentpm namespace revoke-signer --namespace zack --signer-id 9a4e6d5e-...-f2b1
+```
+
+## Workflow: sign & publish (quick recap)
+
+```bash
+agentpm keys generate --label "Prod Key"
+agentpm keys export --key-id <KEY_ID> --out pub.txt
+agentpm namespace add-signer --namespace <NS> --label "Prod" --pubkey pub.txt
+
+# Later, when publishing:
+agentpm publish --sign --key-id <KEY_ID>
+```
+
+If the namespace’s signing mode is **required** and you publish without a valid author signature, the registry rejects the upload with:
+```bash
+HTTP 422: signature_required: namespace requires at least 1 valid author signature
+```
+
+## Notes & best practices
+
+- **CLI-first signer management**: Create keys locally and register signer public keys through the CLI. The web UI lists signers and allows revoke/deactivate actions, but it does not provide an add-signer flow.
+- **Least privilege**: Register only the keys you’ll actually use; revoke old/compromised keys.
+- **Auditability**: Labels help track which machine/user a signer belongs to.

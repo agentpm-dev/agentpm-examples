@@ -3,7 +3,7 @@ name = "agentpm-examples-agent-app-devwork-python"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "agentpm>=0.1.8",
+    "agentpm>=0.1.9",
     "langchain>=1.0.0",
     "langchain-openai>=0.3.0",
     "langgraph>=0.2.0",

@@ -1,0 +1,81 @@
+---
+title: Example Project
+section: Examples
+order: 27
+description: See real tools, agents, templates, and generated projects wired up end-to-end.
+---
+
+# Example Project
+
+See real tools, agents, templates, and generated projects wired up end-to-end.
+
+## Goal
+
+Point you to a working repo with runnable examples across the current AgentPM surfaces. It is useful for learning manifests, publishing, `agentpm new`, workspaces, CLI execution, MCP exposure, and the SDKs together.
+
+## Repository
+
+- **GitHub**: https://github.com/agentpm-dev/agentpm-examples
+- **Published tools namespace**: https://agentpackagemanager.com/namespaces/e6363bd8-e70c-4c11-928b-ebee22de7ede
+
+<Callout title="Demo-quality code" type="warn">
+  These examples are for education and demos, not production hardening. Expect simple error handling and minimal security hardening.
+</Callout>
+
+## What’s inside
+
+- **Tools** — Each has a `agent.json` (`kind:"tool"`), an entrypoint, `files[]`, and IO schemas.
+- **Agent packages** — Published reusable `kind:"agent"` package sources under `agent-packages/*`.
+- **Workflow templates** — Published `kind:"template"` package sources under `template-packages/*`.
+- **Generated example apps** — Checked-in projects created from published templates, showing the actual output of `agentpm new`.
+- **Direct package app examples** — Older and current apps that install published agent packages or tools directly rather than starting from a workflow template.
+- **SDK usage** — Node and Python examples that `load()` tools or published agent roots.
+
+## Current recommended example paths
+
+The examples repo now teaches two complementary flows:
+
+1. **Start from a workflow template**
+   Use `agentpm new` to generate a project, then work inside the generated app.
+2. **Install published packages directly**
+   Use `agentpm install` in a hand-maintained app when you want to learn the lower-level package flow.
+
+The clearest current examples are:
+
+- **Template-generated Node SDK app**
+  - `agent-app-research-node`
+  - Generated from `template-packages/research-assistant-node`
+- **Template-generated Python SDK app**
+  - `agent-app-ops-python`
+  - Generated from `template-packages/triage-worker-python`
+- **Template-generated CLI automation app**
+  - `app-cli-automation-worker`
+  - Generated from `template-packages/cli-automation-worker`
+- **Template-generated MCP server app**
+  - `app-mcp-tool-server`
+  - Generated from `template-packages/mcp-tool-server`
+- **Template-generated multi-agent workspace**
+  - `agent-app-support-assistant-workspace`
+  - Generated from `template-packages/support-assistant-workspace`
+- **Direct published-agent app**
+  - `agent-app-devwork-python`
+  - Consumes the published `@zack/devwork-copilot` agent package without starting from a workflow template
+
+Older `agent-app-node` and `agent-app-python` directories are still useful for historical context, but they are no longer the main starting point.
+
+## How to read the repo
+
+If you want to learn:
+
+- **How to author and publish a workflow template**
+  - start in `template-packages/*`
+- **What a real generated project looks like after `agentpm new`**
+  - start in the matching generated app directory such as `agent-app-research-node` or `app-mcp-tool-server`
+- **How published tools and agent packages are authored**
+  - start in `tools-node/*`, `tools-python/*`, or `agent-packages/*`
+- **How a hand-maintained app can consume published packages directly**
+  - start in `agent-app-devwork-python`
+
+## Contributing
+
+Issues and PRs welcome, especially corrections, new tool examples, template examples, and small agent demos that illustrate good manifest patterns.

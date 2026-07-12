@@ -1,0 +1,135 @@
+---
+title: serve
+section: CLI
+order: 11
+description: Start a local HTTP MCP server that exposes the tools pinned in agent.lock.
+next: cli/export
+---
+
+# serve
+
+Start a local HTTP MCP server for installed AgentPM tools.
+
+## Overview
+
+`agentpm serve --mcp` exposes the tools pinned in `agent.lock` through a local HTTP MCP-compatible server. Tool metadata comes from installed `agent.json` files, and tool calls execute through the same shared runner used by `agentpm run`.
+
+<Callout type="info" title="First built-in adapter">
+  MCP is AgentPM's first built-in ecosystem adapter. The packaging, install, lockfile, and runtime model stay canonical in AgentPM; `serve --mcp` is an exposure surface on top.
+</Callout>
+
+<Callout type="info" title="Future plugin support">
+  Public third-party adapter plugins, including WASM-loaded adapters, are future work. Today, AgentPM ships the built-in MCP adapter only.
+</Callout>
+
+### Command synopsis
+```bash
+agentpm serve --mcp [--host <HOST>] [--port <PORT>] [--tool <PACKAGE_REF> ...] [--tools <PACKAGE_REFS>]
+```
+
+### Arguments
+- **`--mcp`**. Start the built-in MCP adapter.
+- **`--host <HOST>`**. Host interface to bind. Default: `127.0.0.1`.
+- **`--port <PORT>`**. Port to bind. Default: `7331`.
+- **`--tool <PACKAGE_REF>`**. Restrict exposure to a specific locked package ref. Repeatable.
+- **`--tools <PACKAGE_REFS>`**. Restrict exposure to a comma-separated list of locked package refs.
+
+## Examples
+
+### Expose all locked tools
+```bash
+agentpm serve --mcp
+```
+
+### Bind to a different port
+```bash
+agentpm serve --mcp --port 7444
+```
+
+### Expose only one locked tool
+```bash
+agentpm serve --mcp --tool @zack/echo-json
+```
+
+### Expose a selected set of locked tools
+```bash
+agentpm serve --mcp --tools @zack/echo-json,@zack/slack-post-message
+```
+
+## Behavior
+
+- By default, the server exposes every tool pinned in `agent.lock`.
+- This command currently supports HTTP MCP only; stdio transport is out of scope for this surface today.
+- Tool names are normalized into MCP-safe names for the wire protocol and mapped back to the original AgentPM package refs internally.
+- Tool descriptions come from manifest `description`.
+- Tool input metadata comes from manifest `inputs` when present.
+- Tool calls execute through the shared AgentPM runner rather than a separate MCP-specific execution path.
+
+## HTTP endpoints
+
+The server currently exposes:
+
+- `GET /`
+  - simple health-style response body: `AgentPM MCP server`
+- `POST /`
+  - accepts JSON-RPC / MCP requests
+- `POST /mcp`
+  - accepts the same JSON-RPC / MCP requests as `/`
+
+Supported MCP methods:
+
+- `initialize`
+- `notifications/initialized`
+- `tools/list`
+- `tools/call`
+
+### Example: initialize
+```bash
+curl -X POST http://127.0.0.1:7331/ \
+  -H 'content-type: application/json' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {}
+  }'
+```
+
+### Example: list tools
+```bash
+curl -X POST http://127.0.0.1:7331/mcp \
+  -H 'content-type: application/json' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/list",
+    "params": {}
+  }'
+```
+
+### Example: call a tool
+```bash
+curl -X POST http://127.0.0.1:7331/mcp \
+  -H 'content-type: application/json' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "zack__echo_json",
+      "arguments": {
+        "message": "hello"
+      }
+    }
+  }'
+```
+
+<Callout type="info" title="Tool names">
+  AgentPM package refs like `@zack/echo-json` are normalized into MCP-safe names such as `zack__echo_json`. The server keeps the internal mapping back to the original package ref.
+</Callout>
+
+## Troubleshooting
+
+- **No tools exposed**. Confirm `agent.lock` exists and points to installed prepared tools under `.agentpm/tools/<namespace>/<name>/<version>`.
+- **Requested tool filter not found**. `--tool` and `--tools` only work with package refs that are present in `agent.lock`.
+- **Runner failures from MCP calls**. The MCP adapter surfaces tool resolution, runtime, timeout, and malformed output failures from the shared runner.

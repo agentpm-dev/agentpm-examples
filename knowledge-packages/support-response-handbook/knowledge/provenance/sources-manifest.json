@@ -1,0 +1,26 @@
+{
+  "package": "@zack/support-response-handbook",
+  "version": "0.1.0",
+  "maintainer_intent": "Hand-authored support guidance for direct context loading examples in AgentPM.",
+  "sources": [
+    {
+      "path": "knowledge/docs/response-principles.md",
+      "kind": "authored-markdown",
+      "summary": "Core response principles for support drafting."
+    },
+    {
+      "path": "knowledge/docs/escalation-guidelines.md",
+      "kind": "authored-markdown",
+      "summary": "Escalation rules and handoff expectations."
+    },
+    {
+      "path": "knowledge/docs/message-templates.md",
+      "kind": "authored-markdown",
+      "summary": "Reusable response and escalation templates."
+    }
+  ],
+  "builder": {
+    "name": "agentpm-examples-manual-curation",
+    "version": "2026-07-12"
+  }
+}

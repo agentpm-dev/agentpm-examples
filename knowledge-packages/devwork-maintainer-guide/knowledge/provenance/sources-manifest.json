@@ -1,0 +1,35 @@
+{
+  "package": "@zack/devwork-maintainer-guide",
+  "version": "0.1.0",
+  "maintainer_intent": "Small authored maintainer guidance corpus prepared for AgentPM vector retrieval examples.",
+  "sources": [
+    {
+      "id": "src_triage_rules",
+      "path": "knowledge/source-docs/triage-rules.md",
+      "kind": "authored-markdown",
+      "summary": "Issue classification and urgency rules."
+    },
+    {
+      "id": "src_labeling_guide",
+      "path": "knowledge/source-docs/labeling-guide.md",
+      "kind": "authored-markdown",
+      "summary": "Labeling conventions for actionability and ambiguity."
+    },
+    {
+      "id": "src_comment_style",
+      "path": "knowledge/source-docs/comment-style.md",
+      "kind": "authored-markdown",
+      "summary": "Comment-writing guidance for decisions and expectation setting."
+    }
+  ],
+  "embedding": {
+    "provider": "bring-your-own",
+    "model": "example-normalized-4d",
+    "dimensions": 4,
+    "notes": "Small normalized example vectors chosen for predictable local exact-search demos."
+  },
+  "builder": {
+    "name": "agentpm-examples-manual-curation",
+    "version": "2026-07-12"
+  }
+}

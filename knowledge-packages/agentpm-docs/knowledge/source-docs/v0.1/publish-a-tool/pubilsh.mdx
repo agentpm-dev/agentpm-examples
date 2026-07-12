@@ -1,0 +1,127 @@
+---
+title: publish
+section: Publish a tool
+order: 16
+description: Validate, package, and upload your tool to the AgentPM registry.
+next: publish-a-tool/signing
+---
+
+# publish
+
+Validate, package, and upload your tool to the AgentPM registry.
+
+## Goal
+
+Run a dry-run to confirm your package, then publish the real artifact.
+
+## 0) Namespace required
+
+Before publishing, you need a **namespace**.
+
+- Create it on your profile at the AgentPM site.
+- If your account can publish to exactly one namespace, `agentpm publish` can infer it.
+- If your account can publish to more than one namespace, pass `--namespace <handle>` explicitly.
+- Your PAT or logged-in account still has to be allowed to publish into the chosen namespace.
+
+<Callout type="tip" title="New here?">
+  Create an account by signing in at https://agentpackagemanager.com/signUp , then authenticate via agentpm login. You can verify auth anytime with agentpm whoami.
+</Callout>
+
+## 1) Sanity check (optional but recommended)
+
+Run lint and a packaging dry-run:
+```bash
+agentpm lint --strict
+agentpm publish --dry-run
+```
+
+What you should see:
+```java
+• Reading credentials…
+✓ Reading credentials (0ms)
+• Validating manifest…
+✓ Validating manifest (3ms) — schema + semantics
+• Packaging files…
+✓ Packaging files (24ms) — 23866 bytes, sha256: fca0ef9660eb
+Dry-run: artifact created at target/agentpm/summarize-0.1.3.tar.gz
+```
+
+<Callout type="info" title="Note">
+  Lint runs automatically during publish. With --strict, warnings will also block.
+</Callout>
+
+## 2) Publish for real
+
+```bash
+# If your account can publish to exactly one namespace:
+agentpm publish
+
+# If your account can publish to more than one namespace:
+agentpm publish --namespace zack
+```
+
+Typical successful output:
+```java
+• Reading credentials…
+✓ Reading credentials (0ms)
+• Validating manifest…
+✓ Validating manifest (2ms) — schema + semantics
+• Packaging files…
+✓ Packaging files (4ms) — 23866 bytes, sha256: fca0ef9660eb
+• Uploading artifact…
+✓ Uploading artifact (1.5s) — done
+✓ Published summarize@0.1.3
+  id:   21
+  url:  https://www.agentpackagemanager.com/tools/db32af01-3c9f-47d7-ba91-06638f088531/v0.1.3/overview
+```
+
+**What gets produced**
+- A `.tar.gz` at `target/agentpm/<name>-<version>.tar.gz` containing
+    - `agent.json`
+    - your `entrypoint` target
+    - everything matched by `files[]` (paths/globs preserved)
+- A SHA-256 digest is shown and used for integrity on install.
+
+## 3) Versioning & immutability
+
+- **SemVer only**. Bump the `version` in `agent.json` for changes.
+- **No overwrites**. Re-publishing an existing version is rejected—use a new version.
+
+
+## Common options
+
+```bash
+# Treat warnings as errors (same as lint)
+agentpm publish --strict
+
+# Package without uploading
+agentpm publish --dry-run
+
+# Quieter output (useful in CI)
+agentpm publish --quiet
+```
+
+## Tool execution contract
+
+For a tool to work with the SDK, it must follow this process protocol:
+- SDK writes inputs JSON to stdin.
+- Your tool writes one JSON object (final result) to stdout.
+- Logs/diagnostics → stderr only.
+- Exit code 0 on success (non-zero = failure).
+
+If you break this contract, `publish --dry-run` may succeed (it only packages), but runtime calls via the SDK will fail. See **SDKs → Node/Python** for examples.
+
+## Troubleshooting
+
+- **Validation failed**. Fix the reported issues, or drop `--strict` if you’re okay shipping with warnings.
+- **Missing files in the tarball**. Ensure `files[]` includes built artifacts and that `entrypoint.args` points to a packaged path.
+- **Interpreter mismatch**. Align `runtime.type` with `entrypoint.command` (e.g., `node` with a Node entrypoint).
+
+## After publishing
+
+- **Install from another project**
+```bash
+agentpm install @namespace/summarize@0.1.3
+```
+- **Pin in production**. Consumer commits the `agent.lock` so installs are deterministic.
+- **Changelog & docs**. Keep `description` and schema field descriptions sharp—registry pages render from your manifest.

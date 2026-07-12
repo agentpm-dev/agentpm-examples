@@ -1,0 +1,278 @@
+---
+title: publish
+section: CLI
+order: 9
+description: Validate and package your tool, skill, knowledge, agent, or template, then upload the signed artifact to the registry.
+next: cli/run
+---
+
+# publish
+
+Validate and package your tool, skill, knowledge, agent, or template, then upload the signed artifact to the registry.
+
+## Overview
+
+`agentpm publish` runs the same validations as `lint`, packages your project into a `.tar.gz`, and (unless `--dry-run`) uploads it to the registry.
+
+For `kind: "knowledge"`, publish also performs a build-check first. The package must already be prepared with:
+
+```bash
+agentpm knowledge build
+```
+
+Publish validates that the current files still match the build-derived metadata and local index metadata. It does not rewrite `agent.json` or regenerate the index during publish.
+
+### Command synopsis
+```bash
+agentpm publish [--manifest <path>] [--schema <URL|PATH>] [--strict] [--dry-run] [--quiet] [--sign] [--key-id <KEY_ID>] [--token <PAT>] [--namespace <handle>]
+```
+
+### Arguments
+- **`--manifest <path>` (default: `agent.json`)**. Path to the manifest to package and publish.
+- **`--schema <URL|PATH>`**. Override the schema source. By default, the CLI uses `./schemas/agentpm.manifest.schema.json` when it exists relative to the current working directory; otherwise it uses the bundled schema version shipped with the CLI.
+- **`--strict`**. Treat warnings as errors (same semantics as `lint`).
+- **`--dry-run`**. Validate and package, but **do not upload**. Writes a local artifact.
+- **`--quiet`**. Suppress progress output (auto-enabled when not a TTY).
+- **`--sign`** — Attach an **author signature** using a local key (namespace must allow/require). Prompts for the key’s passphrase.
+- **`--key-id <KEY_ID>`** — Key to use when `--sign` (from `agentpm keys list`). Required if `--sign` is set.
+- **`--token <PAT>` (env: `AGENTPM_TOKEN`)**. Personal Access Token for headless auth (overrides env/file).
+- **`--namespace <handle>`**. Publish into a specific namespace handle. Required when your account can publish to more than one namespace.
+
+<Callout type="info" title="Validation">
+  publish runs lint automatically. Any lint errors will block publish; with --strict, warnings also block publish
+</Callout>
+
+If you need a different schema version or a hosted schema URL, pass it explicitly with `--schema`.
+
+<Callout type="info" title="Token resolution order">
+    flag (--token) > env (AGENTPM_TOKEN) > token file (written by agentpm login).
+</Callout>
+
+## Authentication required
+
+You **must be logged in** to publish. Any of these methods work:
+
+- **Flag**: `agentpm publish --token "$AGENTPM_TOKEN"`
+- **Env var**: AGENTPM_TOKEN (e.g., `export AGENTPM_TOKEN=…`)
+- **Logged-in session**: run `agentpm login` once to create a local token file
+
+PAT scopes:
+- `packages:publish` can publish tools, skills, knowledge packages, agents, and templates
+- `tools:publish` is still temporarily accepted for tool packages only
+
+## Namespace required
+
+Before publishing, you need a **namespace**.
+
+- Create it on your profile at the AgentPM site.
+- If your account can publish to exactly one namespace, `agentpm publish` can infer it.
+- If your account can publish to multiple namespaces, pass `--namespace <handle>` explicitly.
+- Your PAT still has to be allowed to publish into the chosen namespace.
+
+<Callout type="tip" title="New here?">
+  Create an account by signing in at https://agentpackagemanager.com/signUp , then authenticate via agentpm login. You can verify auth anytime with agentpm whoami.
+</Callout>
+
+## Signing (author & registry)
+
+- **Author-sign at publish** with your local key:
+```bash
+agentpm publish --sign --key-id <KEY_ID_FROM_keys_list >
+# prompts for key passphrase
+```
+- **Registry attestation** happens automatically for every publish.
+
+### Requirements
+
+- Your namespace’s signing mode controls author signatures: **off | optional | required** (set on the website, Profile → Namespaces → Manage).
+- If **required**, publish will fail unless at least one valid author signature is attached and the key is registered to the namespace:
+```bash
+Error: HTTP 422: signature_required: namespace requires at least 1 valid author signature
+```
+
+### Helpful commands
+
+- Manage local keys: `agentpm keys generate|list|export`
+- Register key with namespace: `agentpm namespace add-signer --namespace <ns> --label "<label>" --pubkey pub.txt`
+
+## Examples
+
+### Dry-run (no upload)
+```bash
+agentpm publish --dry-run
+```
+
+Sample output:
+```java
+• Reading credentials…
+✓ Reading credentials (0ms)
+• Validating manifest…
+✓ Validating manifest (3ms) — schema + semantics
+• Packaging files…
+✓ Packaging files (24ms) — 23866 bytes, sha256: fca0ef9660eb
+Dry-run: artifact created at target/agentpm/summarize-0.1.3.tar.gz
+```
+
+### Dry-run with strict (warnings become errors)
+```bash
+agentpm publish --dry-run --strict
+```
+
+Sample output (fails on warning):
+```java
+• Reading credentials…
+✓ Reading credentials (0ms)
+• Validating manifest…
+  [WARN ] `description` should not be empty
+        at instance /description
+✗ Validating manifest (3ms) — failed
+Error: Manifest validation failed (strict=true)
+```
+
+### Actual publish
+```bash
+agentpm publish --namespace zack
+```
+
+Sample output:
+```java
+• Reading credentials…
+✓ Reading credentials (0ms)
+• Validating manifest…
+✓ Validating manifest (2ms) — schema + semantics
+• Packaging files…
+✓ Packaging files (4ms) — 23866 bytes, sha256: fca0ef9660eb
+• Uploading artifact…
+✓ Uploading artifact (1.5s) — done
+✓ Published summarize@0.1.3
+  id:   21
+  url:  https://www.agentpackagemanager.com/tools/db32af01-3c9f-47d7-ba91-06638f088531/v0.1.3/overview
+```
+
+## What gets packaged
+
+Artifacts are written to:
+`target/agentpm/<name>-<version>.tar.gz`
+
+### Shared package contents
+
+Tool, skill, knowledge, agent, and template packages can include:
+
+- `agent.json` — your manifest (exactly as validated)
+- README content when you provide it through the existing README metadata/content flow
+- license content when you provide it through the existing license metadata/content flow
+
+For `kind: "skill"`, the registry also captures the declared `skill.entrypoint` content separately from the top-level README flow so the package page can render a dedicated Manual tab without conflating it with `README.md`.
+
+### Skill packages
+
+For `kind: "skill"`, the archive contains only manifest-declared files:
+
+- `agent.json`
+- the file at `skill.entrypoint`
+- any files listed in `skill.references[]`
+- any files listed in `skill.scripts[]`
+- optional `readme` file when declared
+- optional `license.file` when declared
+
+Important packaging behavior:
+
+- relative paths are preserved in the tarball
+- undeclared files are not included
+- AgentPM does not crawl Markdown links to infer extra files
+
+### Tool packages
+
+For `kind: "tool"`, the archive contains:
+
+- `entrypoint` — the executable/script declared in `entrypoint.command` (relative path preserved)
+- `files` — everything matched by `files[]` patterns (globs/dirs), with relative paths preserved
+
+### Agent packages
+
+For `kind: "agent"`, the package payload is manifest-driven and does not add executable tool files.
+
+Agent packages do **not** require:
+
+- `entrypoint`
+- `runtime`
+- `inputs`
+- `outputs`
+- `files`
+
+### Template packages
+
+For `kind: "template"`, the archive contains:
+
+- `template.files_root` — the declared scaffold tree, copied into the artifact with relative paths preserved
+
+Template packages do **not** require:
+
+- `entrypoint`
+- `runtime`
+- `inputs`
+- `outputs`
+- `files`
+
+A SHA-256 digest is computed and shown in the output (also used for integrity verification on install).
+
+### Knowledge packages
+
+For `kind: "knowledge"`, the archive is mode-specific.
+
+Context mode packages contain:
+
+- `agent.json`
+- every declared `knowledge.documents[].path`
+- optional `knowledge.provenance.sources_manifest_path` when present
+
+Vector mode packages contain:
+
+- `agent.json`
+- declared `knowledge.corpus.chunks_path`
+- declared `knowledge.corpus.sources_path`
+- declared `knowledge.embedding.vectors_path`
+- all files under the declared default `agentpm-local` index path
+- optional `knowledge.provenance.sources_manifest_path` when present
+
+Important publish behavior for Knowledge:
+
+- publish validates that `agentpm knowledge build` has already been run
+- publish fails if build-derived metadata is missing or stale
+- publish does not regenerate `knowledge/indexes/default`
+- publish does not mutate `agent.json`
+
+## Typical workflow
+
+1. Finish your manifest.
+   - tools: inputs/outputs, entrypoint, files, optional README/license metadata, env vars, version
+   - agents: tools, examples, optional README/license metadata, version
+   - skills: `skill.entrypoint`, optional references/scripts/compatibility, optional README/license metadata, version
+   - knowledge: declared context documents or vector corpus paths, optional provenance metadata, version
+   - templates: `template` metadata, declared `files_root`, optional README/license metadata, version
+2. Run local checks:
+```bash
+agentpm lint --strict
+agentpm knowledge build   # for kind="knowledge"
+agentpm publish --dry-run
+```
+3. Commit changes (including updated version).
+4. Publish for real:
+```bash
+agentpm publish --namespace zack
+```
+
+## Exit codes
+
+- `0` — Published (or dry-run packaged) successfully.
+- `1` — Validation or upload failed (includes lint errors or strict warnings).
+
+## Troubleshooting
+- **Validation failed**. Fix schema errors first (`agentpm lint`). If you used `--strict`, address warnings or omit `--strict` for non-blocking warnings.
+- **Missing files in a tool package**. Ensure `entrypoint.command` points to a checked-in path, and add required assets/globs to `files[]`.
+- **Runtime/Interpreter mismatch**. Lint will error if `runtime.type` doesn’t match `entrypoint.command`. Align them (e.g., `python` ↔ a Python entrypoint).
+
+## Notes & best practices
+- **Determinism**. What you **lint** is what you **publish**. The packaged `agent.json` is the same one that passed validation.
+- **Versioning**. Bump versions semantically; publishing an existing version is rejected.
+- **Reproducibility**. Consumers will lock the artifact (checksum + version) in `agent.lock`, ensuring repeatable installs in CI and across teams.

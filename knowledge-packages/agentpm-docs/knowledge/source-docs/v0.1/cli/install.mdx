@@ -1,0 +1,84 @@
+---
+title: Install
+section: CLI
+order: 3
+description: Get the AgentPM CLI on your machine and confirm it’s on your path.
+next: cli/init
+---
+
+# Install
+
+Get the AgentPM CLI on your machine and confirm it’s on your path.
+
+## macOS & Linux
+```bash title="Homebrew"
+brew tap agentpm-dev/tap
+brew install agentpm
+```
+
+<Callout type="info" title="Homebrew tap trust">
+  On newer Homebrew versions, third-party taps may require explicit trust before formulae can be loaded.
+
+  If Homebrew refuses to load `agentpm-dev/tap/agentpm` from an untrusted tap, run one of:
+
+  ```bash
+  brew trust --formula agentpm-dev/tap/agentpm
+  # or trust the whole tap:
+  brew trust agentpm-dev/tap
+  ```
+</Callout>
+
+### Upgrade
+```bash title="Homebrew"
+brew update && brew upgrade agentpm
+```
+
+### Uninstall
+```bash title="Homebrew"
+brew uninstall agentpm
+```
+
+### Verify
+```bash title="Homebrew"
+which agentpm
+agentpm -V
+brew info agentpm
+```
+
+<Callout type="info" title="Note">
+  If which agentpm prints nothing, ensure Homebrew’s bin directory is on your PATH.
+</Callout>
+
+## Windows
+```powershell title="Scoop"
+scoop bucket add agentpm https://github.com/agentpm-dev/scoop-bucket
+scoop install agentpm
+```
+
+### Upgrade
+```powershell title="Scoop"
+scoop update
+scoop update agentpm
+```
+
+### Uninstall
+```powershell title="Scoop"
+scoop uninstall agentpm
+```
+
+### Verify
+```powershell title="Scoop"
+where agentpm
+agentpm -V
+scoop info agentpm
+```
+
+<Callout type="info" title="Note">
+  If where agentpm doesn’t find the binary, run scoop reset agentpm or re-open your terminal so updated PATH settings take effect.
+</Callout>
+
+## Troubleshooting
+- **Permission issues on macOS/Linux**. Try `brew doctor` to diagnose Homebrew setup problems, or run your shell as a user with the correct permissions for the Homebrew prefix.
+- **Untrusted Homebrew tap**. If Homebrew says it is refusing to load `agentpm-dev/tap/agentpm` from an untrusted tap, run `brew trust --formula agentpm-dev/tap/agentpm` or `brew trust agentpm-dev/tap`.
+- **Corporate proxies / TLS MITM**. Configure your proxy in your shell env before installing, e.g. `HTTPS_PROXY` / `HTTP_PROXY`.
+- **Shell not seeing updates**. Open a new terminal session, or run `hash -r` (bash/zsh) after upgrading.

@@ -2,8 +2,14 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "devwork-copilot",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions.",
+  "knowledge": [
+    {
+      "name": "@zack/devwork-maintainer-guide",
+      "version": "0.1.0"
+    }
+  ],
   "skills": [
     {
       "name": "@zack/issue-triage-playbook",
@@ -24,6 +30,10 @@
     {
       "title": "Prepare maintainer notes",
       "prompt": "Read a set of repository issues and produce a concise maintainer briefing with action items and open questions."
+    },
+    {
+      "title": "Retrieve maintainer guidance",
+      "prompt": "Review an issue thread, pull the most relevant maintainer guidance from the installed Knowledge package, and use it to draft a concise next-step comment."
     }
   ],
   "readme": "README.md",

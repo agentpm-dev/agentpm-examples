@@ -1,0 +1,302 @@
+---
+title: init
+section: CLI
+order: 4
+description: Scaffold a new AgentPM package by generating a starter agent.json manifest for a tool, skill, agent, template, or knowledge package.
+next: cli/login
+---
+
+# init
+
+Scaffold a new AgentPM package by generating a starter `agent.json` manifest for a tool, skill, agent, template, or knowledge package.
+
+## Overview
+
+`agentpm init` creates the minimal manifest you’ll complete later. Choose a kind (`tool`, `skill`, `agent`, `template`, or `knowledge`), set a name/description, and optionally an output directory.
+
+### Command synopsis
+```bash
+agentpm init [--kind <tool|skill|agent|template|knowledge>] [--mode <context|vector>] [--name <string>] [--description <string>] [--out-dir <path>]
+```
+
+### Arguments
+- **`--kind` (default: `tool`)**. What to scaffold: a single tool, a procedural skill, a composed agent, a workflow template package, or a Knowledge package.
+- **`--mode` (default: `context`)**. Only used with `--kind knowledge`. Choose `context` for direct context documents or `vector` for a prepared retrieval corpus starter.
+- **`--name` (default: `my-tool`)**. Name for the tool/agent (used in the manifest).
+- **`--description` (default: `Starter AgentPM project`)**. Short human-readable description.
+- **`--out-dir`**. Directory to write files to (defaults to current working directory).
+
+<Callout type="tip" title="Tip">
+  Use `--out-dir ./my-project` to keep each package in its own folder.
+</Callout>
+
+
+## Examples
+
+### Create an agent
+```bash
+agentpm init --kind agent --name research-assistant --description "Assistant composed of multiple tools"
+```
+
+Generates `agent.json`:
+```json
+{
+  "kind": "agent",
+  "name": "research-assistant",
+  "version": "0.1.0",
+  "description": "Assistant composed of multiple tools",
+  "tools": [],
+  "skills": [],
+  "knowledge": [],
+  "memory": [],
+  "profiles": [],
+  "examples": [
+    {
+      "title": "Example prompt",
+      "prompt": "Describe the user request this agent should handle."
+    }
+  ]
+}
+```
+
+### Create a skill
+```bash
+agentpm init --kind skill --name incident-commander --description "Incident response coordination playbook"
+```
+
+Creates:
+
+```text
+incident-commander/
+  agent.json
+  SKILL.md
+```
+
+Generates `agent.json`:
+
+```json
+{
+  "kind": "skill",
+  "name": "incident-commander",
+  "version": "0.1.0",
+  "description": "Incident response coordination playbook",
+  "tools": [],
+  "skill": {
+    "entrypoint": "SKILL.md"
+  }
+}
+```
+
+### Create a tool
+```bash
+agentpm init --kind tool --name summarize --description "Summarize input text"
+```
+
+Generates `agent.json`:
+```json
+{
+  "kind": "tool",
+  "name": "summarize",
+  "version": "0.1.0",
+  "description": "Summarize input text",
+  "files": [],
+  "entrypoint": {
+    "command": "",
+    "args": []
+  },
+  "inputs": {},
+  "outputs": {}
+}
+```
+
+### Create a knowledge package
+```bash
+agentpm init --kind knowledge --name engineering-playbook --description "Engineering playbook intended for direct context loading"
+```
+
+Creates:
+
+```text
+engineering-playbook/
+  agent.json
+  README.md
+  knowledge/
+    docs/
+      context.md
+```
+
+Generates `agent.json`:
+
+```json
+{
+  "kind": "knowledge",
+  "name": "engineering-playbook",
+  "version": "0.1.0",
+  "description": "Engineering playbook intended for direct context loading",
+  "knowledge": {
+    "mode": "context",
+    "content_type": "documentation",
+    "documents": [
+      {
+        "path": "knowledge/docs/context.md",
+        "content_type": "text/markdown",
+        "role": "context",
+        "description": "Starter context document."
+      }
+    ],
+    "retrieval": {
+      "strategy": "full_context"
+    }
+  }
+}
+```
+
+The generated `README.md` is also mode-specific and explains the direct-context workflow rather than the vector workflow.
+
+For a vector-mode starter:
+
+```bash
+agentpm init --kind knowledge --mode vector --name python-docs --description "Prepared retrieval corpus for Python documentation"
+```
+
+Creates:
+
+```text
+python-docs/
+  agent.json
+  README.md
+  knowledge/
+    chunks.jsonl
+    sources.jsonl
+    embeddings/
+```
+
+Generates `agent.json`:
+
+```json
+{
+  "kind": "knowledge",
+  "name": "python-docs",
+  "version": "0.1.0",
+  "description": "Prepared retrieval corpus for Python documentation",
+  "knowledge": {
+    "mode": "vector",
+    "content_type": "documentation",
+    "corpus": {
+      "chunks_path": "knowledge/chunks.jsonl",
+      "sources_path": "knowledge/sources.jsonl"
+    },
+    "embedding": {
+      "id": "default",
+      "provider": "custom",
+      "model": "unknown",
+      "dimensions": 1536,
+      "metric": "cosine",
+      "normalized": true,
+      "vectors_path": "knowledge/embeddings/default.f32"
+    },
+    "retrieval": {
+      "strategy": "vector"
+    }
+  }
+}
+```
+
+The generated `README.md` for vector mode explains the prepared corpus placeholders and calls out that `knowledge/indexes/default` is generated later by `agentpm knowledge build`.
+
+### Create a workflow template
+
+```bash
+agentpm init --kind template --name research-template --description "Bootstrap a research workflow"
+```
+
+Creates:
+
+```text
+research-template/
+  agent.json
+  template/
+    README.md
+```
+
+Generates `agent.json`:
+
+```json
+{
+  "kind": "template",
+  "name": "research-template",
+  "version": "0.1.0",
+  "description": "Bootstrap a research workflow",
+  "template": {
+    "display_name": "Research Template",
+    "use_case": "starter",
+    "execution_surfaces": ["agentpm-run"],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "research-template"
+      }
+    ],
+    "dependencies": {
+      "tools": [],
+      "agents": []
+    },
+    "entrypoints": [
+      {
+        "label": "Review generated scaffold",
+        "command": "cat README.md"
+      }
+    ]
+  }
+}
+```
+
+`agentpm init --kind template` does not create consumer output like `template/agent.json`.
+
+## What's next?
+
+The generated manifests are intentional skeletons—you’ll need to finish them before you can `install`, `new`, or `publish`.
+
+- For agents:
+    - Add tools to the `tools[]` array (via `agentpm install <tool>` or by editing then running `agentpm install`).
+    - Replace the placeholder example prompt with a real user request your agent should handle.
+    - Leave `memory` and `profiles` empty unless you intentionally want to reserve those fields for future use.
+- For tools:
+    - Fill in `entrypoint.command` (and `args` if needed).
+    - Define `inputs` and `outputs` schemas.
+    - List any packaged artifacts in `files[]` (scripts, models, prompts, etc.).
+- For skills:
+    - Author `SKILL.md`.
+    - Add tool refs to `tools[]` when the skill depends on runnable packages.
+    - Add optional `skill.references`, `skill.scripts`, and descriptive `skill.compatibility` metadata.
+- For templates:
+    - Fill in the template package metadata, variables, dependencies, and entrypoints.
+    - Add scaffold files under `template/` (or your chosen `template.files_root`).
+    - Keep registry docs in the root `README.md` and generated-project docs in `template/README.md`.
+    - Use `agentpm new . ../my-template-test` to verify the scaffold locally before publishing.
+- For knowledge packages:
+    - Replace the placeholder files under `knowledge/` with your real content.
+    - Keep `mode: "context"` for direct context bundles, or use `--mode vector` when starting a prepared retrieval corpus.
+    - Run `agentpm knowledge build` before publishing so the derived metadata and local vector index are current.
+
+Run a quick check:
+```bash
+agentpm lint
+```
+
+<Callout type="tip" title="Tip">
+  Lint helps you catch missing fields, schema issues, and versioning problems early.
+</Callout>
+
+After linting and completing the manifest:
+- Use `agentpm install` to fetch declared tools, skills, and knowledge (for agents) or declared tools (for skills).
+- Use `agentpm new` to verify local or published templates.
+- When ready to share, head to `agentpm publish`.
+
+## Notes & gotchas
+- **Naming**: Choose a unique `name`—it’s surfaced in the registry and in your namespaces.
+- **Versioning**: `init` seeds `0.1.0`. Bump versions semantically as your package evolves.
+- **Subprocess runtime**: Tools execute in a **managed subprocess**; define any required environment variables in the manifest so hosts know what to set.
