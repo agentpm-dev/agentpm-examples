@@ -1,0 +1,84 @@
+---
+title: export
+section: CLI
+order: 12
+description: Generate a starter skill scaffold from an AgentPM tool.
+next: cli/knowledge
+---
+
+# export
+
+Generate a starter skill scaffold from an AgentPM tool.
+
+## Overview
+
+`agentpm export --skill` resolves a tool and writes a scaffolded skill directory with progressive disclosure:
+
+```text
+skills/<tool-name>/
+  SKILL.md
+  references/
+    tool-contract.md
+    examples.md
+  scripts/
+    run.sh
+```
+
+This is a scaffold, not a polished final skill. It is meant to give you a strong starting point while keeping the packaged AgentPM tool as the execution source of truth.
+
+### Command synopsis
+```bash
+agentpm export --skill <PACKAGE_REF> [--output <PATH>] [--manifest] [--force] [--token <PAT>]
+```
+
+### Arguments
+- **`--skill <PACKAGE_REF>`**. Tool spec to export as a starter skill scaffold.
+- **`--output <PATH>`**. Override the default output directory.
+- **`--manifest`**. Also generate a starter `kind: "skill"` `agent.json`.
+- **`--force`**. Overwrite an existing output directory.
+- **`--token <PAT>`**. Optional PAT for private remote export fallback.
+
+## Examples
+
+### Generate the default scaffold
+```bash
+agentpm export --skill @zack/echo-json
+```
+
+### Write the scaffold somewhere else
+```bash
+agentpm export --skill @zack/echo-json --output ./generated-skills/echo-json
+```
+
+### Generate a publishable starter manifest too
+```bash
+agentpm export --skill @zack/echo-json --manifest --force
+```
+
+### Overwrite an existing scaffold
+```bash
+agentpm export --skill @zack/echo-json --force
+```
+
+## Behavior
+
+- The command prefers installed tool metadata when the tool is already available locally.
+- If the tool is not installed, the command can resolve it from the registry and scaffold from the package artifact without installing it.
+- The generated `SKILL.md` stays concise and links out to deeper reference files.
+- `references/tool-contract.md` contains manifest-derived contract details.
+- `references/examples.md` contains generated starter examples.
+- `scripts/run.sh` delegates execution back to `agentpm run`.
+- `--manifest` adds a starter `agent.json` with:
+  - `kind: "skill"`
+  - the source tool pinned in top-level `tools`
+  - `skill.entrypoint`, `skill.references`, and `skill.scripts` pointing at the generated files
+- The generated manifest is a starter, not a finished package. Edit the prose, examples, and dependency metadata before publishing.
+- The default output path uses only the tool name (`skills/<tool-name>`). If you have packages like `@zack/echo-json` and `@acme/echo-json`, use `--output` to avoid collisions.
+- Remote export fallback does not install the tool, create `.agentpm` package directories, or mutate `agent.lock` / workspace metadata.
+
+## Troubleshooting
+
+- **Tool not found locally**. That is fine if the package is available from the registry. The command will fall back to remote resolution when it can.
+- **Private tool export fails**. Re-run with `--token <PAT>` or log in first so remote fallback can access the package.
+- **Output directory already exists**. Re-run with `--force` if you want to replace the existing scaffold.
+- **Scaffold is too generic**. That is expected. Add your own workflow-specific guidance and examples after generation.

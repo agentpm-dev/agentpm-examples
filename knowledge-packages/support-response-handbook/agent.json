@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Multi-file support response handbook for direct context loading across drafting, escalation, and customer messaging workflows.",
+  "kind": "knowledge",
+  "knowledge": {
+    "context": {
+      "content_hash": "sha256:6d1bdc762b4469df4f2a320d223afad243245c6c8c8731ef63a64fdc27e23d58",
+      "document_count": 3,
+      "total_bytes": 4717
+    },
+    "documents": [
+      {
+        "bytes": 1661,
+        "content_type": "text/markdown",
+        "description": "Core support-response principles for tone, structure, and next-step clarity.",
+        "path": "knowledge/docs/response-principles.md",
+        "role": "context",
+        "sha256": "sha256:8fe07112ebec2bee9824f6174e41d7324891796c6b49749c7c06bbf961baffd3"
+      },
+      {
+        "bytes": 1868,
+        "content_type": "text/markdown",
+        "description": "Escalation thresholds and handoff guidance for billing, outage, and account-risk cases.",
+        "path": "knowledge/docs/escalation-guidelines.md",
+        "role": "reference",
+        "sha256": "sha256:10184d5e21948b13fc2b0cc46bc1a9d38bd85c8c13e832e799ce563165d05b9d"
+      },
+      {
+        "bytes": 1188,
+        "content_type": "text/markdown",
+        "description": "Reusable message patterns for acknowledgements, follow-ups, and escalation notices.",
+        "path": "knowledge/docs/message-templates.md",
+        "role": "reference",
+        "sha256": "sha256:5a1cfa37356dd484ed18b8100a8f5bd30550f84a7a4ed256b4f9a3c95fc60fd1"
+      }
+    ],
+    "mode": "context",
+    "provenance": {
+      "builder": {
+        "name": "agentpm-examples-manual-curation",
+        "version": "2026-07-12"
+      },
+      "generated_at": "2026-07-12T00:00:00Z",
+      "sources_manifest_path": "knowledge/provenance/sources-manifest.json"
+    }
+  },
+  "license": {
+    "spdx": "MIT"
+  },
+  "name": "support-response-handbook",
+  "readme": "README.md",
+  "version": "0.1.0"
+}

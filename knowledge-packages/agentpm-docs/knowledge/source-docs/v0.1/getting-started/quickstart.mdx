@@ -1,0 +1,150 @@
+---
+title: Quickstart
+section: Getting started
+order: 2
+description: Create a local agent manifest, install its tools, and call them from Node or Python.
+next: cli/install
+---
+
+# Quickstart
+
+Create a local agent manifest, install its tools, and call them from Node or Python.
+
+## Initialize an agent (manifest)
+```bash
+agentpm init --kind agent --name research-assistant --description "Assistant composed of multiple tools"
+```
+
+This generates `agent.json`:
+```json
+{
+  "kind": "agent",
+  "name": "research-assistant",
+  "version": "0.1.0",
+  "description": "Assistant composed of multiple tools",
+  "tools": [],
+  "skills": [],
+  "knowledge": [],
+  "memory": [],
+  "profiles": [],
+  "examples": [
+    {
+      "title": "Example prompt",
+      "prompt": "Describe the user request this agent should handle."
+    }
+  ]
+}
+```
+
+<Callout type="info" title="Heads-up">
+  The agent manifest is the source of truth for what your agent can call. We’ll add tools to tools[] next.
+</Callout>
+
+## Add a tool to your agent
+
+### Option A - CLI adds it for you
+```bash
+agentpm install @zack/summarize-document@0.1.0
+```
+
+The CLI resolves, downloads, and writes the entry to `agent.json → tools[]`.
+
+### Option B - Edit manifest, then install
+Add to `agent.json`:
+```json
+"tools": [
+  {
+    "name": "@zack/summarize-document",
+    "version": "0.1.0"
+  }
+]
+```
+
+Then run:
+```bash
+agentpm install
+```
+
+<Callout type="tip" title="Deterministic installs">
+  AgentPM locks the exact artifact and runs it in a managed subprocess with your declared runtime & required environment variables, keeping your agent app clean and repeatable.
+</Callout>
+
+## What gets installed
+
+For a local manifest-driven install:
+
+- the local `agent.json` remains the source of truth
+- declared tools install under `.agentpm/tools/<namespace>/<name>/<version>`
+- `agent.lock` is written to capture the resolved install state
+
+At a high level, the lockfile records:
+
+- full package identity (`kind`, `name`, `version`, `integrity`)
+- a `local:agent` root for the local manifest
+- the resolved tool relationships for that local agent
+
+## Use the tool from Node
+
+Install the SDK:
+```bash
+pnpm add @agentpm/sdk
+# or: npm i @agentpm/sdk
+```
+
+Call the tool:
+```ts
+import { load } from '@agentpm/sdk';
+
+const summarize = await load('@zack/summarize-document@0.1.0');
+// `summarize` is a callable bound to a managed subprocess
+
+const out = await summarize({ text: 'AgentPM makes tools portable across stacks.' });
+console.log(out);
+```
+- `load()` resolves & prepares the tool per your manifest/version.
+- The tool **executes in a subprocess**, so Node apps can safely call Python tools (and vice-versa) with no dependency collisions.
+
+If you later install a published agent package directly:
+
+```bash
+agentpm install @zack/support-agent@0.1.0
+```
+
+you can inspect that installed agent from the Node SDK:
+
+```ts
+import { load, loadAgent } from '@agentpm/sdk';
+
+const agent = await loadAgent('@zack/support-agent@0.1.0');
+const firstTool = agent.resolvedTools[0];
+const tool = await load(`${firstTool.name}@${firstTool.version}`);
+```
+
+## Use the tool from Python
+
+Install the SDK:
+```bash
+uv pip install agentpm
+# or: pip install agentpm
+```
+
+Call the tool:
+```py
+from agentpm import load
+
+t = load("@zack/summarize-document@0.1.0")
+out = t({ "text": "AgentPM makes tools portable across stacks." })
+print(out)
+```
+- `load()` returns a callable bound to the tool’s subprocess runtime.
+- Same manifest, same artifact—just a different host language.
+
+For a published agent package, the Python SDK has the matching metadata API:
+
+```py
+from agentpm import load, load_agent
+
+agent = load_agent("@zack/support-agent@0.1.0")
+first_tool = agent["resolvedTools"][0]
+tool = load(f'{first_tool["name"]}@{first_tool["version"]}')
+```

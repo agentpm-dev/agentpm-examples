@@ -1,0 +1,268 @@
+---
+title: knowledge
+section: CLI
+order: 13
+description: Build, inspect, and query local Knowledge packages, including exact local vector search for built vector-mode artifacts.
+next: cli/whoami
+---
+
+# knowledge
+
+Build and validate local `kind: "knowledge"` packages.
+
+## Overview
+
+`agentpm knowledge` exposes the local developer loop for Knowledge artifacts:
+
+- `agentpm knowledge build` validates the selected Knowledge mode, computes derived metadata, and rewrites `agent.json`
+- `agentpm knowledge inspect` validates and displays local or installed Knowledge metadata
+- `agentpm knowledge query` performs exact local search for built vector-mode Knowledge artifacts when a query vector is provided directly or produced by an embedding command adapter
+
+### Command synopsis
+```bash
+agentpm knowledge build [--manifest <path>]
+agentpm knowledge inspect <path-or-package> [--json]
+agentpm knowledge query <path-or-package> [query text] [--vector-json <file|->] [--embedding-command <cmd>] [--top-k <n>] [--score-threshold <f64>] [--json] [--include-text] [--include-metadata]
+```
+
+### Subcommands
+- **`build`**. Validate the local Knowledge package and update derived metadata in `agent.json`.
+- **`inspect`**. Validate and display metadata for a local or installed Knowledge package.
+- **`query`**. Run exact local vector search against a built vector-mode Knowledge package.
+
+## `agentpm knowledge build`
+
+`agentpm knowledge build` resolves the package root from the manifest path, schema-validates the manifest, checks that `kind` is `knowledge`, and then branches by `knowledge.mode`.
+
+### Context mode
+
+For `mode: "context"`, the command:
+
+- requires at least one declared `knowledge.documents[]` entry
+- validates every declared document path
+- computes per-document `bytes` and `sha256`
+- computes `knowledge.context.content_hash` from the declared document payloads in declaration order using a deterministic aggregate hash
+- writes:
+  - `knowledge.context.document_count`
+  - `knowledge.context.total_bytes`
+  - `knowledge.context.content_hash`
+
+### Vector mode
+
+For `mode: "vector"`, the command:
+
+- validates `knowledge/chunks.jsonl`
+- validates `knowledge/sources.jsonl`
+- validates the declared raw little-endian float32 vector file
+- verifies vector count matches chunk count
+- computes `knowledge.corpus.content_hash` from the canonical chunks and sources file bytes in deterministic labeled order
+- computes `knowledge.embedding.vectors_hash` from the raw vector file bytes
+- writes:
+  - `knowledge.corpus.chunk_count`
+  - `knowledge.corpus.source_count`
+  - `knowledge.corpus.content_hash`
+  - `knowledge.embedding.vector_count`
+  - `knowledge.embedding.vectors_hash`
+- generates or refreshes:
+  - `knowledge/indexes/default/metadata.json`
+- updates `knowledge.indexes[]` with the default `agentpm-local` index entry
+
+The generated `metadata.json` records the local index build details, including:
+
+- `format_version`
+- `algorithm`
+- `metric`
+- `normalized`
+- `source_corpus_hash`
+- `source_chunks_hash`
+- `source_sources_hash`
+- `source_vectors_hash`
+- canonical `chunks_path`, `sources_path`, and `vectors_path`
+- `dimensions`, `chunk_count`, `source_count`, and `vector_count`
+
+The local index does not duplicate the canonical vectors or emit a separate row-to-chunk map. Query should treat:
+
+- `knowledge/chunks.jsonl`
+- `knowledge/sources.jsonl`
+- `knowledge.embedding.vectors_path`
+
+as the canonical source-of-truth payloads.
+
+### Arguments
+- **`--manifest <path>` (default: `agent.json`)**. Path to the Knowledge manifest to build.
+
+## `agentpm knowledge inspect`
+
+`agentpm knowledge inspect` works for:
+
+- a package directory containing `agent.json`
+- a direct `agent.json` path
+- an installed package ref already present under `.agentpm/knowledge/...`
+
+The command re-validates the package using the same local build-check path as publish/query, then prints current Knowledge metadata.
+
+### Context mode
+
+For `mode: "context"`, inspect shows:
+
+- declared document paths
+- content types and roles when present
+- per-document `bytes` and `sha256`
+- aggregate `knowledge.context.document_count`
+- aggregate `knowledge.context.total_bytes`
+- aggregate `knowledge.context.content_hash`
+- whether the manifest’s stored derived metadata is still fresh
+
+### Vector mode
+
+For `mode: "vector"`, inspect shows:
+
+- chunk count and source count
+- embedding provider/model
+- dimensions
+- metric
+- normalized flag
+- canonical vectors path and vectors hash
+- default local index path
+- local index type and algorithm
+- local index metadata freshness
+- retrieval defaults when present
+
+### Arguments
+
+- **`<path-or-package>`**. Local package path, direct manifest path, or installed package ref such as `@zack/python-docs`.
+- **`--json`**. Emit structured JSON instead of the human-readable summary.
+
+## `agentpm knowledge query`
+
+`agentpm knowledge query` is currently vector-mode only.
+
+- For `mode: "vector"`, it validates the built manifest and local index metadata, opens the canonical declared vector file, runs exact local search, and hydrates ranked chunk/source rows from the canonical `chunks.jsonl` and `sources.jsonl` files.
+- For `mode: "context"`, it fails clearly because there is no vector index and the package is intended for direct context loading rather than semantic retrieval.
+
+Query supports two vector input paths:
+
+- `--vector-json` to pass the query vector directly
+- `--embedding-command` to turn query text into a vector via a user-provided adapter command
+
+### Query behavior
+
+For the current local exact-search implementation:
+
+- only `metric: "cosine"` with `normalized: true` is supported
+- vector row `N` maps to chunk line `N` in `chunks.jsonl`
+- the command validates manifest-derived counts and hashes before searching
+- the command validates `knowledge/indexes/default/metadata.json` before searching
+
+### Arguments
+
+- **`<path-or-package>`**. Local package path, direct manifest path, or installed package ref such as `@zack/python-docs`.
+- **`--vector-json <file|->`**. Query vector payload as JSON from a file or stdin.
+  - The JSON may be:
+    - an array of numeric values
+    - an object with `vector` or `values`
+  - Optional object metadata such as `provider`, `model`, and `dimensions` is validated against the manifest when present.
+- **`--embedding-command <cmd>`**. Execute a command adapter that reads query text plus embedding metadata on stdin and writes vector JSON on stdout.
+  - Requires query text input.
+  - AgentPM executes argv directly rather than via a shell.
+  - Adapter stdin JSON:
+
+```json
+{
+  "text": "How does auth work?",
+  "embedding": {
+    "provider": "openai",
+    "model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "metric": "cosine",
+    "normalized": true
+  }
+}
+```
+
+  - Adapter stdout JSON:
+
+```json
+{
+  "vector": [0.012, -0.083, 0.44],
+  "provider": "openai",
+  "model": "text-embedding-3-small",
+  "dimensions": 1536
+}
+```
+
+  - AgentPM validates the returned vector length and any returned provider/model/dimensions metadata against the Knowledge manifest before retrieval.
+- **`--top-k <n>`**. Number of ranked rows to return. Defaults to `knowledge.retrieval.default_top_k` when present, otherwise `5`.
+- **`--score-threshold <f64>`**. Drop results below the supplied score threshold.
+- **`--json`**. Emit structured JSON instead of the human-readable summary.
+- **`--include-text`**. Include chunk text in results.
+- **`--include-metadata`**. Include chunk/source metadata objects in results.
+
+## Examples
+
+### Build the Knowledge package in the current directory
+```bash
+agentpm knowledge build
+```
+
+### Build from an explicit manifest path
+```bash
+agentpm knowledge build --manifest ./agent.json
+```
+
+### Inspect a local Knowledge package
+```bash
+agentpm knowledge inspect .
+```
+
+### Inspect an installed Knowledge package
+```bash
+agentpm knowledge inspect @zack/python-docs
+```
+
+### Query a vector-mode package with a JSON vector
+```bash
+agentpm knowledge query . --vector-json query.json --top-k 3 --include-text
+```
+
+### Query a vector-mode package with an embedding adapter command
+```bash
+agentpm knowledge query . "How does auth work?" \
+  --embedding-command 'python3 scripts/knowledge_openai_embeddings.py adapter' \
+  --top-k 3 \
+  --include-text
+```
+
+### Typical local workflow
+```bash
+agentpm lint
+agentpm knowledge build
+agentpm knowledge inspect .
+agentpm publish
+```
+
+## Failure cases
+
+`agentpm knowledge build` exits non-zero when:
+
+- the manifest is not `kind: "knowledge"`
+- schema validation fails
+- a declared context document is missing
+- a declared vector payload file is missing
+- chunk/source JSONL is malformed
+- chunk/source IDs are invalid or inconsistent
+- vector count does not match chunk count
+- vector byte length is not divisible by 4
+- the vector file is empty
+- a vector query is attempted against a context-mode package
+- query vector length does not match `knowledge.embedding.dimensions`
+- optional query vector metadata conflicts with the manifest
+- local index metadata is missing, stale, or unsupported
+
+## Notes
+
+- The command rewrites `agent.json` atomically using the CLI’s existing manifest writer.
+- `build` is the local preparation step. It does not crawl content, chunk documents, or call embedding providers.
+- The generated `agentpm-local` index is an AgentPM-owned local artifact. The canonical portable data remains the declared documents or the chunks, sources, and vector file in the package.
+- `query` supports either explicit vectors via `--vector-json` or text-to-vector adapters via `--embedding-command`.
+- The repo includes an example adapter helper at `scripts/knowledge_openai_embeddings.py adapter` for local/manual testing with OpenAI embeddings.

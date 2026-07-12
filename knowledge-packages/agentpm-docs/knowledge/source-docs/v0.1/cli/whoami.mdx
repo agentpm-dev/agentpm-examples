@@ -1,0 +1,47 @@
+---
+title: whoami
+section: CLI
+order: 14
+description: Check the current authentication status and token scopes.
+next: cli/keys
+---
+
+# whoami
+
+Check the current authentication status and token scopes.
+
+## Overview
+
+`agentpm whoami` verifies your credentials against the registry and prints the authenticated user and scopes. If no token is provided/resolved, it prints a helpful message and exits successfully (status 0).
+
+### Command synopsis
+```bash
+agentpm whoami [--token <PAT>]
+```
+
+### Arguments
+- **`--token <PAT>` (env: `AGENTPM_TOKEN`)**. Personal Access Token for headless auth (overrides env/file).
+
+<Callout type="info" title="Token resolution order">
+    flag (--token) > env (AGENTPM_TOKEN) > token file (written by agentpm login).
+</Callout>
+
+## Examples
+
+**Logged in (valid token)**:
+```bash
+agentpm whoami
+✅  Logged in as you@example.com (["packages:publish"])
+```
+
+**Not authenticated (no token found)**:
+```bash
+agentpm whoami
+Not authenticated. Set AGENTPM_TOKEN or pass --token, or run `agentpm login --paste`.
+```
+
+**Invalid/expired token**:
+```bash
+agentpm whoami
+Token validation failed (401 Unauthorized). Is the PAT correct and unrevoked?
+```

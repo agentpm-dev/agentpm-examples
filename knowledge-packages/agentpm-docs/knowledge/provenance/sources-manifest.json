@@ -1,0 +1,276 @@
+{
+  "package": "@zack/agentpm-docs",
+  "version": "0.1.0",
+  "source_root": "agentpm-api/docs/v0.1",
+  "copied_source_root": "knowledge/source-docs/v0.1",
+  "chunking": {
+    "strategy": "langchain-markdown-headers-plus-recursive-character",
+    "chunk_size": 1200,
+    "overlap": 150
+  },
+  "builder": {
+    "name": "agentpm-examples-agentpm-docs-pipeline",
+    "version": "2026-07-12"
+  },
+  "sources": [
+    {
+      "id": "src_advanced-environment-variables",
+      "path": "knowledge/source-docs/v0.1/advanced/environment-variables.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/advanced/environment-variables",
+      "title": "Environment Variables",
+      "description": "Pass secrets and runtime knobs to tools running in managed subprocesses."
+    },
+    {
+      "id": "src_advanced-mixed-runtimes-with-docker",
+      "path": "knowledge/source-docs/v0.1/advanced/mixed-runtimes-with-docker.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/advanced/mixed-runtimes-with-docker",
+      "title": "Mixed Runtimes with Docker",
+      "description": "Run Node and Python tools reliably in one reproducible environment."
+    },
+    {
+      "id": "src_agent-json-agents",
+      "path": "knowledge/source-docs/v0.1/agent.json/agents.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/agents",
+      "title": "Agents",
+      "description": "Compose tools, skills, and knowledge behind a single agent manifest."
+    },
+    {
+      "id": "src_agent-json-introduction",
+      "path": "knowledge/source-docs/v0.1/agent.json/introduction.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/introduction",
+      "title": "Introduction",
+      "description": "What the manifest is, why it matters, and how the schema keeps things predictable."
+    },
+    {
+      "id": "src_agent-json-knowledge",
+      "path": "knowledge/source-docs/v0.1/agent.json/knowledge.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/knowledge",
+      "title": "Knowledge",
+      "description": "Author prepared context packages for direct context loading or local vector retrieval."
+    },
+    {
+      "id": "src_agent-json-skills",
+      "path": "knowledge/source-docs/v0.1/agent.json/skills.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/skills",
+      "title": "Skills",
+      "description": "Author reusable procedural packages that capture playbooks, checklists, and reasoning guides around tools."
+    },
+    {
+      "id": "src_agent-json-templates",
+      "path": "knowledge/source-docs/v0.1/agent.json/templates.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/templates",
+      "title": "Templates",
+      "description": "Author workflow templates that generate editable AgentPM workspaces."
+    },
+    {
+      "id": "src_agent-json-tools",
+      "path": "knowledge/source-docs/v0.1/agent.json/tools.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/tools",
+      "title": "Tools",
+      "description": "Define a single, runnable capability that agents (or your app) can call."
+    },
+    {
+      "id": "src_cli-export",
+      "path": "knowledge/source-docs/v0.1/cli/export.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/export",
+      "title": "export",
+      "description": "Generate a starter skill scaffold from an AgentPM tool."
+    },
+    {
+      "id": "src_cli-init",
+      "path": "knowledge/source-docs/v0.1/cli/init.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/init",
+      "title": "init",
+      "description": "Scaffold a new AgentPM package by generating a starter agent.json manifest for a tool, skill, agent, template, or knowledge package."
+    },
+    {
+      "id": "src_cli-install-cmd",
+      "path": "knowledge/source-docs/v0.1/cli/install-cmd.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/install-cmd",
+      "title": "install",
+      "description": "Install tools, skills, knowledge packages, or agents, resolve package dependencies, and write an updated lockfile."
+    },
+    {
+      "id": "src_cli-install",
+      "path": "knowledge/source-docs/v0.1/cli/install.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/install",
+      "title": "Install",
+      "description": "Get the AgentPM CLI on your machine and confirm it’s on your path."
+    },
+    {
+      "id": "src_cli-keys",
+      "path": "knowledge/source-docs/v0.1/cli/keys.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/keys",
+      "title": "keys",
+      "description": "Generate, list, and export author signing keys for package signing."
+    },
+    {
+      "id": "src_cli-knowledge",
+      "path": "knowledge/source-docs/v0.1/cli/knowledge.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/knowledge",
+      "title": "knowledge",
+      "description": "Build, inspect, and query local Knowledge packages, including exact local vector search for built vector-mode artifacts."
+    },
+    {
+      "id": "src_cli-lint",
+      "path": "knowledge/source-docs/v0.1/cli/lint.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/lint",
+      "title": "lint",
+      "description": "Validate your `agent.json` (or a folder of manifests) against the AgentPM schema and common best practices."
+    },
+    {
+      "id": "src_cli-login",
+      "path": "knowledge/source-docs/v0.1/cli/login.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/login",
+      "title": "login",
+      "description": "Log in and cache credentials for the CLI."
+    },
+    {
+      "id": "src_cli-namespace",
+      "path": "knowledge/source-docs/v0.1/cli/namespace.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/namespace",
+      "title": "namespace",
+      "description": "Add or revoke authorized signers (public keys) for a namespace."
+    },
+    {
+      "id": "src_cli-new",
+      "path": "knowledge/source-docs/v0.1/cli/new.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/new",
+      "title": "new",
+      "description": "Generate a local AgentPM workspace from a published or local workflow template."
+    },
+    {
+      "id": "src_cli-publish",
+      "path": "knowledge/source-docs/v0.1/cli/publish.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/publish",
+      "title": "publish",
+      "description": "Validate and package your tool, skill, knowledge, agent, or template, then upload the signed artifact to the registry."
+    },
+    {
+      "id": "src_cli-run",
+      "path": "knowledge/source-docs/v0.1/cli/run.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/run",
+      "title": "run",
+      "description": "Execute an installed AgentPM tool with JSON input from stdin, an inline string, or a file."
+    },
+    {
+      "id": "src_cli-serve",
+      "path": "knowledge/source-docs/v0.1/cli/serve.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/serve",
+      "title": "serve",
+      "description": "Start a local HTTP MCP server that exposes the tools pinned in agent.lock."
+    },
+    {
+      "id": "src_cli-whoami",
+      "path": "knowledge/source-docs/v0.1/cli/whoami.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/whoami",
+      "title": "whoami",
+      "description": "Check the current authentication status and token scopes."
+    },
+    {
+      "id": "src_examples-example-project",
+      "path": "knowledge/source-docs/v0.1/examples/example-project.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/examples/example-project",
+      "title": "Example Project",
+      "description": "See real tools, agents, templates, and generated projects wired up end-to-end."
+    },
+    {
+      "id": "src_examples-interoperability-flow",
+      "path": "knowledge/source-docs/v0.1/examples/interoperability-flow.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/examples/interoperability-flow",
+      "title": "Interoperability Flow",
+      "description": "Install a tool once, then run it from the shell, expose it over MCP, and export a starter Skill scaffold."
+    },
+    {
+      "id": "src_getting-started-introduction",
+      "path": "knowledge/source-docs/v0.1/getting-started/introduction.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/getting-started/introduction",
+      "title": "Introduction",
+      "description": "What is AgentPM and how it fits into your agent stack."
+    },
+    {
+      "id": "src_getting-started-quickstart",
+      "path": "knowledge/source-docs/v0.1/getting-started/quickstart.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/getting-started/quickstart",
+      "title": "Quickstart",
+      "description": "Create a local agent manifest, install its tools, and call them from Node or Python."
+    },
+    {
+      "id": "src_publish-a-tool-agent-json",
+      "path": "knowledge/source-docs/v0.1/publish-a-tool/agent.json.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/publish-a-tool/agent.json",
+      "title": "agent.json",
+      "description": "Fill in the minimal fields your tool needs to package and publish."
+    },
+    {
+      "id": "src_publish-a-tool-init",
+      "path": "knowledge/source-docs/v0.1/publish-a-tool/init.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/publish-a-tool/init",
+      "title": "init",
+      "description": "Create a starter tool manifest you’ll complete and publish."
+    },
+    {
+      "id": "src_publish-a-tool-pubilsh",
+      "path": "knowledge/source-docs/v0.1/publish-a-tool/pubilsh.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/publish-a-tool/pubilsh",
+      "title": "publish",
+      "description": "Validate, package, and upload your tool to the AgentPM registry."
+    },
+    {
+      "id": "src_publish-a-tool-signing",
+      "path": "knowledge/source-docs/v0.1/publish-a-tool/signing.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/publish-a-tool/signing",
+      "title": "Signing",
+      "description": "Provenance and trust for AgentPM artifacts."
+    },
+    {
+      "id": "src_publish-a-tool-vulnerability-scanning",
+      "path": "knowledge/source-docs/v0.1/publish-a-tool/vulnerability-scanning.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/publish-a-tool/vulnerability-scanning",
+      "title": "Vulnerability Scanning",
+      "description": "Automated malware/threat screening for published tool versions."
+    },
+    {
+      "id": "src_sdks-node",
+      "path": "knowledge/source-docs/v0.1/sdks/node.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/sdks/node",
+      "title": "Node SDK",
+      "description": "Install packages with the CLI, load tools, and inspect installed agents, skills, and knowledge packages from Node."
+    },
+    {
+      "id": "src_sdks-python",
+      "path": "knowledge/source-docs/v0.1/sdks/python.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/sdks/python",
+      "title": "Python SDK",
+      "description": "Install packages with the CLI, load tools, and inspect installed agents, skills, and Knowledge packages from Python."
+    },
+    {
+      "id": "src_sdks-tool-discovery",
+      "path": "knowledge/source-docs/v0.1/sdks/tool-discovery.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/sdks/tool-discovery",
+      "title": "Package Discovery",
+      "description": "Where the SDK looks for installed tools, skills, and installed agents on disk."
+    },
+    {
+      "id": "src_security-mfa",
+      "path": "knowledge/source-docs/v0.1/security/mfa.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/security/mfa",
+      "title": "MFA",
+      "description": "Coming Soon"
+    },
+    {
+      "id": "src_security-namespaces",
+      "path": "knowledge/source-docs/v0.1/security/namespaces.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/security/namespaces",
+      "title": "Namespaces",
+      "description": "Namespace kinds, visibility, private access, roles, billing, and CLI auth behavior."
+    },
+    {
+      "id": "src_security-pats",
+      "path": "knowledge/source-docs/v0.1/security/pats.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/security/pats",
+      "title": "Personal Access Tokens",
+      "description": "Create PATs, choose scopes, and use them with the CLI."
+    }
+  ]
+}

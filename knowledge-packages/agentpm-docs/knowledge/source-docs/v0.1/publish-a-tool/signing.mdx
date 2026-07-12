@@ -1,0 +1,127 @@
+---
+title: Signing
+section: Publish a tool
+order: 17
+description: Provenance and trust for AgentPM artifacts.
+next: publish-a-tool/vulnerability-scanning
+---
+
+# Signing
+
+Provenance and trust for AgentPM artifacts.
+
+## Goal
+
+AgentPM attaches signatures to published packages so consumers can verify what they’re installing.
+
+There are two, complementary signatures:
+1. **Author-signing** (optional per namespace) — you sign the package at publish time using an Ed25519 key you control.
+2. **Registry-attested** (always on) — the AgentPM registry signs the package on receipt to attest what it stored.
+
+<Callout type="info" title="Signing mode">
+  Signing mode is set per namespace on your profile (“Manage” button): off | optional | required.
+  Author-signing happens only if the namespace mode allows/requires it; registry attestation happens on every publish.
+</Callout>
+
+## Key concepts
+
+- **Author keypairs live locally** and are passphrase-encrypted on disk.
+- **Namespaces own the signer allow-list**. You must register your public key with the namespace before using it to sign.
+- **Publish flow can be gated**: if a namespace is set to required, the registry will reject unsigned publishes or keys not on the allow-list.
+
+## CLI workflows
+
+### 1) Local key management: agentpm keys
+
+Generate, list, and export **public** keys.
+
+```bash
+# Create a new Ed25519 keypair (stores encrypted private key locally)
+agentpm keys generate --label "Zack Prod CLI Key"
+# → prompts twice for a passphrase
+# → prints key id and storage path
+
+# List local keys
+agentpm keys list
+# ZPVjHbC9CN0-cKTk   Zack Prod CLI Key   2025-10-25T21:20:47.646678Z
+
+# Export the public key (base64, 32 bytes) for registration
+agentpm keys export --key-id ZPVjHbC9CN0-cKTk --out pub.txt
+```
+
+### 2) Namespace signer management: agentpm namespace
+
+Add or revoke signers on a namespace (auth required).
+
+```bash
+# Add a signer (public key) to a namespace
+agentpm namespace add-signer --namespace zack --label "Zack Prod" --pubkey pub.txt
+# stdin also supported if --pubkey is omitted
+
+# Revoke a signer (by id displayed in UI)
+agentpm namespace revoke-signer --namespace zack --signer-id <UUID>
+```
+
+<Callout type="tip" title="UI Note">
+  Create keys locally and register signer public keys through the CLI.
+  The website lists existing signers and allows revoke/deactivate actions, but it does not provide an add-signer flow.
+</Callout>
+
+## End-to-end author-sign flow (example)
+
+```bash
+# 1) Create a local key, export public key
+agentpm keys generate --label "Zack Prod CLI Key"
+agentpm keys export --key-id ZPVjHbC9CN0-cKTk --out pub.txt
+
+# 2) Register the public key with your namespace
+agentpm namespace add-signer --namespace zack --label "Zack Prod" --pubkey pub.txt
+
+# 3) Publish with signing
+agentpm publish --sign --key-id ZPVjHbC9CN0-cKTk
+# → prompts for key passphrase, uploads signed package
+```
+
+If your namespace requires author-signing and you forget `--sign` or your key isn’t registered, you’ll see:
+```bash
+Error: HTTP 422: signature_required: namespace requires at least 1 valid author signature
+```
+
+## What gets signed
+
+- **Author-signed statement (Ed25519)**. At publish time, the author signs a small JSON “statement” that includes the tool identity and the SHA-256 digest of the packaged tarball. The signature is an Ed25519 signature over the UTF-8 bytes of that JSON, base64-encoded.
+
+Example:
+
+```json
+{
+  "name": "wikipedia-scrape",
+  "type": "agentpm.tool.signature.v1",
+  "version": "0.1.3",
+  "createdAt": "2025-10-25T21:31:05Z",
+  "artifactDigest": "sha256:547c…1455"
+}
+```
+- **Registry attestation (always)**. After upload, the registry creates its **own attested signature** for the stored artifact (also covering the artifact’s digest). This is what `agentpm install --require_attestation` enforces at install time.
+
+Example:
+
+```json
+{
+  "name": "wikipedia-scrape",
+  "type": "agentpm.registry.attestation.v1",
+  "version": "0.1.3",
+  "storedAt": "2025-10-25T21:31:08Z",
+  "namespace": "zack",
+  "registryKeyId": "apm-prod-1",
+  "artifactDigest": "sha256:547c…1455",
+  "publishedByAccountId": "user_xxx"
+}
+```
+
+## Best practices
+
+- **Use per-machine keys** with clear labels; keep passphrases in your password manager.
+- **Register only the keys you intend to use** for a namespace. Revoke unused ones.
+- **Automate in CI**: store the key file securely and unlock via CI secrets (stdin) if needed.
+- **Pair with verification** on the consumer side (`--require_attestation`).

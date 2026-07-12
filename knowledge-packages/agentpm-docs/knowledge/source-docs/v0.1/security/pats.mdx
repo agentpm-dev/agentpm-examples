@@ -1,0 +1,77 @@
+---
+title: Personal Access Tokens
+section: Security
+order: 24
+description: Create PATs, choose scopes, and use them with the CLI.
+next: advanced/environment-variables
+---
+
+# Personal Access Tokens
+
+Personal Access Tokens (PATs) let you authenticate the CLI without an interactive browser flow.
+
+## What PATs are for
+
+Use a PAT when you want to:
+
+- publish from CI
+- install from private namespaces in headless environments
+- authenticate local scripts without running `agentpm login`
+
+## Current publish scope
+
+The preferred publish scope is:
+
+- `packages:publish`
+
+That scope can publish both:
+
+- tool packages
+- agent packages
+- template packages
+
+Existing PATs with:
+
+- `tools:publish`
+
+are still temporarily accepted for **tool packages only**.
+
+## Using a PAT with the CLI
+
+### Per command
+
+```bash
+agentpm publish --token "$AGENTPM_TOKEN"
+```
+
+### Environment variable
+
+```bash
+export AGENTPM_TOKEN="..."
+agentpm publish
+```
+
+### Persist locally with `login`
+
+```bash
+agentpm login --paste
+```
+
+## Scope examples
+
+Current example:
+
+- `packages:publish`
+
+If you use device flow and want to request scopes explicitly:
+
+```bash
+agentpm login --scope packages:publish
+```
+
+## Best practices
+
+- use `packages:publish` for all new publish tokens
+- prefer env vars or command flags in CI
+- prefer `agentpm login` for local development
+- rotate or revoke PATs if they are ever exposed

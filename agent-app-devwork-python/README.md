@@ -8,7 +8,7 @@ This app installs the published `devwork-copilot` agent package, loads it with t
 
 Published agent package:
 
-- `@zack/devwork-copilot@0.1.1`
+- `@zack/devwork-copilot@0.1.2`
 
 Package source:
 
@@ -22,6 +22,7 @@ This example shows a real app that:
 - loads that agent with `load_agent(...)`
 - reads direct `resolvedTools` from the agent
 - reads `resolvedSkills`, loads those Skills with `load_skill(...)`, and then loads each Skill's `resolvedTools`
+- reads `resolvedKnowledge`, loads the installed Knowledge package with `load_knowledge(...)`, and exposes the vector package metadata in the terminal banner
 - feeds the loaded Skill manual into the workflow prompt
 - runs a stateful maintainer workflow against real installed packages
 
@@ -34,12 +35,13 @@ This example shows a real app that:
 From this app directory, install the published agent package:
 
 ```bash
-agentpm install @zack/devwork-copilot@0.1.1
+agentpm install @zack/devwork-copilot@0.1.2
 ```
 
 That should install:
 
 - the agent artifact under `.agentpm/agents/...`
+- the resolved Knowledge artifact under `.agentpm/knowledge/...`
 - the resolved Skill artifact under `.agentpm/skills/...`
 - the resolved tool artifacts under `.agentpm/tools/...`
 
@@ -50,6 +52,8 @@ From this app directory:
 ```bash
 uv sync
 ```
+
+This example requires `agentpm>=0.1.9` so the Python SDK can load installed Knowledge packages with `load_knowledge(...)`.
 
 ## Environment
 
@@ -104,3 +108,4 @@ For write requests, the app should stop and ask for `/approve` before executing 
 - The graph keeps local conversational state across turns until `/reset`.
 - Tool calls and tool outputs are logged so the execution path is easy to inspect.
 - The current published agent package brings in `issue-triage-playbook`, so the workflow prompt includes the packaged triage manual as part of its maintainer guidance.
+- The current published agent package also brings in `devwork-maintainer-guide`, and the banner prints its installed vector-mode metadata so you can confirm the Knowledge dependency was resolved correctly.

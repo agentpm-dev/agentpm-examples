@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-30T00:55:52.908145Z",
+  "generated": "2026-07-12T17:53:42.263221Z",
   "lockfile_version": 3,
   "packages": {
     "agent:@zack/devwork-copilot@0.1.0": {
@@ -13,6 +13,18 @@
       "kind": "agent",
       "name": "@zack/devwork-copilot",
       "version": "0.1.1"
+    },
+    "agent:@zack/devwork-copilot@0.1.2": {
+      "integrity": "e434adeb63f07efc253637ee3e2c6e3cf16c099133358c365ac318f6c12a714a",
+      "kind": "agent",
+      "name": "@zack/devwork-copilot",
+      "version": "0.1.2"
+    },
+    "knowledge:@zack/devwork-maintainer-guide@0.1.0": {
+      "integrity": "47e267e55f8e4b866a5c882091d13121feb64006e3217d3da3f2be0d8d02bf52",
+      "kind": "knowledge",
+      "name": "@zack/devwork-maintainer-guide",
+      "version": "0.1.0"
     },
     "skill:@zack/issue-triage-playbook@0.1.0": {
       "integrity": "eef04a5b31ca7c474a05fb3f326d147aefa00ecc3bbbdd90ea1934022952a231",
@@ -41,6 +53,17 @@
       ]
     },
     "agent:@zack/devwork-copilot@0.1.1": {
+      "skills": [
+        "skill:@zack/issue-triage-playbook@0.1.0"
+      ],
+      "tools": [
+        "tool:@zack/summarize-text@0.1.8"
+      ]
+    },
+    "agent:@zack/devwork-copilot@0.1.2": {
+      "knowledge": [
+        "knowledge:@zack/devwork-maintainer-guide@0.1.0"
+      ],
       "skills": [
         "skill:@zack/issue-triage-playbook@0.1.0"
       ],

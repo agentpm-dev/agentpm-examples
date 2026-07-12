@@ -1,0 +1,243 @@
+---
+title: Agents
+section: agent.json
+order: 17
+description: Compose tools, skills, and knowledge behind a single agent manifest.
+next: agent.json/templates
+---
+
+# Agents
+
+Compose tools, skills, and knowledge behind a single agent manifest.
+
+## What is an “agent”?
+
+An `agent` is a composition layer: it declares **which tools, skills, and knowledge packages it can use**. The agent manifest doesn’t execute code itself. It is a **package artifact** that enumerates package dependencies, prompt examples, and future reserved references so the CLI and SDKs can resolve, install, and expose the graph to your agent runtime.
+- **Defines capability surface** by listing the packages the agent may use.
+- **Drives deterministic installs** via `agent.lock` (package identity + integrity + relationships).
+- **Keeps host/runtime lightweight**: each tool runs in a **managed subprocess** with its own dependencies.
+- **Preserves future composition metadata** for `memory` and `profiles`, while treating `skills` and `knowledge` as first-class resolved package dependencies.
+
+## Scaffold an agent
+
+```bash
+agentpm init --kind agent --name research-assistant --description "Assistant composed of multiple tools"
+```
+
+Generated skeleton (`agent.json`):
+```json
+{
+  "kind": "agent",
+  "name": "research-assistant",
+  "version": "0.1.0",
+  "description": "Assistant composed of multiple tools",
+  "tools": [],
+  "skills": [],
+  "knowledge": [],
+  "memory": [],
+  "profiles": [],
+  "examples": [
+    {
+      "title": "Example prompt",
+      "prompt": "Describe the user request this agent should handle."
+    }
+  ]
+}
+```
+
+<Callout type="info" title="Note">
+  Add tools to `tools[]`, skills to `skills[]`, and knowledge packages to `knowledge[]` when needed, then run `agentpm install` to resolve and download artifacts.
+</Callout>
+
+## Field reference (overview)
+
+
+| Field         | Type      | Required | Notes                                                          |
+|---------------|-----------|----------|-----------------------------------------------------------------------------|
+| `$schema`     | string    | no       | URI to this schema (optional but recommended)                  |
+| `kind`        | enum      | **yes**  | Must be `"agent"`                                              |
+| `name`        | string    | **yes**  | `^[a-z][a-z0-9-]{0,63}$`                                       |
+| `version`     | semver    | **yes**  | SemVer string (supports pre/metadata)                          |
+| `description` | string    | **yes**  | Free text                                                      |
+| `tools`       | array     | **yes**  | Array of tool refs: string or `{name, version}`; may be empty (`[]`) |
+| `skills`      | array     | no       | Array of skill refs: string or `{name, version}`               |
+| `knowledge`   | array     | no       | Array of knowledge refs: string or `{name, version}`                    |
+| `memory`      | array     | no       | Reserved future refs. Validated and preserved, but not resolved today. |
+| `profiles`    | array     | no       | Reserved future refs. Validated and preserved, but not resolved today. |
+| `examples`    | array     | no       | Inline prompt examples `{ title, prompt }`.                    |
+| `readme`      | string    | no       | Path to README file. Will automatically look for README.md if not specified.        |
+| `license`     | object    | no       | `{ spdx: "license spdx", file: "Path to LICENSE file" }`                            |
+
+
+## Declaring tools
+
+You can reference tools using either a **string spec** or an **object**. Both carry the same information; choose one style per team preference.
+
+The `tools` field is required for `kind: "agent"` manifests, even when the agent currently has no tool dependencies and the value is just `[]`.
+
+### String spec (concise)
+```json
+{
+  "tools": [
+    "@zack/summarize@0.1.2"
+  ]
+}
+```
+
+### Object form (explicit)
+```json
+{
+  "tools": [
+    { "name": "@zack/summarize", "version": "0.1.2" }
+  ]
+}
+```
+
+## Declaring skills
+
+Agents may also declare first-class skill dependencies:
+
+```json
+{
+  "skills": [
+    "@zack/incident-commander@0.1.0",
+    { "name": "@zack/slack-incident-update", "version": "^0.1.0" }
+  ]
+}
+```
+
+Skill dependencies are resolved and locked during install just like tool dependencies.
+
+## Declaring knowledge
+
+Agents may also declare first-class knowledge dependencies:
+
+```json
+{
+  "knowledge": [
+    "@zack/python-docs@0.1.0",
+    { "name": "@zack/support-playbook", "version": "^0.1.0" }
+  ]
+}
+```
+
+Knowledge dependencies are resolved and locked during install just like tool and skill dependencies.
+
+## Installing tools, skills, and knowledge for an agent
+
+Once `tools[]`, `skills[]`, and/or `knowledge[]` are declared, run:
+```bash
+agentpm install
+```
+- Resolves tool, skill, and knowledge versions.
+- Downloads tool artifacts and prepares them under: `.agentpm/tools/<namespace>/<name>/<version>`
+- Downloads skill artifacts and prepares them under: `.agentpm/skills/<namespace>/<name>/<version>`
+- Downloads knowledge artifacts and prepares them under: `.agentpm/knowledge/<namespace>/<name>/<version>`
+- Populates/updates the **lockfile** `agent.lock` with package identity, integrity, and dependency relationships.
+- Uses the download cache at `.agentpm/cache` (use `--refresh` to bypass).
+
+For a **local** `kind: "agent"` manifest, AgentPM does **not** copy that manifest into `.agentpm/agents`. The local `agent.json` remains the source of truth.
+
+You can also add & install in one step:
+```bash
+agentpm install @zack/summarize@0.1.2
+# writes or updates tools[] for a direct Tool install, then installs
+```
+
+```bash
+agentpm install @zack/incident-commander@0.1.0
+# writes or updates skills[] for a direct Skill install, then installs
+```
+
+```bash
+agentpm install @zack/python-docs@0.1.0
+# writes or updates knowledge[] for a direct Knowledge install, then installs
+```
+
+## Direct package install vs manifest-driven install
+
+AgentPM supports two different install workflows for agents:
+
+### Manifest-driven install
+
+```bash
+agentpm install
+```
+
+- reads the local `agent.json`
+- resolves the local manifest's `tools`, `skills`, and `knowledge`
+- writes a `local:agent` root into `agent.lock`
+- installs tools into `.agentpm/tools/...`
+- installs skills into `.agentpm/skills/...`
+- installs knowledge into `.agentpm/knowledge/...`
+- does **not** write the local manifest under `.agentpm/agents`
+
+### Direct package install
+
+```bash
+agentpm install @zack/support-agent@0.1.0
+```
+
+- resolves the requested package by identity
+- if the package is an agent, installs the agent artifact into `.agentpm/agents/...`
+- reads the installed agent manifest and resolves its tool, skill, and knowledge dependencies
+- installs those tools into `.agentpm/tools/...`
+- installs those skills into `.agentpm/skills/...`
+- installs those knowledge packages into `.agentpm/knowledge/...`
+- writes an `agent:@namespace/name@version` root into `agent.lock`
+
+## Lockfile (high level)
+
+`agent.lock` records package identity and relationships instead of only a flat tool map.
+
+Skill-containing graphs are written as `lockfile_version: 3`.
+
+At a high level it contains:
+
+- `packages`
+  - keys like `tool:@zack/summarize@0.1.2`
+  - keys like `skill:@zack/incident-commander@0.1.0`
+  - keys like `knowledge:@zack/python-docs@0.1.0`
+  - keys like `agent:@zack/support-agent@0.1.0`
+- `roots`
+  - `local:agent` for local manifest installs
+  - `agent:@namespace/name@version` for registry-installed agents
+
+That is what lets AgentPM:
+
+- distinguish manifest-driven local installs from installed registry agents
+- keep multiple versions of the same tool when different agents need different versions
+- expose resolved tool refs from installed agents through the SDKs
+
+### Example: two agents, two versions of the same tool
+
+If:
+
+- `@zack/support-agent@0.1.0` resolves `@zack/slack-post-message@0.1.1`
+- `@zack/escalation-agent@0.1.0` resolves `@zack/slack-post-message@0.2.0`
+
+then both tool versions can coexist in `agent.lock` and on disk:
+
+- `.agentpm/tools/zack/slack-post-message/0.1.1/`
+- `.agentpm/tools/zack/slack-post-message/0.2.0/`
+
+Modern lockfiles keep those package identities separate instead of collapsing them into one flat tool entry.
+
+## How agents and tools work together
+- Your app (Node or Python) uses the **SDK** to load callable tool functions based on the agent’s `tools[]`.
+- Each tool executes in its **own subprocess** (correct interpreter/runtime), keeping the host app clean and language-agnostic.
+- The agent manifest + lockfile make the toolset **portable and reproducible** across dev/CI/prod.
+
+## Best practices
+- **Pin for prod**: Exact versions in `tools[]`, commit `agent.lock`.
+- **Gate in CI**:
+```bash
+agentpm lint --strict
+agentpm install --frozen --quiet
+```
+- **Name & describe well**: Clear `name/description` helps discovery and registry docs.
+- **Evolve safely**: Bump the agent’s `version` when you change its tool set or operational contract.
+
+<Callout type="info" title="Dependency scope">
+  Agents resolve `tools[]`, `skills[]`, and `knowledge[]`. `memory` and `profiles` remain preserved future-facing metadata only.
+</Callout>

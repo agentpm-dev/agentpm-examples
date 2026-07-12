@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Prepared vector-mode retrieval corpus built from the public AgentPM v0.1 docs set.",
+  "kind": "knowledge",
+  "knowledge": {
+    "chunking": {
+      "chunk_size": 1200,
+      "overlap": 150,
+      "strategy": "langchain-markdown-headers-plus-recursive-character"
+    },
+    "corpus": {
+      "chunk_count": 459,
+      "chunks_path": "knowledge/chunks.jsonl",
+      "content_hash": "sha256:d534741b4adec099106540f3a81285335eaccd089e8b94c96bec20981e044378",
+      "source_count": 37,
+      "sources_path": "knowledge/sources.jsonl"
+    },
+    "embedding": {
+      "dimensions": 1536,
+      "id": "default",
+      "metric": "cosine",
+      "model": "text-embedding-3-small",
+      "normalized": true,
+      "provider": "openai",
+      "vector_count": 459,
+      "vectors_hash": "sha256:8ebfaaf536f0235961680caff907dac07370b52a38b5c5d2e81e8371300a743f",
+      "vectors_path": "knowledge/embeddings/default.f32"
+    },
+    "indexes": [
+      {
+        "embedding_id": "default",
+        "generated_by": "agentpm knowledge build",
+        "id": "default",
+        "path": "knowledge/indexes/default",
+        "type": "agentpm-local"
+      }
+    ],
+    "mode": "vector",
+    "provenance": {
+      "builder": {
+        "name": "agentpm-examples-agentpm-docs-pipeline",
+        "version": "2026-07-12"
+      },
+      "generated_at": "2026-07-12T00:00:00Z",
+      "sources_manifest_path": "knowledge/provenance/sources-manifest.json"
+    },
+    "retrieval": {
+      "default_score_threshold": 0.35,
+      "default_top_k": 5,
+      "return_citations": true,
+      "strategy": "vector"
+    }
+  },
+  "license": {
+    "spdx": "MIT"
+  },
+  "name": "agentpm-docs",
+  "readme": "README.md",
+  "version": "0.1.0"
+}

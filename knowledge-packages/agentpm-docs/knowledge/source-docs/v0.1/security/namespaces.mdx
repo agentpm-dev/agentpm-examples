@@ -1,0 +1,211 @@
+---
+title: Namespaces
+section: Security
+order: 23
+description: Namespace kinds, visibility, private access, roles, billing, and CLI auth behavior.
+next: security/mfa
+---
+
+# Namespaces
+
+Namespaces are the top-level access boundary in AgentPM.
+
+Package visibility is inherited from the namespace that owns the package:
+
+- public namespace -> public packages
+- private namespace -> private packages
+
+AgentPM does not support package-level public/private overrides today.
+
+## Namespace kinds
+
+AgentPM supports two namespace kinds:
+
+- `user`
+- `org`
+
+### User namespaces
+
+User namespaces are for solo ownership.
+
+- owned by one account
+- can be public or private
+- can have more than one user namespace per account
+- do not support additional members today
+
+### Org namespaces
+
+Org namespaces are for shared ownership and collaboration.
+
+- owned by one account with org members and roles
+- can be public or private
+- support member management
+- use owner/admin/member permissions
+
+## Public vs private namespaces
+
+### Public namespaces
+
+Public namespaces are visible across the AgentPM ecosystem.
+
+- namespace detail pages are public
+- package detail pages are public
+- public package install works without login
+- public ecosystem usage remains free
+
+### Private namespaces
+
+Private namespaces are visible only to authorized users.
+
+- anonymous users do not see private namespaces in search
+- unauthorized authenticated users do not see private namespaces in search
+- unauthorized users cannot open private package detail pages
+- private package installs require valid AgentPM auth and namespace access
+
+## Visibility is immutable after creation
+
+Visibility is chosen when the namespace is created.
+
+Namespace visibility cannot be changed later through the UI or API.
+
+If you need a different visibility model, create a new namespace with the desired visibility and publish there.
+
+## Org roles and permissions
+
+Org namespaces support three roles:
+
+- `owner`
+- `admin`
+- `member`
+
+### Permission summary
+
+| Capability | Owner | Admin | Member |
+|---|---:|---:|---:|
+| View private namespace | Yes | Yes | Yes |
+| Search private packages | Yes | Yes | Yes |
+| Install private packages | Yes | Yes | Yes |
+| Publish package versions | Yes | Yes | Yes |
+| Yank package versions | Yes | Yes | No |
+| Change display metadata | Yes | Yes | No |
+| Manage members | Yes | Yes | No |
+| Change billing / plan | Yes | No | No |
+
+### Owner safeguards
+
+AgentPM prevents unsafe org-owner changes:
+
+- the last owner cannot be removed
+- the last owner cannot be demoted to a non-owner role
+
+## Billing and plan behavior
+
+### Free
+
+Public ecosystem usage remains free.
+
+That includes:
+
+- public user namespaces
+- public org namespaces
+- public package publishing
+- public package discovery
+- public package install
+
+### Private user namespaces
+
+Private user namespaces are covered by:
+
+- active trial
+- Pro
+- Team
+- manual grant
+
+### Private org namespaces
+
+Private org namespaces are covered by:
+
+- Team
+- qualifying manual grant
+
+Pro does not unlock private org namespaces.
+
+### Trial behavior
+
+Your first private user namespace can start a private trial.
+
+When the trial expires:
+
+- private publish is blocked
+- private install is blocked
+- private namespaces are not deleted or made public automatically
+
+### Past-due behavior
+
+Past-due paid subscriptions are treated differently from expired trials.
+
+- private publish is blocked
+- new private namespace creation is blocked
+- private install is still allowed for now
+
+### Canceled or paused behavior
+
+Canceled or paused subscriptions do not keep private access active.
+
+- private publish is blocked
+- private install is blocked
+
+## Private install flow
+
+Private package installation is enforced server-side.
+
+To install from a private namespace, you need:
+
+- valid AgentPM auth
+- access to the namespace
+- an internal billing state that still allows the install
+
+### Interactive login
+
+For local development, sign in once and let the CLI cache credentials:
+
+```bash
+agentpm login
+```
+
+### Headless auth with a PAT
+
+For CI or scripts, provide a PAT:
+
+```bash
+export AGENTPM_TOKEN="..."
+agentpm install @namespace/name@0.1.0
+```
+
+PATs are the recommended way to install from private namespaces in headless environments.
+
+### Lockfiles do not grant access
+
+`agent.lock` records reproducibility. It does not grant access.
+
+If a lockfile references a private package, you still need valid AgentPM auth with namespace access before install can succeed.
+
+## Search and detail-page behavior
+
+Private namespaces and packages do not appear in anonymous discovery.
+
+### Anonymous or unauthorized users
+
+- private namespaces do not appear in search
+- private packages do not appear in search
+- private namespace pages are unavailable to users without access
+- private package pages are unavailable to users without access
+
+### Authorized users
+
+Authorized users can:
+
+- search private namespaces and packages in the supported search modes
+- view private namespace detail pages
+- view private package detail, versions, readme, and security pages
+- install private packages through the CLI

@@ -1,0 +1,372 @@
+---
+title: Knowledge
+section: agent.json
+order: 16
+description: Author prepared context packages for direct context loading or local vector retrieval.
+next: agent.json/agents
+---
+
+# Knowledge
+
+Author prepared context packages for direct context loading or local vector retrieval.
+
+## What is a Knowledge package?
+
+A `kind: "knowledge"` package is a **prepared context artifact**. It is not an executable tool and it is not a composed agent. Instead, it packages content that has already been prepared for one of two retrieval shapes:
+
+- **`mode: "context"`** for declared documents meant to be loaded directly into context
+- **`mode: "vector"`** for a prepared retrieval corpus with chunks, sources, embeddings, and a local index
+
+AgentPM packages prepared context. In the current Knowledge flow, AgentPM does **not** crawl websites, split documents into chunks, or call embedding providers for you during build or publish. Those steps happen in your own content pipeline before `agentpm knowledge build`.
+
+## When to use Knowledge
+
+Choose **Knowledge** when the thing you want to version is **prepared context**:
+
+- documents an agent should read directly
+- a curated playbook or handbook bundle
+- a retrieval corpus you already chunked and embedded elsewhere
+- a package an agent should install and inspect, but not execute
+
+Choose a **Tool** when you need a callable executable capability.
+
+Choose a **Skill** when the main value is procedural know-how.
+
+Choose an **Agent** when you want to compose tools, skills, and/or Knowledge into a reusable package.
+
+Choose a **Template** when you want to generate a starter workspace.
+
+## The two modes
+
+### `mode: "context"`
+
+Use context mode for declared files that should be injected directly into a prompt, runtime context window, or host-side retrieval layer.
+
+Context mode packages:
+
+- declare one or more `knowledge.documents[]`
+- compute per-document `bytes` and `sha256`
+- compute aggregate `knowledge.context.document_count`
+- compute aggregate `knowledge.context.total_bytes`
+- compute aggregate `knowledge.context.content_hash`
+- do **not** require chunks, sources, embeddings, vectors, or indexes
+
+### `mode: "vector"`
+
+Use vector mode for a prepared retrieval corpus.
+
+Vector mode packages:
+
+- declare canonical `chunks.jsonl` and `sources.jsonl`
+- declare an embedding spec and canonical raw float32 vectors file
+- compute corpus and vector hashes
+- require an `agentpm-local` index entry after `agentpm knowledge build`
+- support `agentpm knowledge query` after the package has been built
+
+## Scaffold a Knowledge package
+
+### Context starter
+
+```bash
+agentpm init --kind knowledge --name engineering-playbook --description "Engineering playbook intended for direct context loading"
+```
+
+Generated skeleton (`agent.json`):
+
+```json
+{
+  "kind": "knowledge",
+  "name": "engineering-playbook",
+  "version": "0.1.0",
+  "description": "Engineering playbook intended for direct context loading",
+  "knowledge": {
+    "mode": "context",
+    "documents": [
+      {
+        "path": "knowledge/docs/context.md",
+        "content_type": "text/markdown",
+        "role": "context",
+        "description": "Starter context document."
+      }
+    ]
+  }
+}
+```
+
+### Vector starter
+
+```bash
+agentpm init --kind knowledge --mode vector --name python-docs --description "Prepared retrieval corpus for Python documentation"
+```
+
+Generated skeleton (`agent.json`):
+
+```json
+{
+  "kind": "knowledge",
+  "name": "python-docs",
+  "version": "0.1.0",
+  "description": "Prepared retrieval corpus for Python documentation",
+  "knowledge": {
+    "mode": "vector",
+    "corpus": {
+      "chunks_path": "knowledge/chunks.jsonl",
+      "sources_path": "knowledge/sources.jsonl"
+    },
+    "embedding": {
+      "id": "default",
+      "provider": "bring-your-own",
+      "model": "text-embedding-3-small",
+      "dimensions": 1536,
+      "metric": "cosine",
+      "normalized": true,
+      "vectors_path": "knowledge/embeddings/default.f32"
+    },
+    "indexes": [],
+    "retrieval": {
+      "strategy": "vector",
+      "default_top_k": 5,
+      "return_citations": true
+    }
+  }
+}
+```
+
+<Callout type="info" title="Pre-build starter state">
+  In the generated vector starter, `indexes: []` is expected before build. `agentpm knowledge build` validates the corpus and embedding payloads, writes the default `agentpm-local` index entry, and generates `knowledge/indexes/default/metadata.json`. A vector-mode package is not ready for `agentpm publish` until that build step has run.
+</Callout>
+
+## Field reference
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `$schema` | string | no | Optional schema URI |
+| `kind` | enum | **yes** | Must be `"knowledge"` |
+| `name` | string | **yes** | Package name |
+| `version` | semver | **yes** | SemVer string |
+| `description` | string | **yes** | Human-readable summary |
+| `knowledge.mode` | enum | **yes** | `"context"` or `"vector"` |
+| `knowledge.documents` | array | context mode | Declared context documents |
+| `knowledge.context` | object | build-derived | Context counts and aggregate hash |
+| `knowledge.corpus` | object | vector mode | Canonical chunks/sources paths plus derived counts/hash |
+| `knowledge.chunking` | object | no | Optional descriptive metadata about external chunking |
+| `knowledge.embedding` | object | vector mode | Embedding metadata and canonical vectors path |
+| `knowledge.indexes` | array | vector mode after build | Built local index entries |
+| `knowledge.retrieval` | object | no | Retrieval defaults such as strategy, top-K, and citations |
+| `knowledge.provenance` | object | no | Optional source manifest / builder metadata |
+| `readme` | string | no | Optional README path |
+| `license` | object | no | Optional SPDX/license file metadata |
+
+## Context mode details
+
+Context documents are declared under `knowledge.documents[]`.
+
+Example:
+
+```json
+{
+  "knowledge": {
+    "mode": "context",
+    "documents": [
+      {
+        "path": "knowledge/docs/incident-playbook.md",
+        "content_type": "text/markdown",
+        "role": "context",
+        "description": "Primary incident response playbook."
+      },
+      {
+        "path": "knowledge/docs/comms-template.md",
+        "content_type": "text/markdown",
+        "role": "reference",
+        "description": "Status update template."
+      }
+    ]
+  }
+}
+```
+
+After `agentpm knowledge build`, each document can carry derived metadata:
+
+```json
+{
+  "path": "knowledge/docs/incident-playbook.md",
+  "content_type": "text/markdown",
+  "role": "context",
+  "bytes": 2048,
+  "sha256": "..."
+}
+```
+
+And the aggregate context block is written under `knowledge.context`:
+
+```json
+{
+  "document_count": 2,
+  "total_bytes": 4096,
+  "content_hash": "sha256:..."
+}
+```
+
+## Vector mode details
+
+Vector mode uses three canonical payloads:
+
+- `knowledge.corpus.chunks_path`
+- `knowledge.corpus.sources_path`
+- `knowledge.embedding.vectors_path`
+
+### Chunks JSONL
+
+Each line in `chunks.jsonl` is one JSON object:
+
+```json
+{"id":"chunk_1","source_id":"src_1","text":"Alpha text"}
+{"id":"chunk_2","source_id":"src_2","text":"Beta text","metadata":{"section":"beta"}}
+```
+
+Rules:
+
+- `id` must be unique and non-empty
+- `source_id` must match a source in `sources.jsonl`
+- `text` must be non-empty
+- `metadata`, when present, must be an object
+
+### Sources JSONL
+
+Each line in `sources.jsonl` is one JSON object:
+
+```json
+{"id":"src_1","title":"Alpha doc","uri":"https://example.com/alpha"}
+{"id":"src_2","title":"Beta doc","uri":"https://example.com/beta","metadata":{"section":"beta"}}
+```
+
+Source IDs must be unique and non-empty.
+
+### Raw vector file
+
+`knowledge.embedding.vectors_path` points to a raw little-endian float32 payload. The canonical invariant is:
+
+- vector row `N` maps to chunk line `N` in `chunks.jsonl`
+
+That row-order invariant is how query results hydrate chunks back from scored vector rows.
+
+### Embedding metadata
+
+The embedding block declares the compatibility contract for both build and query:
+
+```json
+{
+  "id": "default",
+  "provider": "openai",
+  "model": "text-embedding-3-small",
+  "dimensions": 1536,
+  "metric": "cosine",
+  "normalized": true,
+  "vectors_path": "knowledge/embeddings/default.f32"
+}
+```
+
+Query-time vectors must match the declared dimensions, and any supplied provider/model metadata must not conflict with the manifest.
+
+### Index metadata
+
+`agentpm knowledge build` writes the default local index entry and `knowledge/indexes/default/metadata.json`.
+
+The generated metadata records:
+
+- index `type`
+- `format_version`
+- `algorithm`
+- `embedding_id`
+- `metric`
+- `normalized`
+- `source_corpus_hash`
+- `source_chunks_hash`
+- `source_sources_hash`
+- `source_vectors_hash`
+- canonical `chunks_path`, `sources_path`, and `vectors_path`
+- `dimensions`
+- `chunk_count`
+- `source_count`
+- `vector_count`
+
+## Typical workflows
+
+### Context mode
+
+```bash
+agentpm init --kind knowledge --name engineering-playbook --description "Engineering playbook"
+agentpm lint
+agentpm knowledge build
+agentpm knowledge inspect .
+agentpm publish
+agentpm install @zack/engineering-playbook
+```
+
+### Vector mode
+
+```bash
+agentpm init --kind knowledge --mode vector --name python-docs --description "Prepared retrieval corpus"
+# create chunks, sources, and vectors with your own pipeline
+agentpm lint
+agentpm knowledge build
+agentpm knowledge inspect .
+agentpm knowledge query . --vector-json query.json
+agentpm publish
+agentpm install @zack/python-docs
+```
+
+## Build and publish rules
+
+Knowledge packages must be built before publishing.
+
+- `agentpm knowledge build` computes derived metadata and writes the local index metadata for vector mode
+- `agentpm publish` performs a build-check before packaging
+- `agentpm publish` does **not** mutate `agent.json`, compute missing hashes, or generate indexes by default
+
+Typical failure cases:
+
+- missing build metadata
+- stale context document hash or byte count
+- stale vector hash or vector count
+- missing or stale local index metadata
+
+When that happens, refresh the package first:
+
+```bash
+agentpm knowledge build
+agentpm publish
+```
+
+## Query vector and embedding adapter inputs
+
+For vector mode, `agentpm knowledge query` accepts either:
+
+- `--vector-json` with a direct vector payload
+- `--embedding-command` with a user-provided adapter
+
+Accepted vector JSON shapes:
+
+```json
+[0.1, 0.2, 0.3]
+```
+
+or:
+
+```json
+{
+  "vector": [0.1, 0.2, 0.3],
+  "provider": "openai",
+  "model": "text-embedding-3-small",
+  "dimensions": 1536
+}
+```
+
+Embedding command adapters receive compact JSON on stdin and must emit vector JSON on stdout. See [`agentpm knowledge`](/docs/v0.1/cli/knowledge) for the exact command contract.
+
+## Security and authorship guidance
+
+- Treat retrieved or directly loaded Knowledge content as untrusted input from the perspective of your agent runtime.
+- Review prompt injection and instruction-conflict risks when you package web-derived or third-party corpus content.
+- Package authors are responsible for provenance, licensing, and the right to redistribute the packaged content.
+- If you include `knowledge.provenance` or `license`, keep those fields current and accurate.

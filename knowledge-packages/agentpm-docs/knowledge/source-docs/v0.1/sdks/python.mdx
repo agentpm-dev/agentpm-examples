@@ -1,0 +1,330 @@
+---
+title: Python SDK
+section: SDKs
+order: 20
+description: Install packages with the CLI, load tools, and inspect installed agents, skills, and Knowledge packages from Python.
+next: sdks/tool-discovery
+---
+
+# Python SDK
+
+Install packages with the CLI, load tools, and inspect installed agents, skills, and Knowledge packages from Python.
+
+## Goal
+
+Install the Python SDK and use:
+
+- `load()` to call a published tool
+- `load_agent()` to inspect an installed agent package and its resolved packages
+- `load_skill()` to inspect an installed skill package and its resolved tools
+
+## 1) Install a tool
+
+From your project with an **agent manifest**:
+```bash
+# declare and install a specific tool version
+agentpm install @zack/summarize@0.1.3
+# or: edit agent.json → tools[] then run agentpm install
+```
+This resolves and prepares the tool under: `.agentpm/tools/<namespace>/<name>/<version>`
+
+You can also install a published agent package directly:
+
+```bash
+agentpm install @zack/support-agent@0.1.0
+```
+
+That writes:
+
+- the installed agent under `.agentpm/agents/<namespace>/<name>/<version>`
+- its resolved skills under `.agentpm/skills/<namespace>/<name>/<version>`
+- its resolved tools under `.agentpm/tools/<namespace>/<name>/<version>`
+
+You can also install a published skill package directly:
+
+```bash
+agentpm install @zack/incident-commander@0.1.0
+```
+
+That writes:
+
+- the installed skill under `.agentpm/skills/<namespace>/<name>/<version>`
+- its resolved tools under `.agentpm/tools/<namespace>/<name>/<version>`
+
+## 2) Install the Python SDK
+
+```bash
+uv pip install agentpm
+# or: pip install agentpm
+```
+
+## 3) The load() function (core API)
+
+`load()` resolves the tool and returns a callable bound to a managed subprocess.
+
+### Basic usage
+
+```py
+from agentpm import load
+
+summarize = load("@zack/summarize@0.1.3")
+result = summarize({ "text": "Cats are elegant, enigmatic creatures." })
+print(result)
+```
+
+### Type signature (overloads)
+
+```py
+from typing import Callable, TypedDict, Literal
+
+ToolFunc = Callable[[JsonValue], JsonValue]
+
+class LoadedWithMeta(TypedDict):
+    func: ToolFunc
+    meta: ToolMeta
+
+def load(
+    spec: str,
+    with_meta: bool = False,
+    timeout: float | None = None,
+    tool_dir_override: str | None = None,
+    env: dict[str, str] | None = None,
+) -> ToolFunc | LoadedWithMeta: ...
+```
+
+### Arguments
+
+- `spec: str` — tool spec like `@namespace/name@0.1.3`
+- `with_meta: bool = False` — include manifest metadata in the return value
+- `timeout: float | None = None` — per-call hard cap in seconds (default: `120.0`)
+- `tool_dir_override: str | None = None` — custom tool root (tests/local layouts)
+- `env: dict[str, str] | None = None` — merged into the subprocess environment
+
+### Example with environment and timeout
+
+```py
+from agentpm import load
+import os
+
+capitalize = load(
+    "@zack/capitalize@0.1.11",
+    timeout=30.0,
+    env={ "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"] },
+)
+
+out = capitalize({
+    "text": "Cats are some of the most amazing creatures—loving, curious, and a little wild at heart.",
+    "doKeywords": True,
+    "doSentiment": True,
+    "doSummary": True,
+    "maxSummaryChars": 200,
+})
+print(out)
+```
+
+## 4) Loading with metadata
+
+Ask `load()` for manifest data you can hand to your agent runtime (for tool descriptions, IO schemas, etc.).
+
+```py
+from agentpm import load
+
+loaded = load("@zack/capitalize@0.1.11", with_meta=True)
+func = loaded["func"]
+meta = loaded["meta"]
+
+out2 = func({ "text": "hi" })
+```
+
+`meta` fields:
+```py
+# meta: ToolMeta
+# {
+#   "name": str,
+#   "version": str,
+#   "description": str | None,
+#   "inputs": JsonValue | None,   # JSON Schema (Draft 2020-12)
+#   "outputs": JsonValue | None,  # JSON Schema (Draft 2020-12)
+#   "runtime": { "type": "node|python", "version": "…" } | None
+# }
+```
+
+### Using meta to configure an agent tool (example)
+
+```py
+from agentpm import load
+import json
+
+tools = [
+    load("@zack/capitalize@0.1.11", with_meta=True),
+    load("@zack/summarize@0.1.3", with_meta=True),
+]
+
+agent_tools = []
+for t in tools:
+    func, meta = t["func"], t["meta"]
+    agent_tools.append({
+        "name": meta["name"],
+        "description": meta.get("description") or "AgentPM tool",
+        # helpful: concatenate description + IO shapes for better tool selection
+        "longDescription": f'{meta.get("description","")}\n\n'
+                           f'Inputs: {json.dumps(meta.get("inputs"))}\n'
+                           f'Outputs: {json.dumps(meta.get("outputs"))}',
+        "call": func,  # the callable your agent runtime will invoke
+    })
+
+# register agent_tools with your agent runtime’s tool loader
+```
+
+## 5) Loading an installed agent package
+
+Use `load_agent()` when you want metadata for a registry-installed agent package plus the concrete package refs it resolved to at install time.
+
+```py
+from agentpm import load, load_agent, load_skill
+
+agent = load_agent("@zack/support-agent@0.1.0")
+first_skill = agent["resolvedSkills"][0]
+skill = load_skill(f'{first_skill["name"]}@{first_skill["version"]}')
+first_tool = skill["resolvedTools"][0]
+tool = load(f'{first_tool["name"]}@{first_tool["version"]}')
+```
+
+What `load_agent()` returns:
+
+- the installed agent manifest
+- the installed agent root path
+- `resolvedKnowledge`, which are the exact Knowledge package refs represented in `agent.lock`
+- reserved refs (`knowledge`, `memory`, `profiles`) from the lockfile metadata path
+- `resolvedTools`, which are the exact tool package refs represented in `agent.lock`
+- `resolvedSkills`, which are the exact skill package refs represented in `agent.lock`
+
+Compatibility note:
+
+- `resolvedKnowledge` is populated from the modern first-class `root.knowledge` entries in `agent.lock`.
+- `reserved.knowledge` is legacy pass-through metadata from older lockfile shapes. For current installs, treat `resolvedKnowledge` as authoritative and expect `reserved.knowledge` to usually be empty.
+- If your workspace still has an older lockfile shape where Knowledge refs only exist under `reserved.knowledge`, rerun `agentpm install` to rewrite the lockfile.
+
+What it does **not** do:
+
+- it does not execute the agent package
+- it does not orchestrate the tools for you
+- it does not load the local project `./agent.json`
+
+That makes `load_agent()` the Python mirror of the Node SDK’s `loadAgent()`:
+
+- inspect an installed agent package
+- get the exact resolved package refs
+- choose which skills and tools to load into your runtime
+
+## 6) Loading an installed skill package
+
+Use `load_skill()` when you want metadata for a registry-installed skill package plus the concrete tool refs it resolved to at install time.
+
+```py
+from agentpm import load_skill
+
+skill = load_skill("@zack/incident-commander@0.1.0")
+
+print(skill["entrypointPath"])
+print(skill["entrypointContent"])
+print(skill["references"])
+print(skill["scripts"])
+print(skill["resolvedTools"])
+```
+
+`load_skill()` returns an inspectable Skill object. Skills are not runnable SDK objects by themselves.
+
+## 7) Loading an installed Knowledge package
+
+Use `load_knowledge()` when you want metadata for a registry-installed Knowledge package plus the canonical package-relative paths it declares.
+
+```py
+from agentpm import load_knowledge
+
+knowledge = load_knowledge("@zack/python-docs@0.1.0")
+
+print(knowledge["knowledge"]["mode"])
+print(knowledge["documentPaths"])
+print(knowledge["chunksPath"])
+print(knowledge["sourcesPath"])
+print(knowledge["vectorsPath"])
+print(knowledge["indexPaths"])
+```
+
+`load_knowledge()` returns an inspectable Knowledge object. Knowledge packages are not runnable SDK objects by themselves.
+
+### `load()` stays tool-only
+
+```py
+from agentpm import load
+
+load("@zack/incident-commander@0.1.0")
+# raises: use load_skill("@zack/incident-commander@0.1.0") instead
+
+load("@zack/python-docs@0.1.0")
+# raises: use load_knowledge("@zack/python-docs@0.1.0") instead
+```
+
+## 8) Execution contract (how tools must behave)
+
+For a tool to work with the SDK, it must follow this process protocol:
+- **STDIN**: SDK writes one JSON object (tool **inputs**) to the subprocess **stdin**.
+- **STDOUT**: Tool writes **exactly one** JSON object (tool **outputs**) to stdout (typically the **last** line).
+- **STDERR**: Any logs/diagnostics go to **stderr**.
+- **Exit code**: `0` on success; non-zero indicates failure.
+
+(The full rationale and Node example are on the **Node SDK** page; the contract is identical here.)
+
+## 9) What load() enforces for safety
+
+- **Interpreter allow-list**
+    - Allowed: `node`, `nodejs`, `python`, `python3`, or versioned like `python3.11`.
+    - Otherwise: throws `ValueError('Unsupported agent.json.entrypoint.command …')`.
+- **Interpreter on PATH**
+    - Verifies the interpreter can be resolved (checks `PATH`, akin to `shutil.which`).
+- **Runtime ↔ entrypoint match (if runtime present)**
+    - Ensures `runtime.type` agrees with `entrypoint.command` (e.g., `python` ↔ `python`).
+- **Timeouts**
+    - Per-call hard cap (`timeoutMs`, default 120s).
+- **Environment merging**
+    - Merges manifest `entrypoint.env` + `env` argument + safe base env.
+
+## 9) How the subprocess is spawned (high level)
+
+- **Working dir (`cwd`)**: `(tool_root / entrypoint.cwd or ".")`.
+- **Isolated run dirs**: per-call temp `run/` folder with dedicated `HOME` and `TMPDIR`.
+- **Python hardening flags**: SDK injects `-I` (isolated) and -B (no `.pyc`) for Python interpreters.
+- **Node memory cap**: if the interpreter is Node, injects `--max-old-space-size` (default `256MB`). You can override via env `AGENTPM_NODE_OLD_SPACE_MB` or by adding the flag yourself.
+- **Optional JITless (Node)**: enable with `AGENTPM_NODE_JITLESS=1` or put `--jitless` in args.
+- **Environment**: composed via `buildEnv(entry.env, opts.env, HOME, TMPDIR)` to keep the tool isolated yet configurable.
+
+<Callout type="tip" title="Tip">
+    If your tool needs more memory, you can add your own flag in entrypoint.args (e.g., --max-old-space-size=512 for Node).
+</Callout>
+
+## 10) Troubleshooting
+
+- **Interpreter not found**
+    - Ensure `node`/`python` is on `PATH`. The error message prints the PATH searched.
+- **Timeouts**
+    - Increase `timeoutMs` in `load()` or set `entrypoint.timeout_ms` (SDK uses the per-call value).
+- **Non-JSON output**
+    - Make sure only one **valid JSON** object is written to stdout; logs go to stderr. On failure, the SDK saves `child.stdout` / `child.stderr` under the run dir and prints the tail of stderr.
+- **Runtime mismatch**
+    - Align `runtime.type` (`node`/`python`) with `entrypoint.command`.
+- **Local testing / custom layouts**
+    - Use `toolDirOverride` in `load()` to point to a local unpacked tool directory.
+- **Modern package loading requires a current `agent.lock`**
+    - `load_agent()` and `load_skill()` read modern lockfile shapes. If the lockfile is missing or too old, rerun `agentpm install`.
+- **Agent installed on disk but not in the lockfile**
+    - `load_agent()` uses the installed agent directory **and** the `agent.lock` root entry together. If the lockfile is missing the agent root, reinstall it.
+- **Skill installed on disk but not in the lockfile**
+    - `load_skill()` uses the installed skill directory **and** the `agent.lock` root entry together. If the lockfile is missing the skill root, reinstall it.
+
+
+## 11) Best practices
+
+- **Define strong IO schemas** so agents construct correct arguments.
+- **Keep logs off stdout**; stdout is reserved for the final JSON.
+- **Set sensible timeouts** (`entrypoint.timeout_ms`) and document required env vars in your tool README/manifest descriptions.

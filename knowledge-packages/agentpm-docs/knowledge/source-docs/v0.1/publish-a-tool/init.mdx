@@ -1,0 +1,58 @@
+---
+title: init
+section: Publish a tool
+order: 14
+description: Create a starter tool manifest you’ll complete and publish.
+next: publish-a-tool/agent.json
+---
+
+# init
+
+Create a starter tool manifest you’ll complete and publish.
+
+## Goal
+
+Scaffold a **tool** with `agentpm init`. On the **next page (agent.json)** you’ll fill in the minimal fields required to publish, continuing this same example.
+
+
+## 1) Scaffold a tool
+
+```bash
+agentpm init --kind tool --name summarize --description "Summarize input text"
+```
+
+Generates agent.json (skeleton):
+```json
+{
+  "kind": "tool",
+  "name": "summarize",
+  "version": "0.1.0",
+  "description": "Summarize input text",
+  "files": [],
+  "entrypoint": { "command": "", "args": [] },
+  "inputs": {},
+  "outputs": {}
+}
+```
+
+<Callout type="info" title="Note">
+  This is intentionally minimal. You’ll complete it on the next page.
+</Callout>
+
+## 2) Quick sanity checks (optional now)
+
+You can already verify your setup compiles and is discoverable:
+```bash
+agentpm lint --strict       # schema + semantic checks; strict treats warnings as errors
+agentpm publish --dry-run   # build tarball without uploading
+```
+
+
+## What you’ll complete on the next page (agent.json)
+- `entrypoint.command` and `args` (interpreter + script/module)
+- `files[]` (everything your tool needs at runtime)
+- `inputs` / `outputs` (JSON Schema for the tool’s interface)
+- `runtime` (`type` and `version`)
+- confirm `name`, `version`, and `description`
+
+Once those are set, you’ll return to **package & publish**.

@@ -1,7 +1,12 @@
 {
-  "description": "Generated from support-assistant-workspace@0.1.0.",
+  "description": "Generated from support-assistant-workspace@0.1.3.",
   "kind": "agent",
-  "knowledge": [],
+  "knowledge": [
+    {
+      "name": "@zack/support-response-handbook",
+      "version": "0.1.0"
+    }
+  ],
   "memory": [],
   "name": "agent-app-support-assistant-workspace",
   "profiles": [],

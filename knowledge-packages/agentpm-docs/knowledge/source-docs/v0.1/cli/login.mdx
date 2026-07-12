@@ -1,0 +1,151 @@
+---
+title: login
+section: CLI
+order: 5
+description: Log in and cache credentials for the CLI.
+next: cli/lint
+---
+
+# login
+
+Log in and cache credentials for the CLI.
+
+## Overview
+
+`agentpm login` authenticates you and (by default) writes a token.json to your OS app-data directory so future commands can use it automatically.
+
+### Command synopsis
+```bash
+agentpm login [--paste] [--stdin] [--no-write] [--device] [--no-open] \
+              [--timeout <SECS>] [--interval <SECS>] [--scope <SCOPE> ...] [token|"-"]
+```
+
+### Arguments
+- **`--paste`**. Prompt once to paste a Personal Access Token (PAT).
+- **`--stdin`**. Read a PAT from stdin (single line).
+- **`--no-write`**. Validate the token but **do not** write credentials to disk.
+- **`--device`**. Force browser-assisted device code flow explicitly.
+- **`--no-open`**. In device flow, **do not** auto-open the browser (print URL + code only).
+- **`--timeout <SECS>` (default: 600)**. Device-flow overall timeout.
+- **`--interval <SECS>` (default: 0)**. Starting poll interval; `0` uses server-provided cadence.
+- **`--scope <SCOPE>` (repeatable)**. Request explicit scopes during device flow.
+
+<Callout type="info" title="Token validation">
+    In paste/stdin and device modes, the CLI calls whoami to verify the token before writing it.
+</Callout>
+
+## Three ways to authenticate
+
+### 1) Pass a token to the command you’re running (no `login` needed)
+
+You can authenticate per command using a flag or environment variable.
+
+**Flag (example: `publish`)**:
+```bash
+agentpm publish --token "$AGENTPM_TOKEN"
+```
+
+**Environment variable**:
+```bash
+export AGENTPM_TOKEN="…"
+agentpm publish
+```
+
+### 2) Provide a PAT via `login` (paste or stdin)
+
+**Paste (interactive TTY)**:
+```bash
+agentpm login --paste
+Paste your AgentPM PAT (input hidden):
+✅  Logged in as you@example.com (["packages:publish"])
+Saved credentials to: ~/Library/Application Support/com.agentpm.AgentPM/token.json
+```
+
+**stdin (non-TTY or scripting)**:
+```bash
+agentpm login --stdin < token.txt
+# or:
+printf '%s\n' "$AGENTPM_TOKEN" | agentpm login --stdin
+✅  Logged in as you@example.com (["packages:publish"])
+Saved credentials to: ~/Library/Application Support/com.agentpm.AgentPM/token.json
+```
+
+### 3) Device code flow (default)
+
+If you just run `agentpm login` in a TTY, the CLI starts device flow:
+```bash
+agentpm login
+To continue, approve this device in your browser:
+  URL : https://agentpackagemanager.com/activate
+  CODE: ABCD-1234
+
+(We’ll keep polling for up to 10 minutes. Press Ctrl+C to cancel.)
+Still waiting for approval… (code: ABCD-1234)
+✅  Logged in as you@example.com (["packages:publish"])
+Saved credentials to: ~/Library/Application Support/com.agentpm.AgentPM/token.json
+```
+
+Options you might use here:
+```bash
+# Do not auto-open the browser
+agentpm login --no-open
+
+# Shorter/longer window or custom poll cadence
+agentpm login --timeout 300 --interval 5
+
+# Ask for specific scopes
+agentpm login --scope packages:publish --scope org:read
+```
+
+<Callout type="info" title="Publish scope compatibility">
+  `packages:publish` is the preferred publish scope. Existing PATs with `tools:publish` are still temporarily accepted for tool packages only.
+</Callout>
+
+## Resolution order
+
+When a command needs auth (e.g., `publish`, `install` for private namespaces), tokens are resolved in this order:
+1. **Explicit flag** (e.g., `--token …`) — highest priority
+2. **Environment variable** (`AGENTPM_TOKEN`)
+3. **Token file** (written by `agentpm login`) — fallback
+
+<Callout type="tip" title="Best practice">
+    For CI, use flags or env. For local development, use agentpm login once and rely on the token file.
+</Callout>
+
+## Where credentials are stored
+
+On success (unless `--no-write`), credentials are saved to your OS app-data directory, e.g.:
+- macOS: `~/Library/Application Support/com.agentpm.AgentPM/token.json`
+- Linux: `~/.config/com.agentpm.AgentPM/token.json` (varies by XDG)
+- Windows: `%APPDATA%\com.agentpm.AgentPM\token.json`
+
+The CLI will print the exact path after login.
+
+## Examples
+
+**Login by pasting a PAT**
+```bash
+agentpm login --paste
+```
+
+**Login using stdin from a file**
+```bash
+agentpm login --stdin < token.txt
+```
+
+**Device flow without opening a browser**
+```bash
+agentpm login --no-open
+```
+
+**Validate only, don’t write**
+```bash
+agentpm login --stdin --no-write < token.txt
+```
+
+## Troubleshooting
+
+- **Invalid token**. Paste/pipe again or reissue a PAT. `--no-write` is handy to test validity in CI.
+- **Device flow times out**. Increase `--timeout`, check network access to the site, or use `--paste/--stdin`.
+- **Multiple accounts/tokens**. Use flags/env per command to override the cached token for that run.
+- **Non-TTY shells**. The CLI defaults to `--stdin` when not a TTY (unless you force `--device`).

@@ -1,0 +1,126 @@
+---
+title: lint
+section: CLI
+order: 6
+description: Validate your `agent.json` (or a folder of manifests) against the AgentPM schema and common best practices.
+next: cli/install-cmd
+---
+
+# lint
+
+Validate your `agent.json` (or a folder of manifests) against the AgentPM schema and common best practices.
+
+## Overview
+
+`agentpm lint` checks schema conformance and common pitfalls. It can print results in multiple formats, optionally treat warnings as errors, and (lightly) auto-fix a few safe issues.
+
+### Command synopsis
+```bash
+agentpm lint [PATHS...] [--schema <URL|PATH>] [--strict] [--format <pretty|json|ndjson>] [--fix]
+```
+
+### Arguments
+- **`PATHS` (default: `./agent.json`)**. Files/dirs/globs to lint. Directories are scanned recursively for `agent.json`.
+- **`--schema <URL|PATH>`**. Override the default schema source. By default, the CLI uses `./schemas/agentpm.manifest.schema.json` when it exists relative to the current working directory; otherwise it uses the bundled schema version shipped with the CLI.
+- **`--strict`**. Treat warnings as errors (schema violations are always errors).
+- **`--format <pretty|json|ndjson>` (default: `pretty`)**. Choose human-readable output or machine-friendly JSON/NDJSON.
+- **`--fix`**. Attempt non-invasive automatic fixes (currently: inject `$schema` if missing).
+
+<Callout type="tip" title="Tip">
+  Use --format=json or --format=ndjson in CI and parse the result for gating.
+</Callout>
+
+## Examples
+
+### Lint the current manifest
+```bash
+agentpm lint
+```
+
+Sample output (missing `description`):
+```vbnet
+✗ agent.json
+  [ERROR] "description" is a required property
+        vs schema  /required
+Error: Lint failed
+```
+
+### Lint multiple paths (file + directory + glob)
+```bash
+agentpm lint agent.json .agentpm/tools/**/agent.json
+```
+
+### Use a custom schema
+```bash
+agentpm lint --schema ./schemas/dev.agentpm.schema.json
+```
+
+You can also point `--schema` at a hosted URL explicitly if you need to validate against a remote schema source.
+
+### Strict mode (warnings become errors)
+```bash
+agentpm lint --strict
+```
+
+### Machine-readable output
+```bash
+agentpm lint --format=json
+```
+
+```json
+[
+  {
+    "file": "agent.json",
+    "ok": false,
+    "issues": [
+      {
+        "file": "agent.json",
+        "level": "error",
+        "message": "\"description\" is a required property",
+        "instance_path": "",
+        "schema_path": "/required"
+      }
+    ]
+  }
+]
+Error: Lint failed
+```
+
+### Auto-fix safe issues
+```bash
+agentpm lint --fix
+# currently adds a $schema field if it's missing
+```
+
+## How lint classifies issues
+
+**Always errors (schema violations)**:
+- Any JSON Schema validation failure. (Example: `"description" is a required property`)
+
+**Warnings (unless --strict)**:
+- Missing `$schema`. Message: `Missing $schema; editors may lack IntelliSense`.
+- Empty `description`. Message: `description should not be empty`.
+- Reserved future-facing reference fields when populated. Example message: `` `memory` is validated and preserved, but not resolved in Phase 3. `` AgentPM accepts `memory` and `profiles` so you can track future references now, but current install and runtime flows do not resolve them yet.
+
+**Semantic error checks (beyond schema)**:
+- Interpreter mismatch between `runtime.type` and `entrypoint.command`. Error message example: `runtime.type should match entrypoint.command (python vs node)`.
+
+<Callout type="info" title="Why this matters">
+    Lint catches issues early so installs and publishes are predictable. agentpm publish runs lint automatically and will block the publish on any lint errors.
+</Callout>
+
+## Exit codes
+
+- `0` — All checked manifests passed (no errors; warnings allowed unless `--strict`).
+- `1` — Lint failed (any error, or any warning when `--strict` is set).
+
+## Recommended workflow
+
+1. Run `agentpm lint` locally during development.
+2. Use `agentpm lint --format=json` in CI to gate merges.
+3. Add `--strict` for release branches to enforce clean manifests.
+4. Let `--fix` add `$schema` automatically; commit the change.
+
+## Notes & gotchas
+- **`$schema` field**. Including `$schema` enables IDE IntelliSense and makes the schema version explicit. Lint will add it for you with `--fix`.
+- **Globs & directories**. When passing directories, ensure your shell doesn’t expand globs unexpectedly; quote them if needed (e.g., `"tools/**/agent.json"`).

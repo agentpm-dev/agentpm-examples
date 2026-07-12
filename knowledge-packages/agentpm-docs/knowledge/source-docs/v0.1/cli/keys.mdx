@@ -1,0 +1,90 @@
+---
+title: keys
+section: CLI
+order: 15
+description: Generate, list, and export author signing keys for package signing.
+next: cli/namespace
+---
+
+# keys
+
+Generate, list, and export author signing keys for package signing.
+
+## Overview
+
+`agentpm keys` manages local **Ed25519** keypairs used for **author-signing** at publish time. Private keys are **passphrase-encrypted** on disk; you export the **public key** to register it with a namespace.
+
+### Command synopsis
+
+```bash
+agentpm keys <command>
+
+Commands:
+  generate   Create a new ed25519 keypair locally
+  list       List local keys
+  export     Export the public key (base64) for registration
+```
+
+### Subcommands & arguments
+
+`generate`
+```bash
+agentpm keys generate --label <LABEL>
+```
+
+- **`--label <LABEL>`** — Required. Friendly name for the key (shown in `keys list`).
+- Prompts for **passphrase twice**; generates Ed25519 keypair; stores encrypted private key.
+
+**Output (example)**:
+```bash
+✅  Created key "Zack Prod CLI Key"
+   id: ZPVjHbC9CN0-cKTk
+   stored at: ~/Library/Application Support/com.agentpm.AgentPM/keys/ZPVjHbC9CN0-cKTk.json
+```
+
+`list`
+```bash
+agentpm keys list
+```
+
+- Prints **key id**, **label**, and **created_at**.
+- Shows “(no keys)” if empty.
+
+**Output (example)**:
+```bash
+ZPVjHbC9CN0-cKTk    Zack Prod CLI Key    2025-10-25T21:20:47.646678Z
+```
+
+`export`
+```bash
+agentpm keys export --key-id <KEY_ID> [--out <FILE>]
+```
+
+- **`--key-id <KEY_ID>`** — Required. Use the id from `keys list`.
+- **`--out <FILE>`** — Optional; write public key to a file. If omitted, prints to stdout.
+- Exports **public key only** as raw **base64** (32 bytes)—this is what namespaces accept.
+
+**Output (example)**:
+```bash
+Wrote public key to pub.txt
+```
+
+## Examples
+
+```bash
+# Create a key
+agentpm keys generate --label "Prod CLI Key"
+
+# Inspect
+agentpm keys list
+
+# Export public key for namespace registration
+agentpm keys export --key-id ZPVjHbC9CN0-cKTk --out pub.txt
+```
+
+## Notes & best practices
+
+- **Encryption**: Private keys are passphrase-encrypted (KDF: `argon2id`) before writing to disk.
+- **Key id**: Displayed `id` is a fingerprint-derived identifier; keep it handy for `publish --key-id`.
+- **Safety**: Store passphrases in a password manager; don’t commit key files to VCS.
+- **CI**: You can use CLI-generated keys in CI by securely provisioning the encrypted file + passphrase.

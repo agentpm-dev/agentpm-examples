@@ -1,0 +1,118 @@
+---
+title: Mixed Runtimes with Docker
+section: Advanced
+order: 26
+description: Run Node and Python tools reliably in one reproducible environment.
+next: examples/example-project
+---
+
+# Mixed Runtimes with Docker
+
+Run Node and Python tools reliably in one reproducible environment.
+
+## Why Docker?
+
+Some tools run on **Node**, others on **Python**—your agent may spawn both. A single Docker image avoids PATH drift and “interpreter not found” issues across laptops, CI, and prod.
+
+- **Hermetic**: Node + Python versions are pinned in the image
+- **No PATH drama**: `node` and `python` are present & discoverable
+- **Prod/CI parity**: the same image runs everywhere
+- **Easy secrets**: pass API keys via env at `docker run` / Compose time
+- **Fewer surprises**: consistent OS libs (SSL, libc, LLM deps, etc.)
+
+## When to use it
+
+- Your platform doesn’t let you install both runtimes
+- Your agent uses tools with different interpreters (Node + Python)
+- Local IDE/CI PATH differences cause flaky runs
+- You want reproducible builds and easy rollback
+
+## How it works (pattern)
+
+The base idea: start from a Python image, **vendor a specific Node binary** (or vice-versa), and set env that tells the SDKs which interpreters to use.
+
+### Key moves
+
+- Copy Node (e.g., Node 20) from an official Node image into your runtime layer
+- Set `AGENTPM_NODE` (and optionally `AGENTPM_PYTHON`) to absolute paths
+- Install your app + the AgentPM SDK
+
+Minimal outline (explained, not a full copy):
+
+```Dockerfile
+# Stage 1: pull a known Node version
+FROM node:20-bullseye AS node20
+
+# Stage 2: Python app base
+FROM python:3.11-slim AS runtime
+
+# Vendor Node into the runtime and point SDK at it
+COPY --from=node20 /usr/local/bin/node /opt/node20/bin/node
+ENV AGENTPM_NODE=/opt/node20/bin/node
+
+# Create user/workdir, install app and AgentPM SDK
+# (pip install, copy source, etc.)
+
+# Optional debugging / tuning
+ENV AGENTPM_DEBUG=1
+# ENV AGENTPM_NODE_JITLESS=1
+# ENV AGENTPM_NODE_OLD_SPACE_MB=1024
+
+CMD ["python", "run.py"]
+```
+
+### Why this pattern works
+
+- You control exact Node/Python versions
+- SDKs see absolute interpreters (`AGENTPM_NODE`, `AGENTPM_PYTHON`) so PATH is irrelevant
+- Reproducible, single artifact for dev/CI/prod
+
+## Compose for local dev
+
+Mount your source and pass secrets/env conveniently:
+
+```yaml
+version: "3.9"
+services:
+  agent:
+    build: ..
+    image: agent-app:latest
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      AGENTPM_DEBUG: "1"             # verbose SDK diagnostics
+      # Optional interpreter overrides (usually unnecessary if image pins them)
+      # AGENTPM_NODE: /usr/bin/node
+      # AGENTPM_PYTHON: /usr/local/bin/python3.11
+    volumes:
+      - ./:/app
+    command: ["python", "run.py"]
+```
+
+## Runtime knobs that pair well with Docker
+
+- **Interpreter selection**
+    - `AGENTPM_NODE=/opt/node20/bin/node`
+    - `AGENTPM_PYTHON=/usr/local/bin/python3.11`
+- **Tool discovery**
+    - `AGENTPM_TOOL_DIR=/opt/tools` (if you copy tools to a custom path)
+- **Diagnostics**
+    - `AGENTPM_DEBUG=1` to print project root, search paths, merged `PATH`, and resolved interpreters
+- **Node memory / JIT**
+    - `AGENTPM_NODE_OLD_SPACE_MB=512` (injects `--max-old-space-size`)
+    - `AGENTPM_NODE_JITLESS=1` to add `--jitless`
+- **(Python SDK, POSIX)**
+    - `AGENTPM_RLIMIT_AS_MB=2048` to cap address space (not applied on macOS)
+
+## Best practices
+
+- **Prefer absolute interpreters** for production (e.g., `/usr/bin/node`); SDKs still enforce Node/Python family.
+- **Bake exact tool versions** and commit `agent.lock` and run `agentpm install --frozen` in the build to ensure deterministic installs.
+- **Keep secrets out of the image**; pass via env at run time or use a secrets manager/Compose overrides.
+- **Tune memory** for Node tools with `AGENTPM_NODE_OLD_SPACE_MB` or explicit `--max-old-space-size` in `entrypoint.args`.
+
+## Troubleshooting
+
+- **Interpreter not found**. Ensure `AGENTPM_NODE/AGENTPM_PYTHON` point to real binaries in the image. Turn on `AGENTPM_DEBUG=1` to see PATH and which() checks.
+- **Tool not discovered**. Verify `.agentpm/tools` exists in the container, or set `AGENTPM_TOOL_DIR` (and confirm with debug logs).
+- **OOM / slow runs**. Increase `AGENTPM_NODE_OLD_SPACE_MB`, adjust Python rlimits, or set per-tool `timeout`/`timeoutMs`.
+- **Different behavior in dev vs CI**. Build once, re-use the exact image tag in both places; avoid installing interpreters/tools differently across environments.

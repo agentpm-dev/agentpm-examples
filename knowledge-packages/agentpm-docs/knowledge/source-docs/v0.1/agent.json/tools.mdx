@@ -1,0 +1,287 @@
+---
+title: Tools
+section: agent.json
+order: 14
+description: Define a single, runnable capability that agents (or your app) can call.
+next: agent.json/skills
+---
+
+# Tools
+
+Define a single, runnable capability that agents (or your app) can call.
+
+## What is a “tool”?
+
+A **tool** is a self-contained skill that an agent (or your app) can call to get real work done (summarize text, create a ticket, query a DB, call an internal API). In AgentPM, a tool:
+- **Exposes a typed interface** via `inputs` and `outputs` (JSON Schema), so agents know exactly what to pass and what to expect.
+- **Becomes a callable function** through the SDKs; the agent (or your app) invokes it just like any other tool/function in its runtime.
+- **Runs in a managed subprocess**, isolating dependencies from the agent host so Node ↔ Python mixes are safe and deterministic.
+- **Advertises capabilities** (name, description, schema) that agent planners can use for tool selection and argument construction.
+- **Publishes portable artifacts** (manifest + files) that agents can install, verify, and reuse across stacks and languages.
+
+## Scaffold a tool
+
+```bash
+agentpm init --kind tool --name summarize --description "Summarize input text"
+```
+
+Generated skeleton (`agent.json`):
+```json
+{
+  "kind": "tool",
+  "name": "summarize",
+  "version": "0.1.0",
+  "description": "Summarize input text",
+  "files": [],
+  "entrypoint": {
+    "command": "",
+    "args": []
+  },
+  "inputs": {},
+  "outputs": {}
+}
+```
+
+<Callout type="info" title="Note">
+  You’ll need to complete this manifest before publish. Run agentpm lint for guidance.
+</Callout>
+
+## Field reference (overview)
+
+| Field         | Type      | Required | Notes                                                          |
+|---------------|-----------|----------|-----------------------------------------------------------------------------|
+| `$schema`     | string    | no       | URI to this schema (optional but recommended)                  |
+| `kind`        | enum      | **yes**  | Must be `"tool"`                                               |
+| `name`        | string    | **yes**  | `^[a-z][a-z0-9-]{0,63}$`                                       |
+| `version`     | semver    | **yes**  | SemVer string (supports pre/metadata)                          |
+| `description` | string    | **yes**  | Free text                                                      |
+| `entrypoint`  | string    | **yes**  | Execution ref `{command, args, cwd, timeout_ms, env}`          |
+| `inputs`      | object    | **yes**  | JSON Schema (or shape) for inputs                              |
+| `outputs`     | object    | **yes**  | JSON Schema (or shape) for outputs                             |
+| `files`       | string[]  | **yes**  | Non-empty list of paths/globs to package                       |
+| `runtime`     | object    | no       | `{ type: "python or node", version: "MAJOR[.MINOR[.PATCH]]" }` |
+| `environment` | object    | no       | Dictionary of required or optional env variables `{required, description, default}` |
+| `readme`      | string    | no       | Path to README file. Will automatically look for README.md if not specified.        |
+| `license`     | object    | no       | `{ spdx: "license spdx", file: "Path to LICENSE file" }`                            |
+
+
+## Defining the entrypoint
+
+```json
+"entrypoint": {
+  "command": "node",               // interpreter: node|nodejs|python|python3 (or absolute path)
+  "args": ["dist/summarize.js"],   // script/module path (repo-relative)
+  "cwd": ".",                     // optional working dir
+  "timeout_ms": 60000,            // optional execution timeout
+  "env": { }                     // optional env vars passed to subprocess
+},
+"runtime": {
+  "type": "node",
+  "version": "20"               // major or full semver your tool requires
+}
+```
+
+<Callout type="tip" title="Tip">
+  Lint enforces that runtime.type matches the interpreter implied by entrypoint.command.
+</Callout>
+
+## Defining the environment
+
+Use `agent.json → environment.vars` to declare the env vars your tool expects. These are **tool-facing variables** (API keys, endpoints, knobs) that the SDK merges into the subprocess from what you pass to load(...env=…).
+- Keys must be **UPPER_SNAKE_CASE** (`^[A-Z][A-Z0-9_]*$`).
+- Each var has:
+    - `required: boolean`
+    - `description: string`
+    - optional `default: string` (used if the caller doesn’t supply a value)
+
+```json
+{
+  "environment": {
+    "vars": {
+      "OPENAI_API_KEY": {
+        "required": true,
+        "description": "API key for OpenAI"
+      },
+      "OPENAI_BASE_URL": {
+        "required": false,
+        "description": "Custom API endpoint; defaults to https://api.openai.com/v1",
+        "default": "https://api.openai.com/v1"
+      }
+    }
+  }
+}
+```
+
+<Callout type="tip" title="Required env vars are enforced by the SDK">
+  If a tool declares required environment variables without a default, the SDK load() function will fail immediately when that variable is missing. Provide the value by passing it per-call via load().
+</Callout>
+
+
+**Notes**
+
+- These declarations power docs in the registry UI and validation in the SDKs.
+
+## Defining inputs and outputs (JSON Schema)
+
+Both `inputs` and `outputs` are **any valid Draft 2020-12 JSON Schema**. Below are common patterns—mix and match as needed.
+
+### 1) Minimal object with a required field
+```json
+"inputs": {
+  "type": "object",
+  "properties": {
+    "text": { "type": "string", "description": "Text to process" }
+  },
+  "required": ["text"],
+  "additionalProperties": false
+},
+"outputs": {
+  "type": "object",
+  "properties": {
+    "summary": { "type": "string" }
+  },
+  "required": ["summary"],
+  "additionalProperties": false
+}
+```
+
+### 2) Optional params with defaults (document in description)
+```json
+"inputs": {
+  "type": "object",
+  "properties": {
+    "text": { "type": "string" },
+    "max_sentences": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Default: 3" }
+  },
+  "required": ["text"],
+  "additionalProperties": false
+}
+```
+
+### 3) Enums, unions, and nullable
+```json
+"inputs": {
+  "type": "object",
+  "properties": {
+    "text": { "type": "string" },
+    "style": { "type": "string", "enum": ["bullet", "abstract", "headline"] },
+    "language": {
+      "oneOf": [
+        { "type": "string", "enum": ["en","es","fr","de"] },
+        { "type": "null" }
+      ],
+      "description": "If null, auto-detect."
+    }
+  },
+  "required": ["text"],
+  "additionalProperties": false
+}
+```
+
+### 4) Arrays and item schemas
+```json
+"inputs": {
+  "type": "object",
+  "properties": {
+    "documents": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    }
+  },
+  "required": ["documents"],
+  "additionalProperties": false
+}
+```
+
+### 5) Numbers with constraints (good for budgets/limits)
+```json
+"inputs": {
+  "type": "object",
+  "properties": {
+    "budget_ms": { "type": "number", "minimum": 0, "maximum": 10000 }
+  },
+  "required": ["budget_ms"],
+  "additionalProperties": false
+}
+```
+
+### 6) Nested objects and patternProperties
+```json
+"inputs": {
+  "type": "object",
+  "properties": {
+    "text": { "type": "string" },
+    "metadata": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": { "type": ["string","number","boolean"] }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["text"],
+  "additionalProperties": false
+}
+```
+
+### 7) Discriminated unions (advanced)
+```json
+"inputs": {
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": { "mode": { "const": "single" }, "text": { "type": "string" } },
+      "required": ["mode","text"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": { "mode": { "const": "batch" }, "documents": { "type": "array", "items": { "type": "string" }, "minItems": 1 } },
+      "required": ["mode","documents"],
+      "additionalProperties": false
+    }
+  ]
+}
+```
+
+Guidance:
+- Prefer `type:"object" + properties + required` for clarity.
+- Use `additionalProperties:false` to catch typos early.
+- Document sensible defaults in `description` or add an output field like `used_defaults` if the tool applies them.
+
+## Packaging files
+
+Include everything your tool needs at runtime:
+```json
+"files": [
+  "dist/**",
+  "prompts/*.md",
+  "models/*.bin"
+]
+```
+- Paths are repo-relative; globs/directories are supported.
+- The published archive preserves relative paths.
+- Make sure your `entrypoint.args` points at a packaged file.
+
+## Best practices
+
+- **Strong schemas**: Validate early with `agentpm lint --strict`.
+- **Env & timeouts**: Declare any required env vars in docs; set `timeout_ms` to bound execution.
+- **Runtime clarity**: Keep `runtime.type/version` in sync with your actual interpreter.
+- **Determinism**: Pin `version`, publish with CI, and let consumers lock via `agent.lock`.
+- **Docs from manifest**: Good `description` + field descriptions render as rich docs in the registry.
+
+## Next steps
+
+- Fill in `entrypoint`, `inputs`, `outputs`, and `files`.
+- Run:
+```bash
+agentpm lint --strict
+agentpm publish --dry-run
+```
+- When ready:
+```bash
+agentpm publish
+```
+- See the `Agents` page next for composing multiple tools.

@@ -1,0 +1,297 @@
+---
+title: install
+section: CLI
+order: 7
+description: Install tools, skills, knowledge packages, or agents, resolve package dependencies, and write an updated lockfile.
+next: cli/new
+---
+
+# install
+
+Install tools, skills, knowledge packages, or agents, resolve package dependencies, and make the resulting packages available to your app.
+
+<Callout type="info" title="Templates use agentpm new, not install">
+  Workflow templates are consumed with `agentpm new`, not `agentpm install`. Generated multi-root workspace projects may later use `agentpm install` to regenerate `agent.lock`, but `agentpm install <spec>` is not the entrypoint for template consumption.
+</Callout>
+
+## Overview
+
+`agentpm install` supports two workflows:
+
+- **manifest-driven install** from a local `kind: "agent"` or `kind: "skill"` manifest
+- **direct package install** for a tool, skill, knowledge, or agent spec
+
+In both cases, AgentPM resolves package versions, downloads artifacts, installs them into the normalized `.agentpm` layout, and writes `agent.lock`.
+
+### Command synopsis
+```bash
+agentpm install [<spec>] [--manifest <path>] [--frozen] [--refresh] [--update-range] [--require_attestation] [--quiet] [--token <PAT>]
+```
+
+### Arguments
+- **`spec` (optional)**. Install a specific package by spec, e.g. `@namespace/name@0.1.2` or `@namespace/name@^1.2`.
+  - If it resolves to a **tool**, AgentPM installs the tool directly.
+  - If it resolves to a **skill**, AgentPM installs the skill artifact and resolves/installs its tool dependencies.
+  - If it resolves to a **knowledge** package, AgentPM installs the knowledge artifact directly.
+  - If it resolves to an **agent**, AgentPM installs the agent artifact and then resolves/installs its tool, skill, and knowledge dependencies.
+  - In a local `kind: "agent"` project, direct **tool** installs add/update `agent.json → tools[]`, direct **skill** installs add/update `agent.json → skills[]`, and direct **knowledge** installs add/update `agent.json → knowledge[]`.
+- **`--manifest <path>` (default: `agent.json`)**. Path to the local manifest to read/write.
+- **`--frozen`**. Fail if anything would change the resolved set (no re-resolution or lock updates).
+- **`--refresh`**. Force re-resolution and re-download even if everything looks satisfied locally (bypass caches).
+- **`--update-range`**. If `spec` conflicts with the current range in `agent.json`, update the range in the manifest to match the requested spec.
+- **`--require_attestation`** — **Fail install** if any resolved artifact is missing a registry attestation signature (supply-chain enforcement).
+- **`--quiet`**. Reduce output noise (spinner/logs).
+- **`--token <PAT>` (env: `AGENTPM_TOKEN`)**. Personal Access Token for headless auth (overrides env/file).
+
+<Callout type="info" title="Scope">
+  Agents resolve `tools[]`, `skills[]`, and `knowledge[]`. Skills resolve `tools[]`. `memory` and `profiles` remain reserved metadata.
+</Callout>
+
+<Callout type="info" title="Token resolution order">
+    flag (--token) > env (AGENTPM_TOKEN) > token file (written by agentpm login).
+</Callout>
+
+## Examples
+
+### Install all tools declared in a local agent manifest
+```bash
+agentpm install
+```
+
+Sample output:
+```java
+• Reading credentials…
+✓ Reading credentials (0ms)
+• Resolving versions…
+✓ Resolving versions (10ms)
+• Requesting download URLs…
+✓ Requesting download URLs (50ms)
+• Downloading packages…
+✓ Downloading packages (1ms)
+• Finalizing install…
+✓ Finalizing install (10ms)
+Installed ✓
+```
+
+### Add + install a specific tool by spec
+```bash
+agentpm install @zack/summarize@0.1.2
+# writes/updates the entry in agent.json → tools[] and installs the artifact
+```
+
+### Install a published agent package directly
+```bash
+agentpm install @zack/support-agent@0.1.0
+```
+
+This installs:
+
+- the agent artifact under `.agentpm/agents/zack/support-agent/0.1.0/`
+- the agent's resolved skill dependencies under `.agentpm/skills/...`
+- the agent's resolved knowledge dependencies under `.agentpm/knowledge/...`
+- the agent's resolved tool dependencies under `.agentpm/tools/...`
+
+### Install a published skill package directly
+```bash
+agentpm install @zack/incident-commander@0.1.0
+```
+
+This installs:
+
+- the skill artifact under `.agentpm/skills/zack/incident-commander/0.1.0/`
+- the skill's resolved tool dependencies under `.agentpm/tools/...`
+
+### Install a published knowledge package directly
+```bash
+agentpm install @zack/python-docs@0.1.0
+```
+
+This installs:
+
+- the knowledge artifact under `.agentpm/knowledge/zack/python-docs/0.1.0/`
+
+### Re-resolve and re-download everything
+```bash
+agentpm install --refresh
+```
+
+### Prevent any changes to the resolved set
+```bash
+agentpm install --frozen
+# exits with an error if resolution would change
+```
+
+### Update the manifest’s version range to match your spec
+```bash
+agentpm install @zack/summarize@0.1.2 --update-range
+```
+
+## What `install` does
+
+1. **Reads credentials** and, for manifest-driven installs, your local `agent.json`.
+2. **Resolves package versions** (respecting exact pins or semver ranges).
+3. **Fetches download URLs** and **downloads artifacts**.
+4. **Chooses install directories by kind**:
+   - tools → `.agentpm/tools/...`
+   - skills → `.agentpm/skills/...`
+   - knowledge → `.agentpm/knowledge/...`
+   - agents → `.agentpm/agents/...`
+5. **Writes updates** when installing a direct tool, skill, or knowledge spec in a local agent project (adds or updates `tools[]`, `skills[]`, or `knowledge[]`).
+
+**Install locations**
+- Prepared tools: `.agentpm/tools/<namespace>/<name>/<version>`
+- Installed skill packages: `.agentpm/skills/<namespace>/<name>/<version>`
+- Installed knowledge packages: `.agentpm/knowledge/<namespace>/<name>/<version>`
+- Installed agent packages: `.agentpm/agents/<namespace>/<name>/<version>`
+- Download cache (tgz artifacts): `.agentpm/cache` (used unless you pass `--refresh`)
+
+## Lockfile (`agent.lock`)
+
+`agentpm install` writes **agent.lock** at the project root to guarantee repeatable installs across machines and CI.
+
+**Example:**
+```json
+{
+  "lockfile_version": 3,
+  "packages": {
+    "tool:@zack/summarize@0.1.2": {
+      "kind": "tool",
+      "name": "@zack/summarize",
+      "version": "0.1.2",
+      "integrity": "dd58…ae6d"
+    },
+    "skill:@zack/incident-commander@0.1.0": {
+      "kind": "skill",
+      "name": "@zack/incident-commander",
+      "version": "0.1.0",
+      "integrity": "c3d9…8f2b"
+    },
+    "knowledge:@zack/python-docs@0.1.0": {
+      "kind": "knowledge",
+      "name": "@zack/python-docs",
+      "version": "0.1.0",
+      "integrity": "f1aa…921b"
+    }
+  },
+  "roots": {
+    "local:agent": {
+      "name": "research-assistant",
+      "version": "0.1.0",
+      "tools": ["tool:@zack/summarize@0.1.2"],
+      "skills": ["skill:@zack/incident-commander@0.1.0"],
+      "knowledge": ["knowledge:@zack/python-docs@0.1.0"],
+      "reserved": {
+        "memory": [],
+        "profiles": []
+      }
+    }
+  }
+}
+```
+
+**What’s in it**
+- `packages` — exact package identities and integrities.
+- `roots` — local manifest roots and installed registry package roots.
+- `integrity` — a cryptographic checksum of the artifact used to verify content.
+- `generated` — timestamp for traceability.
+- `lockfile_version` — the current format version.
+
+**How it’s used**
+- On install, the lockfile **pins** versions and checksums.
+- `--frozen` will **fail** if the resolved set would change (protects CI from drift).
+- `--refresh` re-resolves and re-downloads; if versions change (e.g., semver ranges), the lockfile is updated accordingly.
+- Existing older lockfiles are still read where practical, but Skill- or Knowledge-containing graphs are written as `lockfile_version: 3`.
+- Reinstalling from an older lock that still used `reserved.skills` or `reserved.knowledge` rewrites the lock into the modern shape: resolvable entries move into first-class root `skills` and `knowledge`, and migrated reserved entries are removed from the rewritten lock.
+
+**Best practices**
+- Commit `agent.lock` to **version control**.
+- Don’t edit it by hand—change `agent.json` (or pass a spec) and re-run `agentpm install`.
+- Use exact pins for production; if using ranges, combine with `--frozen` in CI.
+
+### Manifest-driven vs direct package install
+
+`agentpm install` supports two install sources:
+
+- **Manifest-driven install**
+  - Run `agentpm install` in a project with a local `kind: "agent"` or `kind: "skill"` manifest.
+  - For local agents, AgentPM resolves declared `tools[]`, `skills[]`, and `knowledge[]`.
+  - For local skills, AgentPM resolves declared `tools[]`.
+  - `agent.lock` records the local manifest as `local:agent` or `local:skill`.
+
+- **Direct package install**
+  - Run `agentpm install @namespace/name@version`.
+  - If that package resolves to a tool, AgentPM installs the tool directly into `.agentpm/tools/...`.
+  - If that package resolves to a skill, AgentPM installs the skill package into `.agentpm/skills/...`, then resolves and installs its tools into `.agentpm/tools/...`.
+  - If that package resolves to a knowledge package, AgentPM installs the package into `.agentpm/knowledge/...`.
+  - If that package resolves to an agent, AgentPM installs the agent package into `.agentpm/agents/...`, then resolves and installs its tools, skills, and knowledge.
+  - `agent.lock` records installed registry agents, skills, and knowledge packages with roots like `agent:@namespace/name@version`, `skill:@namespace/name@version`, and `knowledge:@namespace/name@version`.
+
+## Verify registry attestation on install
+
+Ensure every artifact you pull has a **registry attestation**:
+```bash
+agentpm install --require_attestation
+```
+
+- Fails the install if any resolved artifact **lacks** the registry’s attested signature.
+- Works alongside your normal resolution/lockfile flow.
+- Use in **CI** and production to prevent un-attested packages from entering your environment.
+
+## Private installs
+
+Private package installs require valid AgentPM auth.
+
+Use one of these:
+
+- `agentpm login` for an interactive local session
+- `--token <PAT>` for a single command
+- `AGENTPM_TOKEN` for CI or scripts
+
+Example:
+
+```bash
+agentpm install @namespace/private-tool@0.1.0 --token "$AGENTPM_TOKEN"
+```
+
+If you do not have access to the namespace, install fails safely instead of exposing private package metadata.
+
+### `agent.lock` does not grant access
+
+`agent.lock` records reproducibility. It does not grant access to private packages.
+
+If a lockfile references a private package, you still need valid AgentPM auth with access to that namespace before install can resolve or download the artifact.
+
+
+## Common flows
+
+- **Declared in manifest → install all**
+```bash
+# agent.json already has tools[] entries
+agentpm install
+```
+
+- **Ad-hoc add a tool**
+```bash
+agentpm install @namespace/my-tool@0.3.1
+# now present in tools[] and installed
+```
+
+- **Pin vs range**
+    - Use exact pins (`0.1.2`) for reproducibility.
+
+## Errors & troubleshooting
+
+- **Reserved field warnings under `--strict`**. `memory` and `profiles` remain reserved future-facing metadata. `skills` and `knowledge` are first-class for agents.
+- **Unsupported older lock under `--frozen`**. If an older lockfile cannot represent the requested Skill-aware graph, rerun `agentpm install` without `--frozen` to regenerate `agent.lock` v3.
+- **Frozen mismatch**. If `--frozen` fails, you’re attempting to change the resolved set. Remove `--frozen` or commit the intended updates first.
+- **Stale cache**. If you suspect a bad/corrupt artifact or want to force re-fetch, use `--refresh`.
+
+## Recommended workflow
+
+1. Declare tools, skills, and knowledge in `agent.json`, or install packages via `agentpm install @namespace/name@version`.
+2. Run `agentpm install` locally; commit manifest and `agent.lock` changes.
+3. In CI, run:
+```bash
+agentpm lint --strict
+agentpm install --frozen --quiet
+```
