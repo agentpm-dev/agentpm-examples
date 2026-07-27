@@ -1,0 +1,19 @@
+{
+  "agentpm_version": "0.1.20",
+  "built_at": "2026-07-27T17:11:37Z",
+  "contract_count": 1,
+  "contracts_hash": "sha256:78f6e783fdf877e1332e5874a33766108cd58430c729f69faf2a17996802e4be",
+  "contracts_index_hash": "sha256:7abb08d8a609b2ca115b740c43b02c4f8d812ed0072fc4aa9e0f7527e626ce20",
+  "format_version": 1,
+  "manifest_path": "agent.json",
+  "source_contract_inputs_hash": "sha256:47d1e671b2122eb6e11a66a3fc37b477b16fe8b897aa29a0c09fc64797ba7253",
+  "source_manifest_hash": "sha256:bdd8d38400233731f74f93a8cd9b4ab099fd110ee3e7637da74e3b0429d95660",
+  "source_schemas": [
+    {
+      "path": "schemas/customer-state.schema.json",
+      "sha256": "sha256:11460c8c5385fa2ad6a85566ceb64ef7f6bffdfe52916c4d8809c8d1aa024c05"
+    }
+  ],
+  "source_schemas_hash": "sha256:9ad1dd0eba48f55af3e090f8c52f6522f8b3b6960a520553ab5eefb2fa53d595",
+  "type": "agentpm-memory-contracts"
+}

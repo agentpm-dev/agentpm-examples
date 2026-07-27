@@ -16,6 +16,7 @@ The current examples repo now shows both sides of the agent workflow:
 
 - `agent-packages/*` contains the publishable source manifests for example agents
 - `knowledge-packages/*` contains the publishable source manifests for first-wave example Knowledge packages
+- `memory-packages/*` contains the publishable source manifests for first-wave example Memory Blueprints
 - `skill-packages/*` contains the publishable source manifests for first-wave example skills
 - `template-packages/*` contains the publishable source manifests for official workflow templates
 - the newer `agent-app-*` directories show real apps that either install published agent packages or are generated from published workflow templates and then consumed through the SDKs
@@ -58,6 +59,9 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`knowledge-packages/support-response-handbook`](knowledge-packages/support-response-handbook/)
     - [`knowledge-packages/devwork-maintainer-guide`](knowledge-packages/devwork-maintainer-guide/)
     - [`knowledge-packages/agentpm-docs`](knowledge-packages/agentpm-docs/)
+
+- **Memory packages**
+    - [`memory-packages/support-customer-state`](memory-packages/support-customer-state/)
 
 - **Skill packages**
     - [`skill-packages/incident-handoff-checklist`](skill-packages/incident-handoff-checklist/)

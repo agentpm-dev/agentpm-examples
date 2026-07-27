@@ -1,0 +1,149 @@
+{
+  "$id": "agentpm://memory/support-customer-state/0.1.0/customer_state/customer_state/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `support-customer-state` space `customer_state` and record type `customer_state`.",
+  "properties": {
+    "content": {
+      "$id": "content",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "description": "Durable structured support context for one customer.",
+      "properties": {
+        "display_name": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "personal",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": false
+        },
+        "known_constraints": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        },
+        "preferred_contact_channel": {
+          "enum": [
+            "email",
+            "chat",
+            "phone"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "personal",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": false
+        },
+        "preferred_response_tone": {
+          "enum": [
+            "concise",
+            "reassuring",
+            "detailed"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "personal",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": false
+        },
+        "support_tier": {
+          "enum": [
+            "standard",
+            "priority",
+            "enterprise"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        }
+      },
+      "required": [
+        "display_name",
+        "support_tier",
+        "preferred_contact_channel",
+        "preferred_response_tone"
+      ],
+      "title": "Support Customer State",
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "delete_customer_state",
+            "refresh_customer_state"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "customer_state"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "customer_state"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ],
+  "title": "support-customer-state customer_state customer_state record contract",
+  "type": "object"
+}

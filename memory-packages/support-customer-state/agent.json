@@ -1,0 +1,81 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Simple support-facing Memory Blueprint for one durable customer state document with light lifecycle policy.",
+  "kind": "memory",
+  "license": {
+    "spdx": "MIT"
+  },
+  "memory": {
+    "scopes": {
+      "user": {
+        "description": "The customer whose support state is being retained."
+      }
+    },
+    "record_types": {
+      "customer_state": {
+        "description": "Durable structured support context for one customer.",
+        "schema": "schemas/customer-state.schema.json",
+        "version": "1.0.0"
+      }
+    },
+    "spaces": {
+      "customer_state": {
+        "description": "The current durable support state for one customer.",
+        "model": "document",
+        "record_types": [
+          "customer_state"
+        ],
+        "retrieval": {
+          "modes": [
+            "key"
+          ]
+        },
+        "retention": {
+          "on_expire": "delete",
+          "ttl": "P365D"
+        },
+        "scope": [
+          "user"
+        ]
+      }
+    },
+    "operations": {
+      "delete_customer_state": {
+        "cascade_derived_records": false,
+        "description": "Delete the durable customer state when an external workflow requests removal.",
+        "targets": [
+          {
+            "space": "customer_state"
+          }
+        ],
+        "trigger": {
+          "type": "external"
+        },
+        "type": "delete"
+      },
+      "refresh_customer_state": {
+        "description": "Refresh the durable customer state from the current structured record.",
+        "inputs": [
+          {
+            "record_type": "customer_state",
+            "space": "customer_state"
+          }
+        ],
+        "output": {
+          "record_type": "customer_state",
+          "space": "customer_state"
+        },
+        "preserve_provenance": true,
+        "source_handling": "retain",
+        "trigger": {
+          "every": "P30D",
+          "type": "interval"
+        },
+        "type": "transform"
+      }
+    }
+  },
+  "name": "support-customer-state",
+  "readme": "README.md",
+  "version": "0.1.0"
+}

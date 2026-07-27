@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Support Customer State",
+  "description": "Durable structured support context for one customer.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "display_name": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "personal",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": false
+    },
+    "support_tier": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "priority",
+        "enterprise"
+      ],
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "preferred_contact_channel": {
+      "type": "string",
+      "enum": [
+        "email",
+        "chat",
+        "phone"
+      ],
+      "x-agentpm-data-class": "personal",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": false
+    },
+    "preferred_response_tone": {
+      "type": "string",
+      "enum": [
+        "concise",
+        "reassuring",
+        "detailed"
+      ],
+      "x-agentpm-data-class": "personal",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": false
+    },
+    "known_constraints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    }
+  },
+  "required": [
+    "display_name",
+    "support_tier",
+    "preferred_contact_channel",
+    "preferred_response_tone"
+  ]
+}
