@@ -7,6 +7,9 @@ It composes skills for:
 - Slack status update workflow
 - issue triage workflow
 
+It includes Memory for:
+- continuity across active operational conversations, incident threads, and handoff context
+
 And it keeps direct agent-level tools for:
 - querying CSV data
 - transforming JSON payloads
@@ -14,6 +17,7 @@ And it keeps direct agent-level tools for:
 Example prompts:
 - Query recent operational data, transform it into a clean summary, and draft a Slack update for the team.
 - Inspect recent issues, combine them with structured data, and produce a short operational briefing with next steps.
+- Review the current incident thread, use the installed continuity memory contract, and summarize what should persist into the next operator handoff.
 
 ## Local development
 

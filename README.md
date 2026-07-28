@@ -62,6 +62,7 @@ Each tool is intentionally simple to highlight integration, not performance.
 
 - **Memory packages**
     - [`memory-packages/support-customer-state`](memory-packages/support-customer-state/)
+    - [`memory-packages/conversation-continuity`](memory-packages/conversation-continuity/)
 
 - **Skill packages**
     - [`skill-packages/incident-handoff-checklist`](skill-packages/incident-handoff-checklist/)

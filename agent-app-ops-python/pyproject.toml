@@ -3,7 +3,7 @@ name = "agent-app-ops-python"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "agentpm>=0.1.8",
+    "agentpm>=0.1.10",
     "langchain>=0.2.16",
     "langchain-openai>=0.2.5",
     "pydantic>=2.7.0",

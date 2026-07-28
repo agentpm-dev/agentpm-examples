@@ -5,14 +5,14 @@ import os
 from pathlib import Path
 from typing import Any
 
-from agentpm import load, load_agent, load_skill
+from agentpm import load, load_agent, load_memory, load_memory_contract, load_skill
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
 ROOT = Path(__file__).resolve().parents[1]
-AGENT_SPEC = "@zack/ops-console@0.1.1"
+AGENT_SPEC = "@zack/ops-console@0.1.2"
 EXTRA_TOOL_NAME = "@zack/summarize-text"
 
 
@@ -48,6 +48,24 @@ def resolve_extra_tool_spec() -> str:
 
 def _spec_from_entry(entry: dict[str, Any]) -> str:
     return f'{entry["name"]}@{entry["version"]}'
+
+
+def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:
+    packages: list[dict[str, Any]] = []
+    for entry in loaded_agent.get("resolvedMemory", []):
+        spec = _spec_from_entry(entry)
+        packages.append({"spec": spec, "loaded": load_memory(spec)})
+    return packages
+
+
+def describe_memory_contract(
+    loaded_memory: dict[str, Any],
+    *,
+    space: str,
+    record_type: str,
+) -> list[str]:
+    contract = load_memory_contract(loaded_memory, space=space, record_type=record_type)
+    return [value for value in contract.get("required", []) if isinstance(value, str)]
 
 
 def _schema_type_to_python(prop: dict[str, Any]) -> tuple[Any, Field]:

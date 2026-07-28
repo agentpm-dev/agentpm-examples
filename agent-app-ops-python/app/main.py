@@ -6,7 +6,12 @@ from langchain_openai import ChatOpenAI
 
 from app.callbacks import TriageVerboseHandler
 from app.settings import OPENAI_API_KEY, OPENAI_MODEL
-from app.tooling import AGENT_SPEC, load_langchain_tools
+from app.tooling import (
+    AGENT_SPEC,
+    describe_memory_contract,
+    load_agent_memory_packages,
+    load_langchain_tools,
+)
 
 
 WORKER_LABEL = "zack-worker"
@@ -20,7 +25,12 @@ FIXTURE_SCHEMA_HINT = (
 )
 
 
-def print_banner(manifest_name: str, loaded_skills: list[dict], metas: list[dict]) -> None:
+def print_banner(
+    manifest_name: str,
+    loaded_skills: list[dict],
+    metas: list[dict],
+    memory_packages: list[dict],
+) -> None:
     print(f"\n{WORKER_LABEL}: {manifest_name}")
     print(f"Agent package: {AGENT_SPEC}")
     print(f"Team: {TEAM_NAME}")
@@ -35,6 +45,20 @@ def print_banner(manifest_name: str, loaded_skills: list[dict], metas: list[dict
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
         print(f"- {meta.get('name')}@{meta.get('version')}: {meta.get('description') or 'No description'}")
+    print(f"Loaded memory packages: {len(memory_packages)}")
+    for package in memory_packages:
+        loaded_memory = package["loaded"]
+        memory = loaded_memory["memory"]
+        print(f"- {package['spec']}")
+        print(f"  Spaces: {', '.join(sorted(memory.get('spaces', {}).keys()))}")
+        print(f"  Operations: {len(memory.get('operations', {}))}")
+        print(f"  Contracts: {len(loaded_memory.get('contracts', []))}")
+        required_fields = describe_memory_contract(
+            loaded_memory,
+            space="conversation_state",
+            record_type="conversation_summary",
+        )
+        print("  Conversation summary contract required fields: " + ", ".join(required_fields))
     print("\nCommands: /help /tools /reset /quit\n")
 
 
@@ -72,6 +96,7 @@ def render_skill_manuals(loaded_skills: list[dict]) -> str:
 
 def build_agent():
     loaded_agent, loaded_skills, tools, metas = load_langchain_tools()
+    memory_packages = load_agent_memory_packages(loaded_agent)
     skill_manuals = render_skill_manuals(loaded_skills)
     system_prompt = (
         f"You are {WORKER_LABEL}, a pragmatic local triage assistant for the {TEAM_NAME} team. "
@@ -96,7 +121,7 @@ def build_agent():
         tools=tools,
         system_prompt=system_prompt,
     )
-    return loaded_agent, loaded_skills, agent, metas
+    return loaded_agent, loaded_skills, memory_packages, agent, metas
 
 
 def extract_final_text(result: dict) -> str:
@@ -118,10 +143,10 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    loaded_agent, loaded_skills, agent, metas = build_agent()
+    loaded_agent, loaded_skills, memory_packages, agent, metas = build_agent()
     history: list[BaseMessage] = []
 
-    print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas)
+    print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas, memory_packages)
 
     while True:
         try:
@@ -138,7 +163,7 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas)
+            print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas, memory_packages)
             continue
         if line == "/reset":
             history.clear()

@@ -10,13 +10,16 @@ ROOT = Path(__file__).resolve().parents[1]
 class ScaffoldTests(unittest.TestCase):
     def test_runtime_loads_agent_tools_skills_and_generated_manifest(self) -> None:
         source = (ROOT / "app" / "tooling.py").read_text(encoding="utf-8")
-        self.assertIn('AGENT_SPEC = "@zack/ops-console@0.1.1"', source)
+        self.assertIn('AGENT_SPEC = "@zack/ops-console@0.1.2"', source)
         self.assertIn('EXTRA_TOOL_NAME = "@zack/summarize-text"', source)
         self.assertIn('load_agent(AGENT_SPEC)', source)
-        self.assertIn('from agentpm import load, load_agent, load_skill', source)
+        self.assertIn('from agentpm import load, load_agent, load_memory, load_memory_contract, load_skill', source)
         self.assertIn("def _spec_from_entry(entry: dict[str, Any]) -> str:", source)
+        self.assertIn("def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:", source)
+        self.assertIn("def describe_memory_contract(", source)
         self.assertIn('loaded_agent.get("resolvedTools", [])', source)
         self.assertIn('loaded_agent.get("resolvedSkills", [])', source)
+        self.assertIn('loaded_agent.get("resolvedMemory", [])', source)
         self.assertIn('loaded_skill.get("resolvedTools", [])', source)
         self.assertIn('loaded_skill = load_skill(_spec_from_entry(skill_entry))', source)
         self.assertIn("resolve_extra_tool_spec()", source)
@@ -27,6 +30,9 @@ class ScaffoldTests(unittest.TestCase):
         source = (ROOT / "app" / "main.py").read_text(encoding="utf-8")
         self.assertIn("FIXTURE_SCHEMA_HINT", source)
         self.assertIn("render_skill_manuals", source)
+        self.assertIn("load_agent_memory_packages", source)
+        self.assertIn("Loaded memory packages:", source)
+        self.assertIn("Conversation summary contract required fields:", source)
         self.assertIn("Follow these packaged operations manuals", source)
         self.assertIn("Do not use alternate names like id, description, or created_at.", source)
         self.assertIn("not symbolic operators like =.", source)
@@ -44,6 +50,8 @@ class ScaffoldTests(unittest.TestCase):
         self.assertIn("fixtures/incidents.csv", readme)
         self.assertIn("zack-worker", readme)
         self.assertIn("@zack/ops-console", readme)
+        self.assertIn("@zack/conversation-continuity", readme)
+        self.assertIn("prepare the next handoff", readme.lower())
         self.assertIn("agentpm install", readme)
 
     def test_fixture_file_exists(self) -> None:
