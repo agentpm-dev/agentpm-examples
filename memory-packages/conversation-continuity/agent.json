@@ -1,0 +1,174 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Flagship multi-space Memory Blueprint for durable conversation continuity across recent interactions, summaries, and saved notes.",
+  "kind": "memory",
+  "memory": {
+    "scopes": {
+      "user": {
+        "description": "The end user whose continuity state is being retained."
+      },
+      "conversation": {
+        "description": "The active conversation thread."
+      }
+    },
+    "record_types": {
+      "interaction": {
+        "description": "One ordered interaction inside a conversation.",
+        "schema": "schemas/interaction.schema.json",
+        "version": "1.0.0"
+      },
+      "conversation_summary": {
+        "description": "Durable continuity snapshot for one conversation.",
+        "schema": "schemas/conversation-summary.schema.json",
+        "version": "1.0.0"
+      },
+      "saved_note": {
+        "description": "A reusable note or follow-up fact attached to a conversation.",
+        "schema": "schemas/saved-note.schema.json",
+        "version": "1.0.0"
+      }
+    },
+    "spaces": {
+      "recent_interactions": {
+        "description": "Short-term ordered interaction history for one active conversation.",
+        "model": "sequence",
+        "record_types": [
+          "interaction"
+        ],
+        "retrieval": {
+          "modes": [
+            "chronological",
+            "semantic"
+          ]
+        },
+        "retention": {
+          "on_expire": "delete",
+          "ttl": "P14D"
+        },
+        "capacity": {
+          "max_records": 40
+        },
+        "constraints": {
+          "append_only": true
+        },
+        "scope": [
+          "user",
+          "conversation"
+        ]
+      },
+      "conversation_state": {
+        "description": "The current durable continuity snapshot for one conversation.",
+        "model": "document",
+        "record_types": [
+          "conversation_summary"
+        ],
+        "retrieval": {
+          "modes": [
+            "key",
+            "semantic"
+          ]
+        },
+        "retention": {
+          "on_expire": "archive",
+          "ttl": "P90D"
+        },
+        "scope": [
+          "user",
+          "conversation"
+        ]
+      },
+      "saved_notes": {
+        "description": "Sharable notes and follow-up facts for a conversation.",
+        "model": "collection",
+        "record_types": [
+          "saved_note"
+        ],
+        "retrieval": {
+          "modes": [
+            "filter",
+            "semantic"
+          ]
+        },
+        "retention": {
+          "on_expire": "archive",
+          "ttl": "P180D"
+        },
+        "constraints": {
+          "append_only": true
+        },
+        "scope": [
+          "user",
+          "conversation"
+        ]
+      }
+    },
+    "operations": {
+      "consolidate_recent_interactions": {
+        "description": "Convert recent interactions into a durable conversation summary.",
+        "inputs": [
+          {
+            "record_type": "interaction",
+            "space": "recent_interactions"
+          }
+        ],
+        "output": {
+          "record_type": "conversation_summary",
+          "space": "conversation_state"
+        },
+        "preserve_provenance": true,
+        "source_handling": "delete_after_success",
+        "trigger": {
+          "space": "recent_interactions",
+          "threshold": 12,
+          "type": "record_count"
+        },
+        "type": "consolidate"
+      },
+      "refresh_saved_note": {
+        "description": "Normalize one saved note in place to keep continuity facts current.",
+        "inputs": [
+          {
+            "record_type": "saved_note",
+            "space": "saved_notes"
+          }
+        ],
+        "output": {
+          "record_type": "saved_note",
+          "space": "saved_notes"
+        },
+        "preserve_provenance": true,
+        "source_handling": "retain",
+        "trigger": {
+          "every": "P7D",
+          "type": "interval"
+        },
+        "type": "transform"
+      },
+      "delete_conversation_continuity": {
+        "cascade_derived_records": true,
+        "description": "Delete continuity state for a conversation when an external workflow requests removal.",
+        "targets": [
+          {
+            "space": "recent_interactions"
+          },
+          {
+            "space": "conversation_state"
+          },
+          {
+            "space": "saved_notes"
+          }
+        ],
+        "trigger": {
+          "type": "external"
+        },
+        "type": "delete"
+      }
+    }
+  },
+  "name": "conversation-continuity",
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  },
+  "version": "0.1.0"
+}

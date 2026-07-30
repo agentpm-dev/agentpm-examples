@@ -4,13 +4,13 @@ import json
 import os
 from typing import Any
 
-from agentpm import load, load_agent, load_knowledge, load_skill
+from agentpm import load, load_agent, load_knowledge, load_memory, load_memory_contract, load_skill
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
-AGENT_SPEC = "@zack/devwork-copilot@0.1.2"
+AGENT_SPEC = "@zack/devwork-copilot@0.1.3"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -23,6 +23,24 @@ def collect_string_env() -> dict[str, str]:
 
 def _spec_from_entry(entry: dict[str, Any]) -> str:
     return f'{entry["name"]}@{entry["version"]}'
+
+
+def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:
+    packages: list[dict[str, Any]] = []
+    for entry in loaded_agent.get("resolvedMemory", []):
+        spec = _spec_from_entry(entry)
+        packages.append({"spec": spec, "loaded": load_memory(spec)})
+    return packages
+
+
+def describe_memory_contract(
+    loaded_memory: dict[str, Any],
+    *,
+    space: str,
+    record_type: str,
+) -> list[str]:
+    contract = load_memory_contract(loaded_memory, space=space, record_type=record_type)
+    return [value for value in contract.get("required", []) if isinstance(value, str)]
 
 
 def _schema_type_to_python(prop: dict[str, Any]) -> tuple[Any, Field]:
@@ -99,12 +117,14 @@ def load_langchain_tools() -> tuple[
     dict[str, Any],
     list[dict[str, Any]],
     list[dict[str, Any]],
+    list[dict[str, Any]],
     list[StructuredTool],
     list[dict[str, Any]],
 ]:
     loaded_agent = load_agent(AGENT_SPEC)
     loaded_skills: list[dict[str, Any]] = []
     loaded_knowledge: list[dict[str, Any]] = []
+    loaded_memory: list[dict[str, Any]] = []
     loaded_tools: list[StructuredTool] = []
     metas: list[dict[str, Any]] = []
     env = collect_string_env()
@@ -182,4 +202,6 @@ def load_langchain_tools() -> tuple[
     for knowledge_entry in loaded_agent.get("resolvedKnowledge", []):
         loaded_knowledge.append(load_knowledge(_spec_from_entry(knowledge_entry)))
 
-    return loaded_agent, loaded_skills, loaded_knowledge, loaded_tools, metas
+    loaded_memory = load_agent_memory_packages(loaded_agent)
+
+    return loaded_agent, loaded_skills, loaded_knowledge, loaded_memory, loaded_tools, metas

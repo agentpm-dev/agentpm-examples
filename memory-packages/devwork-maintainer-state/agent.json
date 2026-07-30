@@ -1,0 +1,170 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Workflow-oriented Memory Blueprint for maintainer preferences, active work threads, and follow-up notes across repository review sessions.",
+  "kind": "memory",
+  "license": {
+    "spdx": "MIT"
+  },
+  "memory": {
+    "scopes": {
+      "user": {
+        "description": "The maintainer whose working state is being retained."
+      },
+      "repository": {
+        "description": "The repository where the maintainer workflow is happening."
+      }
+    },
+    "record_types": {
+      "maintainer_preference": {
+        "description": "Durable maintainer preferences for triage and follow-through style.",
+        "schema": "schemas/maintainer-preference.schema.json",
+        "version": "1.0.0"
+      },
+      "work_thread": {
+        "description": "A durable summary of one active maintainer work thread.",
+        "schema": "schemas/work-thread.schema.json",
+        "version": "1.0.0"
+      },
+      "follow_up_note": {
+        "description": "A small follow-up note or decision cue attached to maintainer workflow.",
+        "schema": "schemas/follow-up-note.schema.json",
+        "version": "1.0.0"
+      }
+    },
+    "spaces": {
+      "maintainer_profile": {
+        "description": "The current durable maintainer profile for triage and review preferences.",
+        "model": "document",
+        "record_types": [
+          "maintainer_preference"
+        ],
+        "retrieval": {
+          "modes": [
+            "key",
+            "semantic"
+          ]
+        },
+        "retention": {
+          "on_expire": "archive",
+          "ttl": "P365D"
+        },
+        "scope": [
+          "user"
+        ]
+      },
+      "active_work_threads": {
+        "description": "Current active maintainer threads for one repository.",
+        "model": "collection",
+        "record_types": [
+          "work_thread"
+        ],
+        "retrieval": {
+          "modes": [
+            "filter",
+            "semantic"
+          ]
+        },
+        "retention": {
+          "on_expire": "archive",
+          "ttl": "P90D"
+        },
+        "scope": [
+          "user",
+          "repository"
+        ]
+      },
+      "follow_up_notes": {
+        "description": "Small maintainer notes that should survive across review sessions until acted on.",
+        "model": "collection",
+        "record_types": [
+          "follow_up_note"
+        ],
+        "retrieval": {
+          "modes": [
+            "filter",
+            "semantic"
+          ]
+        },
+        "retention": {
+          "on_expire": "delete",
+          "ttl": "P30D"
+        },
+        "capacity": {
+          "max_records": 50
+        },
+        "constraints": {
+          "append_only": true
+        },
+        "scope": [
+          "user",
+          "repository"
+        ]
+      }
+    },
+    "operations": {
+      "consolidate_follow_up_notes": {
+        "description": "Consolidate accumulated maintainer notes into one current work-thread summary.",
+        "inputs": [
+          {
+            "record_type": "follow_up_note",
+            "space": "follow_up_notes"
+          }
+        ],
+        "output": {
+          "record_type": "work_thread",
+          "space": "active_work_threads"
+        },
+        "preserve_provenance": true,
+        "source_handling": "retain",
+        "trigger": {
+          "space": "follow_up_notes",
+          "threshold": 4,
+          "type": "record_count"
+        },
+        "type": "consolidate"
+      },
+      "delete_maintainer_state": {
+        "cascade_derived_records": true,
+        "description": "Delete maintainer workflow state for a repository when an external workflow requests removal.",
+        "targets": [
+          {
+            "space": "maintainer_profile"
+          },
+          {
+            "space": "active_work_threads"
+          },
+          {
+            "space": "follow_up_notes"
+          }
+        ],
+        "trigger": {
+          "type": "external"
+        },
+        "type": "delete"
+      },
+      "refresh_work_thread": {
+        "description": "Refresh one active work thread so the maintainer summary stays current.",
+        "inputs": [
+          {
+            "record_type": "work_thread",
+            "space": "active_work_threads"
+          }
+        ],
+        "output": {
+          "record_type": "work_thread",
+          "space": "active_work_threads"
+        },
+        "preserve_provenance": true,
+        "source_handling": "retain",
+        "trigger": {
+          "every": "P14D",
+          "type": "interval"
+        },
+        "type": "transform"
+      }
+    }
+  },
+  "name": "devwork-maintainer-state",
+  "readme": "README.md",
+  "version": "0.1.0"
+}

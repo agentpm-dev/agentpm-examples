@@ -26,6 +26,7 @@ This app:
 - loads the published `@zack/ops-console` agent package with the AgentPM Python SDK
 - reads the agent's direct `resolvedTools`
 - reads the agent's `resolvedSkills`, loads those Skill packages with `load_skill(...)`, and then loads each Skill's `resolvedTools`
+- reads the agent's `resolvedMemory`, loads the published `@zack/conversation-continuity` Memory Blueprint, and prints its installed spaces, lifecycle operations, and contract summary at startup
 - feeds the loaded Skill manuals into the agent prompt so the runtime follows the packaged procedures as well as the packaged tool graph
 - separately loads the direct `@zack/summarize-text` tool from the generated local manifest
 - runs an interactive LangChain-managed triage loop over local incident data, GitHub issues, JSON transforms, and optional Slack updates
@@ -57,6 +58,7 @@ With the current published `@zack/ops-console` package, that means:
 
 - direct agent tools like `csv-query` and `json-transform` load from the agent's own `resolvedTools`
 - Skill packages like incident handoff, Slack status updates, and issue triage load from `resolvedSkills`
+- the published `@zack/conversation-continuity` Memory Blueprint loads from `resolvedMemory` so you can inspect the installed continuity contract for conversation state and saved notes
 - tool-backed Skills then contribute their own resolved tool refs such as GitHub issue access and Slack posting
 
 ## Fixture-first workflow
@@ -91,6 +93,7 @@ When using `csv-query` against this fixture:
 - `Look at fixtures/incidents.csv, identify the highest-severity open incidents, and give me a short Operations triage summary.`
 - `Use the local incidents fixture at fixtures/incidents.csv, draft a calm status update for the Operations team, and do not send it anywhere yet.`
 - `Summarize the main operational risks in fixtures/incidents.csv and tell me which follow-up items should happen first.`
+- `Review the open incidents in fixtures/incidents.csv and prepare the next handoff with the current status, open risks, recent decisions, and anything that should carry forward.`
 - `Using the columns incident_id, severity, status, opened_at, and summary from fixtures/incidents.csv, summarize the most urgent open incidents.`
 - `If GitHub credentials are available, list open issues in agentpm-dev/agentpm-examples and compare them to the incidents in fixtures/incidents.csv.`
 - `If GitHub credentials are available, compare the incidents in fixtures/incidents.csv to open repo issues and tell me what looks under-reported.`

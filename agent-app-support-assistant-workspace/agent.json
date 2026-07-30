@@ -1,5 +1,6 @@
 {
-  "description": "Generated from support-assistant-workspace@0.1.3.",
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Generated from support-assistant-workspace@0.1.4.",
   "kind": "agent",
   "knowledge": [
     {
@@ -7,7 +8,12 @@
       "version": "0.1.0"
     }
   ],
-  "memory": [],
+  "memory": [
+    {
+      "name": "@zack/support-customer-state",
+      "version": "0.1.0"
+    }
+  ],
   "name": "agent-app-support-assistant-workspace",
   "profiles": [],
   "skills": [],

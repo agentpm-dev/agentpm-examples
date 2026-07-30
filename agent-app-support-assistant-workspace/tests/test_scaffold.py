@@ -14,6 +14,7 @@ class ScaffoldTests(unittest.TestCase):
         self.assertIn("agents/answer-drafter.agent.json", readme)
         self.assertIn("agents/escalation-reviewer.agent.json", readme)
         self.assertIn("@zack/ops-console", readme)
+        self.assertIn("@zack/support-customer-state", readme)
         self.assertIn("does not add recursive `agents[]`", readme)
 
     def test_generated_code_has_high_signal_workspace_comments(self) -> None:

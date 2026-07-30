@@ -1,0 +1,145 @@
+{
+  "$id": "agentpm://memory/conversation-continuity/0.1.0/conversation_state/conversation_summary/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `conversation-continuity` space `conversation_state` and record type `conversation_summary`.",
+  "properties": {
+    "content": {
+      "$id": "content",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "description": "Durable continuity snapshot for one conversation.",
+      "properties": {
+        "current_issue": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        },
+        "customer_goal": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "personal",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": false
+        },
+        "open_questions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        },
+        "risk_level": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "summary": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        }
+      },
+      "required": [
+        "summary",
+        "current_issue"
+      ],
+      "title": "Conversation Summary",
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "consolidate_recent_interactions",
+            "delete_conversation_continuity",
+            "refresh_saved_note"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "conversation_summary"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "conversation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user",
+        "conversation"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "conversation_state"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ],
+  "title": "conversation-continuity conversation_state conversation_summary record contract",
+  "type": "object"
+}

@@ -1,0 +1,27 @@
+{
+  "agentpm_version": "0.1.19",
+  "built_at": "2026-07-30T00:15:37Z",
+  "contract_count": 3,
+  "contracts_hash": "sha256:bab20df891e8b65a28dc471e96b1a7862e799e37ac7214f75b2dd6e8048236f1",
+  "contracts_index_hash": "sha256:7633a127ae9951ba704d122bbb2337a8f415c834e544a1cc52d8f7d5c6f09bd1",
+  "format_version": 1,
+  "manifest_path": "agent.json",
+  "source_contract_inputs_hash": "sha256:bab945ac9ff080407cfcec6d6a8b5fb1d297349cd13bdc6742c3bc0cc5c9da02",
+  "source_manifest_hash": "sha256:9d52bc1a1262454a955fb6628088f6fc4251480d5d5acef604635b9fae71da57",
+  "source_schemas": [
+    {
+      "path": "schemas/follow-up-note.schema.json",
+      "sha256": "sha256:bf50c8f3b172102effe08290b7dc49439083c1ba424d3a4f7c3d1b25dfbbc523"
+    },
+    {
+      "path": "schemas/maintainer-preference.schema.json",
+      "sha256": "sha256:bf2e4cf514cff8275a90297682cdee58abc1c3b9c63169c741c0188f78f577ec"
+    },
+    {
+      "path": "schemas/work-thread.schema.json",
+      "sha256": "sha256:5f6fb1953497212be7d7db547e4e4801d5d17aa314b75cb17a9770035a9e70fc"
+    }
+  ],
+  "source_schemas_hash": "sha256:96d28bddd2c6912c552f4a587ac070081d076836ce5d6384b9c1b405bfe8cfc2",
+  "type": "agentpm-memory-contracts"
+}

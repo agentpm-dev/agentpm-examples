@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Saved Note",
+  "description": "A reusable note or follow-up fact attached to a conversation.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "note": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "constraint",
+        "preference",
+        "follow_up",
+        "context"
+      ],
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "pinned": {
+      "type": "boolean",
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    }
+  },
+  "required": [
+    "title",
+    "note",
+    "category"
+  ]
+}

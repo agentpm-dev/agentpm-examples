@@ -1,12 +1,18 @@
 {
-  "generated": "2026-06-29T21:56:10.312621Z",
+  "generated": "2026-07-28T03:12:46.889097Z",
   "lockfile_version": 3,
   "packages": {
-    "agent:@zack/ops-console@0.1.1": {
-      "integrity": "3b3e3895ec971d96095dfd4bb51d3413c6ece6673118e675b5ba63a791caa910",
+    "agent:@zack/ops-console@0.1.2": {
+      "integrity": "c7d23b83fb5e7979a4b40f250b92860714b41e08f1b95849bfbadb370049fbc4",
       "kind": "agent",
       "name": "@zack/ops-console",
-      "version": "0.1.1"
+      "version": "0.1.2"
+    },
+    "memory:@zack/conversation-continuity@0.1.0": {
+      "integrity": "2c99b4616e436c76a04c98ba9ba069a11e80bd705649936c6920320e0a6e3be3",
+      "kind": "memory",
+      "name": "@zack/conversation-continuity",
+      "version": "0.1.0"
     },
     "skill:@zack/incident-handoff-checklist@0.1.0": {
       "integrity": "71de39e72cb8ffa536da12b68ca544616645f6c7560da18abe3114e731c28f68",
@@ -58,7 +64,10 @@
     }
   },
   "roots": {
-    "agent:@zack/ops-console@0.1.1": {
+    "agent:@zack/ops-console@0.1.2": {
+      "memory": [
+        "memory:@zack/conversation-continuity@0.1.0"
+      ],
       "skills": [
         "skill:@zack/incident-handoff-checklist@0.1.0",
         "skill:@zack/slack-status-update@0.1.0",

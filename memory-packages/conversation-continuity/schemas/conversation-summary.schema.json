@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Conversation Summary",
+  "description": "Durable continuity snapshot for one conversation.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "current_issue": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "customer_goal": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "personal",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": false
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    }
+  },
+  "required": [
+    "summary",
+    "current_issue"
+  ]
+}

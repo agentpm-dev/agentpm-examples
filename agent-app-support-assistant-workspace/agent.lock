@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-12T17:32:50.472129Z",
+  "generated": "2026-07-27T17:54:39.480656Z",
   "lockfile_version": 3,
   "packages": {
     "agent:@zack/ops-console@0.1.1": {
@@ -12,6 +12,12 @@
       "integrity": "ab126646b8a9860cc4fd03bc1402d24769ecc6f377e91004168bcd4c46c91568",
       "kind": "knowledge",
       "name": "@zack/support-response-handbook",
+      "version": "0.1.0"
+    },
+    "memory:@zack/support-customer-state@0.1.0": {
+      "integrity": "73ce4f93c943af2017fb449348dc77b31858d31a37f95c8904e0ec8d51f343dc",
+      "kind": "memory",
+      "name": "@zack/support-customer-state",
       "version": "0.1.0"
     },
     "skill:@zack/incident-handoff-checklist@0.1.0": {
@@ -90,6 +96,9 @@
     "local:agent": {
       "knowledge": [
         "knowledge:@zack/support-response-handbook@0.1.0"
+      ],
+      "memory": [
+        "memory:@zack/support-customer-state@0.1.0"
       ],
       "name": "agent-app-support-assistant-workspace",
       "tools": [

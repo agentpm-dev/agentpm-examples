@@ -1,0 +1,147 @@
+{
+  "$id": "agentpm://memory/devwork-maintainer-state/0.1.0/maintainer_profile/maintainer_preference/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `devwork-maintainer-state` space `maintainer_profile` and record type `maintainer_preference`.",
+  "properties": {
+    "content": {
+      "$id": "content",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "description": "Durable maintainer preferences for triage and follow-through style.",
+      "properties": {
+        "default_focus_labels": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "escalation_keywords": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        },
+        "pause_write_actions": {
+          "type": "boolean",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": false
+        },
+        "preferred_triage_depth": {
+          "enum": [
+            "fast",
+            "balanced",
+            "deep"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "preferred_update_tone": {
+          "enum": [
+            "direct",
+            "collaborative",
+            "detailed"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "personal",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": false
+        }
+      },
+      "required": [
+        "preferred_triage_depth",
+        "preferred_update_tone",
+        "pause_write_actions"
+      ],
+      "title": "Maintainer Preference",
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "consolidate_follow_up_notes",
+            "delete_maintainer_state",
+            "refresh_work_thread"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "maintainer_preference"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "maintainer_profile"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ],
+  "title": "devwork-maintainer-state maintainer_profile maintainer_preference record contract",
+  "type": "object"
+}

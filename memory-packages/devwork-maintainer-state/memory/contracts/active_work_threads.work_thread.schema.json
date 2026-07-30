@@ -1,0 +1,175 @@
+{
+  "$id": "agentpm://memory/devwork-maintainer-state/0.1.0/active_work_threads/work_thread/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `devwork-maintainer-state` space `active_work_threads` and record type `work_thread`.",
+  "properties": {
+    "content": {
+      "$id": "content",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "description": "A durable summary of one active maintainer work thread.",
+      "properties": {
+        "current_status": {
+          "enum": [
+            "triage",
+            "needs-author",
+            "blocked",
+            "ready",
+            "done"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "issue_number": {
+          "minimum": 1,
+          "type": "integer",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "labels": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "maintainer_summary": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        },
+        "needs_follow_up": {
+          "type": "boolean",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "next_action": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        },
+        "repository": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "title": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        }
+      },
+      "required": [
+        "repository",
+        "issue_number",
+        "title",
+        "current_status",
+        "next_action",
+        "maintainer_summary",
+        "needs_follow_up"
+      ],
+      "title": "Work Thread",
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "consolidate_follow_up_notes",
+            "delete_maintainer_state",
+            "refresh_work_thread"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "work_thread"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user",
+        "repository"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "active_work_threads"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ],
+  "title": "devwork-maintainer-state active_work_threads work_thread record contract",
+  "type": "object"
+}

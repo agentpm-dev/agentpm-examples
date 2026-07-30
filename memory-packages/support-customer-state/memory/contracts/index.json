@@ -1,0 +1,15 @@
+{
+  "contracts": [
+    {
+      "model": "document",
+      "path": "memory/contracts/customer_state.customer_state.schema.json",
+      "record_type": "customer_state",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:ab8eb7e071121d8907246f5cd11f3b446cee3a3fd3481ac6af1847ed783fc7ed",
+      "source_schema": "schemas/customer-state.schema.json",
+      "space": "customer_state"
+    }
+  ],
+  "format_version": 1,
+  "type": "agentpm-memory-contract-index"
+}

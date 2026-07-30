@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Work Thread",
+  "description": "A durable summary of one active maintainer work thread.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "repository": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "issue_number": {
+      "type": "integer",
+      "minimum": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "current_status": {
+      "type": "string",
+      "enum": [
+        "triage",
+        "needs-author",
+        "blocked",
+        "ready",
+        "done"
+      ],
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "maintainer_summary": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "needs_follow_up": {
+      "type": "boolean",
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    }
+  },
+  "required": [
+    "repository",
+    "issue_number",
+    "title",
+    "current_status",
+    "next_action",
+    "maintainer_summary",
+    "needs_follow_up"
+  ]
+}

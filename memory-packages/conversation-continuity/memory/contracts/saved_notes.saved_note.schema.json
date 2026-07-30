@@ -1,0 +1,135 @@
+{
+  "$id": "agentpm://memory/conversation-continuity/0.1.0/saved_notes/saved_note/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `conversation-continuity` space `saved_notes` and record type `saved_note`.",
+  "properties": {
+    "content": {
+      "$id": "content",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "description": "A reusable note or follow-up fact attached to a conversation.",
+      "properties": {
+        "category": {
+          "enum": [
+            "constraint",
+            "preference",
+            "follow_up",
+            "context"
+          ],
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "note": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "moderate",
+          "x-agentpm-shareable": true
+        },
+        "pinned": {
+          "type": "boolean",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        },
+        "title": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-data-class": "operational",
+          "x-agentpm-persist": true,
+          "x-agentpm-sensitivity": "low",
+          "x-agentpm-shareable": true
+        }
+      },
+      "required": [
+        "title",
+        "note",
+        "category"
+      ],
+      "title": "Saved Note",
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "consolidate_recent_interactions",
+            "delete_conversation_continuity",
+            "refresh_saved_note"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "saved_note"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "conversation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user",
+        "conversation"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "saved_notes"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ],
+  "title": "conversation-continuity saved_notes saved_note record contract",
+  "type": "object"
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Follow-up Note",
+  "description": "A small follow-up note or decision cue attached to maintainer workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "repository": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "issue_number": {
+      "type": "integer",
+      "minimum": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "note_type": {
+      "type": "string",
+      "enum": [
+        "question",
+        "risk",
+        "decision",
+        "handoff"
+      ],
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "owner_hint": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    },
+    "due_hint": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    }
+  },
+  "required": [
+    "repository",
+    "issue_number",
+    "note_type",
+    "body"
+  ]
+}
