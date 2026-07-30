@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Maintainer Preference",
+  "description": "Durable maintainer preferences for triage and follow-through style.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "preferred_triage_depth": {
+      "type": "string",
+      "enum": [
+        "fast",
+        "balanced",
+        "deep"
+      ],
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "preferred_update_tone": {
+      "type": "string",
+      "enum": [
+        "direct",
+        "collaborative",
+        "detailed"
+      ],
+      "x-agentpm-data-class": "personal",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": false
+    },
+    "default_focus_labels": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "low",
+      "x-agentpm-shareable": true
+    },
+    "pause_write_actions": {
+      "type": "boolean",
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": false
+    },
+    "escalation_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-agentpm-data-class": "operational",
+      "x-agentpm-persist": true,
+      "x-agentpm-sensitivity": "moderate",
+      "x-agentpm-shareable": true
+    }
+  },
+  "required": [
+    "preferred_triage_depth",
+    "preferred_update_tone",
+    "pause_write_actions"
+  ]
+}

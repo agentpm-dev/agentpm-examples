@@ -1,29 +1,23 @@
 {
-  "generated": "2026-07-12T17:53:42.263221Z",
+  "generated": "2026-07-30T01:46:25.710820Z",
   "lockfile_version": 3,
   "packages": {
-    "agent:@zack/devwork-copilot@0.1.0": {
-      "integrity": "7ce9509a6c675bb09b27d359f5ffa87f4ad93e57256834e85eda40b7d516039d",
+    "agent:@zack/devwork-copilot@0.1.3": {
+      "integrity": "7f14cee5ad02ca218b089bb1e8c30d497d8a40bac735fd77203c8a550693edd7",
       "kind": "agent",
       "name": "@zack/devwork-copilot",
-      "version": "0.1.0"
-    },
-    "agent:@zack/devwork-copilot@0.1.1": {
-      "integrity": "d0f7f84d1f9eb1669227ee7c2017bd89baed6a1258e78135b7b5d5a5d92a4556",
-      "kind": "agent",
-      "name": "@zack/devwork-copilot",
-      "version": "0.1.1"
-    },
-    "agent:@zack/devwork-copilot@0.1.2": {
-      "integrity": "e434adeb63f07efc253637ee3e2c6e3cf16c099133358c365ac318f6c12a714a",
-      "kind": "agent",
-      "name": "@zack/devwork-copilot",
-      "version": "0.1.2"
+      "version": "0.1.3"
     },
     "knowledge:@zack/devwork-maintainer-guide@0.1.0": {
       "integrity": "47e267e55f8e4b866a5c882091d13121feb64006e3217d3da3f2be0d8d02bf52",
       "kind": "knowledge",
       "name": "@zack/devwork-maintainer-guide",
+      "version": "0.1.0"
+    },
+    "memory:@zack/devwork-maintainer-state@0.1.0": {
+      "integrity": "ccde00c37fabd03ab6f8c143d947b7941503748b3bbd3b3a754df849f467bc37",
+      "kind": "memory",
+      "name": "@zack/devwork-maintainer-state",
       "version": "0.1.0"
     },
     "skill:@zack/issue-triage-playbook@0.1.0": {
@@ -46,23 +40,12 @@
     }
   },
   "roots": {
-    "agent:@zack/devwork-copilot@0.1.0": {
-      "tools": [
-        "tool:@zack/github-issues@0.1.1",
-        "tool:@zack/summarize-text@0.1.8"
-      ]
-    },
-    "agent:@zack/devwork-copilot@0.1.1": {
-      "skills": [
-        "skill:@zack/issue-triage-playbook@0.1.0"
-      ],
-      "tools": [
-        "tool:@zack/summarize-text@0.1.8"
-      ]
-    },
-    "agent:@zack/devwork-copilot@0.1.2": {
+    "agent:@zack/devwork-copilot@0.1.3": {
       "knowledge": [
         "knowledge:@zack/devwork-maintainer-guide@0.1.0"
+      ],
+      "memory": [
+        "memory:@zack/devwork-maintainer-state@0.1.0"
       ],
       "skills": [
         "skill:@zack/issue-triage-playbook@0.1.0"

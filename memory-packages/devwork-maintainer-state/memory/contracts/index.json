@@ -1,0 +1,33 @@
+{
+  "contracts": [
+    {
+      "model": "collection",
+      "path": "memory/contracts/active_work_threads.work_thread.schema.json",
+      "record_type": "work_thread",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:4612ef475084d80ef92443eb2ab139c17bfa7972171572b91057b44e8f6e6e1e",
+      "source_schema": "schemas/work-thread.schema.json",
+      "space": "active_work_threads"
+    },
+    {
+      "model": "collection",
+      "path": "memory/contracts/follow_up_notes.follow_up_note.schema.json",
+      "record_type": "follow_up_note",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:a6d779772389a5f08542e1480632b77d0d8f28c0a8dde44e187910d447acaa66",
+      "source_schema": "schemas/follow-up-note.schema.json",
+      "space": "follow_up_notes"
+    },
+    {
+      "model": "document",
+      "path": "memory/contracts/maintainer_profile.maintainer_preference.schema.json",
+      "record_type": "maintainer_preference",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:a9f03662eb0d0086779a2834ba698e0113d38e53004871664f2ccd342131b634",
+      "source_schema": "schemas/maintainer-preference.schema.json",
+      "space": "maintainer_profile"
+    }
+  ],
+  "format_version": 1,
+  "type": "agentpm-memory-contract-index"
+}

@@ -4,7 +4,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from app.callbacks import DevworkVerboseHandler
 from app.settings import OPENAI_API_KEY, OPENAI_MODEL
-from app.tooling import AGENT_SPEC, load_langchain_tools
+from app.tooling import AGENT_SPEC, describe_memory_contract, load_langchain_tools
 from app.workflow import DevworkState, build_graph
 
 
@@ -12,6 +12,7 @@ def print_banner(
     manifest_name: str,
     loaded_skills: list[dict],
     loaded_knowledge: list[dict],
+    loaded_memory: list[dict],
     metas: list[dict],
 ) -> None:
     print(f"\nDevwork Copilot: {manifest_name}")
@@ -35,6 +36,20 @@ def print_banner(
             f"- {loaded_item.get('name')}@{loaded_item.get('version')}: "
             f"{loaded_item.get('description') or 'No description'} ({detail})"
         )
+    print(f"Loaded memory packages: {len(loaded_memory)}")
+    for package in loaded_memory:
+        loaded_item = package["loaded"]
+        memory = loaded_item["memory"]
+        print(f"- {package['spec']}")
+        print(f"  Spaces: {', '.join(sorted(memory.get('spaces', {}).keys()))}")
+        print(f"  Operations: {len(memory.get('operations', {}))}")
+        print(f"  Contracts: {len(loaded_item.get('contracts', []))}")
+        required_fields = describe_memory_contract(
+            loaded_item,
+            space="active_work_threads",
+            record_type="work_thread",
+        )
+        print("  Work-thread contract required fields: " + ", ".join(required_fields))
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
         print(f"- {meta.get('name')}@{meta.get('version')}: {meta.get('description') or 'No description'}")
@@ -82,11 +97,11 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    loaded_agent, loaded_skills, loaded_knowledge, tools, metas = load_langchain_tools()
+    loaded_agent, loaded_skills, loaded_knowledge, loaded_memory, tools, metas = load_langchain_tools()
     graph = build_graph(tools, render_skill_manuals(loaded_skills))
     state: DevworkState = {"messages": [], "pending_tool_calls": None}
 
-    print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, metas)
+    print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, loaded_memory, metas)
 
     while True:
         try:
@@ -103,7 +118,7 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, metas)
+            print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, loaded_memory, metas)
             continue
         if line == "/reset":
             state = {"messages": [], "pending_tool_calls": None}
