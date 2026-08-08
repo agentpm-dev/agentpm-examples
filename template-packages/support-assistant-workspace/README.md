@@ -7,6 +7,7 @@ It generates a local project that:
 - synthesizes the root `agent.json` as a normal single-agent manifest
 - installs a published context-mode Knowledge package for support-response guidance
 - installs a published Memory Blueprint for durable support-state structure
+- installs a published Instruction Profile for durable support-response behavior
 - adds extra local agent manifests under `agents/`
 - records a published agent root in `agentpm.workspace.json`
 - writes a workspace-level `agent.lock`
@@ -33,6 +34,8 @@ This template intentionally combines:
   - `@zack/support-response-handbook@0.1.0`
 - a published Memory Blueprint package:
   - `@zack/support-customer-state@0.1.0`
+- a published Instruction Profile package:
+  - `@zack/support-response-style@0.1.0`
 - a published agent root:
   - `@zack/ops-console@0.1.1`
 - local generated agents:
@@ -41,7 +44,7 @@ This template intentionally combines:
 
 That demonstrates the real AgentPM workspace model:
 
-- template-declared Knowledge and Memory dependencies are installed and synthesized into the generated root `agent.json`
+- template-declared Knowledge, Memory, and Profile dependencies are installed and synthesized into the generated root `agent.json`
 - published agent roots live in `agentpm.workspace.json`
 - local agents live under `agents/`
 - normal `kind: "agent"` manifests do not gain recursive `agents[]`

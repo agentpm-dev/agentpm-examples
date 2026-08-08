@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-27T17:54:39.480656Z",
+  "generated": "2026-08-08T21:26:10.082409Z",
   "lockfile_version": 3,
   "packages": {
     "agent:@zack/ops-console@0.1.1": {
@@ -18,6 +18,12 @@
       "integrity": "73ce4f93c943af2017fb449348dc77b31858d31a37f95c8904e0ec8d51f343dc",
       "kind": "memory",
       "name": "@zack/support-customer-state",
+      "version": "0.1.0"
+    },
+    "profile:@zack/support-response-style@0.1.0": {
+      "integrity": "b825663e34941c7233547327df6bc63c9986682ee11bf7e392f37ae601b46642",
+      "kind": "profile",
+      "name": "@zack/support-response-style",
       "version": "0.1.0"
     },
     "skill:@zack/incident-handoff-checklist@0.1.0": {
@@ -101,6 +107,9 @@
         "memory:@zack/support-customer-state@0.1.0"
       ],
       "name": "agent-app-support-assistant-workspace",
+      "profiles": [
+        "profile:@zack/support-response-style@0.1.0"
+      ],
       "tools": [
         "tool:@zack/summarize-text@0.1.8"
       ],
