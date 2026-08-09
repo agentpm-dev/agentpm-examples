@@ -1,17 +1,23 @@
 {
-  "generated": "2026-07-28T03:12:46.889097Z",
+  "generated": "2026-08-09T00:22:44.672481Z",
   "lockfile_version": 3,
   "packages": {
-    "agent:@zack/ops-console@0.1.2": {
-      "integrity": "c7d23b83fb5e7979a4b40f250b92860714b41e08f1b95849bfbadb370049fbc4",
+    "agent:@zack/ops-console@0.1.3": {
+      "integrity": "c952d27bc189e0e8a92749fa3a5f6e583a37ef3a3365960286de276f85644d5e",
       "kind": "agent",
       "name": "@zack/ops-console",
-      "version": "0.1.2"
+      "version": "0.1.3"
     },
     "memory:@zack/conversation-continuity@0.1.0": {
       "integrity": "2c99b4616e436c76a04c98ba9ba069a11e80bd705649936c6920320e0a6e3be3",
       "kind": "memory",
       "name": "@zack/conversation-continuity",
+      "version": "0.1.0"
+    },
+    "profile:@zack/incident-operator-style@0.1.0": {
+      "integrity": "a13f0ff2d07b930ba2de351ca68a3aab63bceeb240acbcdc0a564769e4e8acb4",
+      "kind": "profile",
+      "name": "@zack/incident-operator-style",
       "version": "0.1.0"
     },
     "skill:@zack/incident-handoff-checklist@0.1.0": {
@@ -64,9 +70,12 @@
     }
   },
   "roots": {
-    "agent:@zack/ops-console@0.1.2": {
+    "agent:@zack/ops-console@0.1.3": {
       "memory": [
         "memory:@zack/conversation-continuity@0.1.0"
+      ],
+      "profiles": [
+        "profile:@zack/incident-operator-style@0.1.0"
       ],
       "skills": [
         "skill:@zack/incident-handoff-checklist@0.1.0",

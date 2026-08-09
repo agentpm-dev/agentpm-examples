@@ -68,6 +68,7 @@ Each tool is intentionally simple to highlight integration, not performance.
 
 - **Profile packages**
     - [`profile-packages/support-response-style`](profile-packages/support-response-style/)
+    - [`profile-packages/incident-operator-style`](profile-packages/incident-operator-style/)
 
 - **Skill packages**
     - [`skill-packages/incident-handoff-checklist`](skill-packages/incident-handoff-checklist/)
