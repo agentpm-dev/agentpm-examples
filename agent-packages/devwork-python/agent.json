@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "devwork-copilot",
-  "version": "0.1.3",
-  "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions and maintainer workflow continuity.",
+  "version": "0.1.4",
+  "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions, maintainer workflow continuity, and a durable maintainer behavior profile.",
   "knowledge": [
     {
       "name": "@zack/devwork-maintainer-guide",
@@ -13,6 +13,12 @@
   "memory": [
     {
       "name": "@zack/devwork-maintainer-state",
+      "version": "0.1.0"
+    }
+  ],
+  "profiles": [
+    {
+      "name": "@zack/devwork-maintainer-style",
       "version": "0.1.0"
     }
   ],
@@ -44,6 +50,10 @@
     {
       "title": "Prepare the next maintainer handoff",
       "prompt": "Review the current repository issues and summarize what the next maintainer should know, including current priorities, open follow-ups, unresolved questions, and anything that should carry forward."
+    },
+    {
+      "title": "Draft a maintainer follow-up",
+      "prompt": "Review the issue thread, summarize the current maintainer position, and draft the next follow-up comment."
     }
   ],
   "readme": "README.md",

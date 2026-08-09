@@ -27,7 +27,9 @@ This app:
 - reads the agent's direct `resolvedTools`
 - reads the agent's `resolvedSkills`, loads those Skill packages with `load_skill(...)`, and then loads each Skill's `resolvedTools`
 - reads the agent's `resolvedMemory`, loads the published `@zack/conversation-continuity` Memory Blueprint, and prints its installed spaces, lifecycle operations, and contract summary at startup
+- reads the agent's `resolvedProfiles`, loads the published `@zack/incident-operator-style` Instruction Profile, and prints its role, objectives, constraints, and tone at startup
 - feeds the loaded Skill manuals into the agent prompt so the runtime follows the packaged procedures as well as the packaged tool graph
+- feeds the loaded Instruction Profile metadata into the runtime prompt so the packaged communication style is available as a durable behavior layer
 - separately loads the direct `@zack/summarize-text` tool from the generated local manifest
 - runs an interactive LangChain-managed triage loop over local incident data, GitHub issues, JSON transforms, and optional Slack updates
 
@@ -59,6 +61,7 @@ With the current published `@zack/ops-console` package, that means:
 - direct agent tools like `csv-query` and `json-transform` load from the agent's own `resolvedTools`
 - Skill packages like incident handoff, Slack status updates, and issue triage load from `resolvedSkills`
 - the published `@zack/conversation-continuity` Memory Blueprint loads from `resolvedMemory` so you can inspect the installed continuity contract for conversation state and saved notes
+- the published `@zack/incident-operator-style` Instruction Profile loads from `resolvedProfiles` so you can inspect the installed incident-operator behavior contract
 - tool-backed Skills then contribute their own resolved tool refs such as GitHub issue access and Slack posting
 
 ## Fixture-first workflow

@@ -6,7 +6,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from agentpm import load, load_knowledge, load_memory, load_memory_contract
+from agentpm import (
+    load,
+    load_knowledge,
+    load_memory,
+    load_memory_contract,
+    load_profile,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +23,7 @@ SAMPLE_THREAD_PATH = ROOT / "sample-inputs/support-thread.md"
 SUMMARY_SPEC = "@zack/summarize-text@0.1.8"
 SUPPORT_HANDBOOK_SPEC = "@zack/support-response-handbook@0.1.0"
 SUPPORT_CUSTOMER_STATE_SPEC = "@zack/support-customer-state@0.1.0"
+SUPPORT_RESPONSE_STYLE_SPEC = "@zack/support-response-style@0.1.0"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -67,6 +74,13 @@ def main() -> None:
         else:
             print(f"- {memory_ref['name']}@{memory_ref['version']}")
 
+    print("\nRoot profile dependencies:")
+    for profile_ref in root_manifest.get("profiles", []):
+        if isinstance(profile_ref, str):
+            print(f"- {profile_ref}")
+        else:
+            print(f"- {profile_ref['name']}@{profile_ref['version']}")
+
     try:
         handbook = load_knowledge(SUPPORT_HANDBOOK_SPEC)
         print("\nInstalled knowledge details:")
@@ -96,6 +110,26 @@ def main() -> None:
         )
     except FileNotFoundError:
         print("\nMemory package not installed yet. Run `agentpm install` first.")
+
+    try:
+        support_profile = load_profile(SUPPORT_RESPONSE_STYLE_SPEC)
+        print("\nInstalled profile details:")
+        print(f"- Package: {SUPPORT_RESPONSE_STYLE_SPEC}")
+        print(f"- Role: {support_profile['profile']['identity']['role']}")
+        print(
+            "- Objectives: "
+            + str(len(support_profile["profile"].get("objectives", [])))
+        )
+        print(
+            "- Constraints: "
+            + str(len(support_profile["profile"].get("constraints", [])))
+        )
+        print(
+            "- Tone: "
+            + ", ".join(support_profile["profile"]["communication"].get("tone", []))
+        )
+    except FileNotFoundError:
+        print("\nProfile package not installed yet. Run `agentpm install` first.")
 
     # The root app uses its own direct tool dependency here. That keeps the
     # runtime example honest: the workspace can contain multiple local and

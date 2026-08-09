@@ -14,6 +14,7 @@ The generated project includes three different role shapes:
   - owns the direct `@zack/summarize-text` dependency declared by the template
   - includes the published `@zack/support-response-handbook` Knowledge dependency declared by the template
   - includes the published `@zack/support-customer-state` Memory Blueprint declared by the template
+  - includes the published `@zack/support-response-style` Instruction Profile declared by the template
 - published agent root
   - `@zack/ops-console`
   - recorded in `agentpm.workspace.json`
@@ -50,12 +51,18 @@ The generated root agent also carries the template's published Memory dependency
 - `@zack/support-customer-state`
   - a simple durable support-state document contract for carrying stable customer context across support sessions
 
+The generated root agent also carries the template's published Instruction Profile dependency:
+
+- `@zack/support-response-style`
+  - a durable support-response behavior package for tone, ownership, boundaries, and next-step guidance
+
 ## Suggested role breakdown
 
 - root agent:
   - support coordinator / workspace entrypoint
   - direct owner of the installed support-response handbook context package
   - direct owner of the installed support customer state memory package
+  - direct owner of the installed support-response style profile package
 - published `@zack/ops-console` agent:
   - external operational context and reusable packaged behavior
 - local `answer-drafter` agent:
@@ -98,7 +105,7 @@ The illustrative script uses that sample file so you can see the workspace in ac
 Common next steps:
 
 - edit `agents/*.agent.json` to refine local roles
-- edit the root `agent.json` to change the coordinator’s direct tools, Knowledge dependencies, or Memory dependencies
+- edit the root `agent.json` to change the coordinator’s direct tools, Knowledge dependencies, Memory dependencies, or Profile dependencies
 - run `agentpm install` after manifest edits to regenerate `agent.lock`
 - add normal application code that decides when each local or published agent role should be used
 

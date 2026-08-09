@@ -4,7 +4,11 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from app.callbacks import DevworkVerboseHandler
 from app.settings import OPENAI_API_KEY, OPENAI_MODEL
-from app.tooling import AGENT_SPEC, describe_memory_contract, load_langchain_tools
+from app.tooling import (
+    AGENT_SPEC,
+    describe_memory_contract,
+    load_langchain_tools,
+)
 from app.workflow import DevworkState, build_graph
 
 
@@ -13,6 +17,7 @@ def print_banner(
     loaded_skills: list[dict],
     loaded_knowledge: list[dict],
     loaded_memory: list[dict],
+    loaded_profiles: list[dict],
     metas: list[dict],
 ) -> None:
     print(f"\nDevwork Copilot: {manifest_name}")
@@ -50,6 +55,19 @@ def print_banner(
             record_type="work_thread",
         )
         print("  Work-thread contract required fields: " + ", ".join(required_fields))
+    print(f"Loaded profile packages: {len(loaded_profiles)}")
+    for package in loaded_profiles:
+        loaded_item = package["loaded"]
+        profile = loaded_item["profile"]
+        identity = profile.get("identity", {})
+        communication = profile.get("communication", {})
+        print(f"- {package['spec']}")
+        print(f"  Role: {identity.get('role', 'unknown')}")
+        print(f"  Objectives: {len(profile.get('objectives', []))}")
+        print(f"  Constraints: {len(profile.get('constraints', []))}")
+        tone = communication.get("tone", [])
+        if isinstance(tone, list) and tone:
+            print("  Tone: " + ", ".join(value for value in tone if isinstance(value, str)))
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
         print(f"- {meta.get('name')}@{meta.get('version')}: {meta.get('description') or 'No description'}")
@@ -93,15 +111,71 @@ def render_skill_manuals(loaded_skills: list[dict]) -> str:
     return "\n\n".join(sections)
 
 
+def render_profile_guidance(loaded_profiles: list[dict]) -> str:
+    sections: list[str] = []
+    for package in loaded_profiles:
+        loaded_profile = package["loaded"]
+        profile = loaded_profile.get("profile", {})
+        identity = profile.get("identity", {})
+        communication = profile.get("communication", {})
+        lines = [
+            f"Profile: {package['spec']}",
+            f"Role: {identity.get('role', '')}",
+        ]
+        objectives = profile.get("objectives", [])
+        if isinstance(objectives, list) and objectives:
+            lines.append(
+                "Objectives: " + "; ".join(value for value in objectives if isinstance(value, str))
+            )
+        tone = communication.get("tone", [])
+        if isinstance(tone, list) and tone:
+            lines.append("Tone: " + ", ".join(value for value in tone if isinstance(value, str)))
+        guidelines = communication.get("guidelines", [])
+        if isinstance(guidelines, list) and guidelines:
+            lines.append(
+                "Guidelines: " + "; ".join(value for value in guidelines if isinstance(value, str))
+            )
+        constraints = profile.get("constraints", [])
+        if isinstance(constraints, list) and constraints:
+            instructions = [
+                item.get("instruction")
+                for item in constraints
+                if isinstance(item, dict) and isinstance(item.get("instruction"), str)
+            ]
+            if instructions:
+                lines.append("Constraints: " + "; ".join(instructions))
+        sections.append("\n".join(line for line in lines if line.strip()))
+    return "\n\n".join(sections)
+
+
 def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    loaded_agent, loaded_skills, loaded_knowledge, loaded_memory, tools, metas = load_langchain_tools()
-    graph = build_graph(tools, render_skill_manuals(loaded_skills))
+    (
+        loaded_agent,
+        loaded_skills,
+        loaded_knowledge,
+        loaded_memory,
+        loaded_profiles,
+        tools,
+        metas,
+    ) = load_langchain_tools()
+    graph = build_graph(
+        tools,
+        render_skill_manuals(loaded_skills),
+        render_profile_guidance(loaded_profiles),
+    )
     state: DevworkState = {"messages": [], "pending_tool_calls": None}
 
-    print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, loaded_memory, metas)
+    print_banner(
+        loaded_agent["manifest"]["name"],
+        loaded_skills,
+        loaded_knowledge,
+        loaded_memory,
+        loaded_profiles,
+        metas,
+    )
 
     while True:
         try:
@@ -118,7 +192,14 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(loaded_agent["manifest"]["name"], loaded_skills, loaded_knowledge, loaded_memory, metas)
+            print_banner(
+                loaded_agent["manifest"]["name"],
+                loaded_skills,
+                loaded_knowledge,
+                loaded_memory,
+                loaded_profiles,
+                metas,
+            )
             continue
         if line == "/reset":
             state = {"messages": [], "pending_tool_calls": None}

@@ -1,12 +1,12 @@
 {
-  "generated": "2026-07-30T01:46:25.710820Z",
+  "generated": "2026-08-09T00:48:38.503874Z",
   "lockfile_version": 3,
   "packages": {
-    "agent:@zack/devwork-copilot@0.1.3": {
-      "integrity": "7f14cee5ad02ca218b089bb1e8c30d497d8a40bac735fd77203c8a550693edd7",
+    "agent:@zack/devwork-copilot@0.1.4": {
+      "integrity": "49df56f20297dd4983b5ef0dafeb1b09d8c5033b7ba30ec21c36b5a5f40eea43",
       "kind": "agent",
       "name": "@zack/devwork-copilot",
-      "version": "0.1.3"
+      "version": "0.1.4"
     },
     "knowledge:@zack/devwork-maintainer-guide@0.1.0": {
       "integrity": "47e267e55f8e4b866a5c882091d13121feb64006e3217d3da3f2be0d8d02bf52",
@@ -18,6 +18,12 @@
       "integrity": "ccde00c37fabd03ab6f8c143d947b7941503748b3bbd3b3a754df849f467bc37",
       "kind": "memory",
       "name": "@zack/devwork-maintainer-state",
+      "version": "0.1.0"
+    },
+    "profile:@zack/devwork-maintainer-style@0.1.0": {
+      "integrity": "66a516af6f018b8a50d6ebe9bfac16d1c00c10a8ebfc56810d0e437982829164",
+      "kind": "profile",
+      "name": "@zack/devwork-maintainer-style",
       "version": "0.1.0"
     },
     "skill:@zack/issue-triage-playbook@0.1.0": {
@@ -40,12 +46,15 @@
     }
   },
   "roots": {
-    "agent:@zack/devwork-copilot@0.1.3": {
+    "agent:@zack/devwork-copilot@0.1.4": {
       "knowledge": [
         "knowledge:@zack/devwork-maintainer-guide@0.1.0"
       ],
       "memory": [
         "memory:@zack/devwork-maintainer-state@0.1.0"
+      ],
+      "profiles": [
+        "profile:@zack/devwork-maintainer-style@0.1.0"
       ],
       "skills": [
         "skill:@zack/issue-triage-playbook@0.1.0"

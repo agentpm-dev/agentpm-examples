@@ -10,6 +10,7 @@ from app.tooling import (
     AGENT_SPEC,
     describe_memory_contract,
     load_agent_memory_packages,
+    load_agent_profile_packages,
     load_langchain_tools,
 )
 
@@ -30,6 +31,7 @@ def print_banner(
     loaded_skills: list[dict],
     metas: list[dict],
     memory_packages: list[dict],
+    profile_packages: list[dict],
 ) -> None:
     print(f"\n{WORKER_LABEL}: {manifest_name}")
     print(f"Agent package: {AGENT_SPEC}")
@@ -59,6 +61,19 @@ def print_banner(
             record_type="conversation_summary",
         )
         print("  Conversation summary contract required fields: " + ", ".join(required_fields))
+    print(f"Loaded profile packages: {len(profile_packages)}")
+    for package in profile_packages:
+        loaded_profile = package["loaded"]
+        profile = loaded_profile["profile"]
+        identity = profile.get("identity", {})
+        communication = profile.get("communication", {})
+        print(f"- {package['spec']}")
+        print(f"  Role: {identity.get('role', 'unknown')}")
+        print(f"  Objectives: {len(profile.get('objectives', []))}")
+        print(f"  Constraints: {len(profile.get('constraints', []))}")
+        tone = communication.get("tone", [])
+        if isinstance(tone, list) and tone:
+            print("  Tone: " + ", ".join(value for value in tone if isinstance(value, str)))
     print("\nCommands: /help /tools /reset /quit\n")
 
 
@@ -97,6 +112,7 @@ def render_skill_manuals(loaded_skills: list[dict]) -> str:
 def build_agent():
     loaded_agent, loaded_skills, tools, metas = load_langchain_tools()
     memory_packages = load_agent_memory_packages(loaded_agent)
+    profile_packages = load_agent_profile_packages(loaded_agent)
     skill_manuals = render_skill_manuals(loaded_skills)
     system_prompt = (
         f"You are {WORKER_LABEL}, a pragmatic local triage assistant for the {TEAM_NAME} team. "
@@ -115,13 +131,51 @@ def build_agent():
             "\n\nFollow these packaged operations manuals when they are relevant to the user's request:\n\n"
             f"{skill_manuals}"
         )
+    if profile_packages:
+        profile_sections: list[str] = []
+        for package in profile_packages:
+            loaded_profile = package["loaded"]
+            profile = loaded_profile["profile"]
+            identity = profile.get("identity", {})
+            communication = profile.get("communication", {})
+            section_lines = [
+                f"Profile: {package['spec']}",
+                f"Role: {identity.get('role', '')}",
+            ]
+            objectives = profile.get("objectives", [])
+            if isinstance(objectives, list) and objectives:
+                section_lines.append(
+                    "Objectives: " + "; ".join(value for value in objectives if isinstance(value, str))
+                )
+            tone = communication.get("tone", [])
+            if isinstance(tone, list) and tone:
+                section_lines.append("Tone: " + ", ".join(value for value in tone if isinstance(value, str)))
+            guidelines = communication.get("guidelines", [])
+            if isinstance(guidelines, list) and guidelines:
+                section_lines.append(
+                    "Guidelines: " + "; ".join(value for value in guidelines if isinstance(value, str))
+                )
+            constraints = profile.get("constraints", [])
+            if isinstance(constraints, list) and constraints:
+                instructions = [
+                    item.get("instruction")
+                    for item in constraints
+                    if isinstance(item, dict) and isinstance(item.get("instruction"), str)
+                ]
+                if instructions:
+                    section_lines.append("Constraints: " + "; ".join(instructions))
+            profile_sections.append("\n".join(line for line in section_lines if line.strip()))
+        system_prompt += (
+            "\n\nFollow these packaged Instruction Profiles when they are relevant to the user's request:\n\n"
+            + "\n\n".join(profile_sections)
+        )
 
     agent = create_agent(
         model=ChatOpenAI(model=OPENAI_MODEL, temperature=0.2, api_key=OPENAI_API_KEY),
         tools=tools,
         system_prompt=system_prompt,
     )
-    return loaded_agent, loaded_skills, memory_packages, agent, metas
+    return loaded_agent, loaded_skills, memory_packages, profile_packages, agent, metas
 
 
 def extract_final_text(result: dict) -> str:
@@ -143,10 +197,16 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    loaded_agent, loaded_skills, memory_packages, agent, metas = build_agent()
+    loaded_agent, loaded_skills, memory_packages, profile_packages, agent, metas = build_agent()
     history: list[BaseMessage] = []
 
-    print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas, memory_packages)
+    print_banner(
+        loaded_agent["manifest"]["name"],
+        loaded_skills,
+        metas,
+        memory_packages,
+        profile_packages,
+    )
 
     while True:
         try:
@@ -163,7 +223,13 @@ def main() -> None:
             print_help()
             continue
         if line == "/tools":
-            print_banner(loaded_agent["manifest"]["name"], loaded_skills, metas, memory_packages)
+            print_banner(
+                loaded_agent["manifest"]["name"],
+                loaded_skills,
+                metas,
+                memory_packages,
+                profile_packages,
+            )
             continue
         if line == "/reset":
             history.clear()

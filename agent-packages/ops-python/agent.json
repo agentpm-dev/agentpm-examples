@@ -2,11 +2,17 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "ops-console",
-  "version": "0.1.2",
-  "description": "Operations assistant for reviewing issues, querying data, transforming JSON payloads, drafting Slack-ready updates, and carrying continuity across active operational conversations.",
+  "version": "0.1.3",
+  "description": "Operations assistant for reviewing issues, querying data, transforming JSON payloads, drafting Slack-ready updates, carrying continuity across active operational conversations, and applying a durable incident-operator communication style.",
   "memory": [
     {
       "name": "@zack/conversation-continuity",
+      "version": "0.1.0"
+    }
+  ],
+  "profiles": [
+    {
+      "name": "@zack/incident-operator-style",
       "version": "0.1.0"
     }
   ],
@@ -46,6 +52,10 @@
     {
       "title": "Prepare the next handoff",
       "prompt": "Review the current incident thread and summarize what the next operator should know, including the current status, open risks, recent decisions, and anything that should carry forward."
+    },
+    {
+      "title": "Draft a precise incident update",
+      "prompt": "Prepare an incident update that states the current status, open risks, active owner, and next checkpoint."
     }
   ],
   "readme": "README.md",

@@ -5,14 +5,21 @@ import os
 from pathlib import Path
 from typing import Any
 
-from agentpm import load, load_agent, load_memory, load_memory_contract, load_skill
+from agentpm import (
+    load,
+    load_agent,
+    load_memory,
+    load_memory_contract,
+    load_profile,
+    load_skill,
+)
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
 ROOT = Path(__file__).resolve().parents[1]
-AGENT_SPEC = "@zack/ops-console@0.1.2"
+AGENT_SPEC = "@zack/ops-console@0.1.3"
 EXTRA_TOOL_NAME = "@zack/summarize-text"
 
 
@@ -55,6 +62,14 @@ def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, A
     for entry in loaded_agent.get("resolvedMemory", []):
         spec = _spec_from_entry(entry)
         packages.append({"spec": spec, "loaded": load_memory(spec)})
+    return packages
+
+
+def load_agent_profile_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:
+    packages: list[dict[str, Any]] = []
+    for entry in loaded_agent.get("resolvedProfiles", []):
+        spec = _spec_from_entry(entry)
+        packages.append({"spec": spec, "loaded": load_profile(spec)})
     return packages
 
 

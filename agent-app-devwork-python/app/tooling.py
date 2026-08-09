@@ -4,13 +4,21 @@ import json
 import os
 from typing import Any
 
-from agentpm import load, load_agent, load_knowledge, load_memory, load_memory_contract, load_skill
+from agentpm import (
+    load,
+    load_agent,
+    load_knowledge,
+    load_memory,
+    load_memory_contract,
+    load_profile,
+    load_skill,
+)
 from langchain_core.tools import StructuredTool
 from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
-AGENT_SPEC = "@zack/devwork-copilot@0.1.3"
+AGENT_SPEC = "@zack/devwork-copilot@0.1.4"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -30,6 +38,14 @@ def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, A
     for entry in loaded_agent.get("resolvedMemory", []):
         spec = _spec_from_entry(entry)
         packages.append({"spec": spec, "loaded": load_memory(spec)})
+    return packages
+
+
+def load_agent_profile_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:
+    packages: list[dict[str, Any]] = []
+    for entry in loaded_agent.get("resolvedProfiles", []):
+        spec = _spec_from_entry(entry)
+        packages.append({"spec": spec, "loaded": load_profile(spec)})
     return packages
 
 
@@ -118,6 +134,7 @@ def load_langchain_tools() -> tuple[
     list[dict[str, Any]],
     list[dict[str, Any]],
     list[dict[str, Any]],
+    list[dict[str, Any]],
     list[StructuredTool],
     list[dict[str, Any]],
 ]:
@@ -125,6 +142,7 @@ def load_langchain_tools() -> tuple[
     loaded_skills: list[dict[str, Any]] = []
     loaded_knowledge: list[dict[str, Any]] = []
     loaded_memory: list[dict[str, Any]] = []
+    loaded_profiles: list[dict[str, Any]] = []
     loaded_tools: list[StructuredTool] = []
     metas: list[dict[str, Any]] = []
     env = collect_string_env()
@@ -203,5 +221,14 @@ def load_langchain_tools() -> tuple[
         loaded_knowledge.append(load_knowledge(_spec_from_entry(knowledge_entry)))
 
     loaded_memory = load_agent_memory_packages(loaded_agent)
+    loaded_profiles = load_agent_profile_packages(loaded_agent)
 
-    return loaded_agent, loaded_skills, loaded_knowledge, loaded_memory, loaded_tools, metas
+    return (
+        loaded_agent,
+        loaded_skills,
+        loaded_knowledge,
+        loaded_memory,
+        loaded_profiles,
+        loaded_tools,
+        metas,
+    )
