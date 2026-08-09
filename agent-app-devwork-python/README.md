@@ -8,7 +8,7 @@ This app installs the published `devwork-copilot` agent package, loads it with t
 
 Published agent package:
 
-- `@zack/devwork-copilot@0.1.3`
+- `@zack/devwork-copilot@0.1.4`
 
 Package source:
 
@@ -24,7 +24,9 @@ This example shows a real app that:
 - reads `resolvedSkills`, loads those Skills with `load_skill(...)`, and then loads each Skill's `resolvedTools`
 - reads `resolvedKnowledge`, loads the installed Knowledge package with `load_knowledge(...)`, and exposes the vector package metadata in the terminal banner
 - reads `resolvedMemory`, loads the installed `@zack/devwork-maintainer-state` Memory Blueprint, and exposes its installed spaces, lifecycle operations, and contract summary in the terminal banner
+- reads `resolvedProfiles`, loads the installed `@zack/devwork-maintainer-style` Instruction Profile, and exposes its role, objectives, constraints, and tone in the terminal banner
 - feeds the loaded Skill manual into the workflow prompt
+- feeds the loaded Instruction Profile metadata into the workflow prompt
 - runs a stateful maintainer workflow against real installed packages
 
 - orchestration style: LangGraph state machine with guarded transitions
@@ -36,7 +38,7 @@ This example shows a real app that:
 From this app directory, install the published agent package:
 
 ```bash
-agentpm install @zack/devwork-copilot@0.1.3
+agentpm install @zack/devwork-copilot@0.1.4
 ```
 
 That should install:
@@ -44,6 +46,7 @@ That should install:
 - the agent artifact under `.agentpm/agents/...`
 - the resolved Knowledge artifact under `.agentpm/knowledge/...`
 - the resolved Memory artifact under `.agentpm/memory/...`
+- the resolved Profile artifact under `.agentpm/profiles/...`
 - the resolved Skill artifact under `.agentpm/skills/...`
 - the resolved tool artifacts under `.agentpm/tools/...`
 
@@ -55,7 +58,7 @@ From this app directory:
 uv sync
 ```
 
-This example requires `agentpm>=0.1.10` so the Python SDK can load installed Knowledge and Memory packages with `load_knowledge(...)` and `load_memory(...)`.
+This example requires `agentpm>=0.1.11` so the Python SDK can load installed Knowledge, Memory, and Profile packages with `load_knowledge(...)`, `load_memory(...)`, and `load_profile(...)`.
 
 ## Environment
 
@@ -112,3 +115,4 @@ For write requests, the app should stop and ask for `/approve` before executing 
 - The current published agent package brings in `issue-triage-playbook`, so the workflow prompt includes the packaged triage manual as part of its maintainer guidance.
 - The current published agent package also brings in `devwork-maintainer-guide`, and the banner prints its installed vector-mode metadata so you can confirm the Knowledge dependency was resolved correctly.
 - The current published agent package also brings in `devwork-maintainer-state`, and the banner prints its installed Memory Blueprint metadata so you can confirm the Memory dependency was resolved correctly.
+- The current published agent package also brings in `devwork-maintainer-style`, and the banner prints its installed Instruction Profile metadata so you can confirm the Profile dependency was resolved correctly.

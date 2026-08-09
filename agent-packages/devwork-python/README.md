@@ -11,6 +11,9 @@ It includes Knowledge for:
 It includes Memory for:
 - maintainer workflow continuity across profile preferences, active work threads, and follow-up notes
 
+It includes a Profile for:
+- concise maintainer tone, explicit approval boundaries, and pragmatic follow-through guidance
+
 And it keeps direct agent-level tools for:
 - summarizing issue queues and maintainer context
 
@@ -19,6 +22,7 @@ Example prompts:
 - Read a set of repository issues and produce a concise maintainer briefing with action items and open questions.
 - Review an issue thread, retrieve the most relevant maintainer guidance, and draft a short comment that sets expectations clearly.
 - Review the current repository issues and summarize what the next maintainer should know, including current priorities, open follow-ups, unresolved questions, and anything that should carry forward.
+- Review the issue thread, summarize the current maintainer position, and draft the next follow-up comment.
 
 ## Local development
 
