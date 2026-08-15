@@ -16,6 +16,7 @@ The current examples repo now shows both sides of the agent workflow:
 
 - `agent-packages/*` contains the publishable source manifests for example agents
 - `knowledge-packages/*` contains the publishable source manifests for first-wave example Knowledge packages
+- `loop-packages/*` contains the publishable source manifests for first-wave example Loop packages
 - `memory-packages/*` contains the publishable source manifests for first-wave example Memory Blueprints
 - `profile-packages/*` contains the publishable source manifests for first-wave example Instruction Profiles
 - `skill-packages/*` contains the publishable source manifests for first-wave example skills
@@ -60,6 +61,9 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`knowledge-packages/support-response-handbook`](knowledge-packages/support-response-handbook/)
     - [`knowledge-packages/devwork-maintainer-guide`](knowledge-packages/devwork-maintainer-guide/)
     - [`knowledge-packages/agentpm-docs`](knowledge-packages/agentpm-docs/)
+
+- **Loop packages**
+    - [`loop-packages/support-escalation-loop`](loop-packages/support-escalation-loop/)
 
 - **Memory packages**
     - [`memory-packages/support-customer-state`](memory-packages/support-customer-state/)

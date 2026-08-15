@@ -12,6 +12,7 @@ The generated project includes three different role shapes:
   - synthesized by `agentpm new`
   - the primary local workspace agent
   - owns the direct `@zack/summarize-text` dependency declared by the template
+  - includes the published `@zack/support-escalation-loop` Loop dependency declared by the template
   - includes the published `@zack/support-response-handbook` Knowledge dependency declared by the template
   - includes the published `@zack/support-customer-state` Memory Blueprint declared by the template
   - includes the published `@zack/support-response-style` Instruction Profile declared by the template
@@ -41,6 +42,11 @@ Instead, it gives you a structured project that you can extend with normal appli
 
 The template package itself only scaffolds the extra local manifests under `agents/`. The generated root `agent.json` is still synthesized by `agentpm new`.
 
+The generated root agent also carries the template's published Loop dependency:
+
+- `@zack/support-escalation-loop`
+  - a support-oriented Loop package for triage, draft response, and escalation handoff control flow
+
 The generated root agent also carries the template's published Knowledge dependency:
 
 - `@zack/support-response-handbook`
@@ -60,6 +66,7 @@ The generated root agent also carries the template's published Instruction Profi
 
 - root agent:
   - support coordinator / workspace entrypoint
+  - direct owner of the installed support escalation loop package
   - direct owner of the installed support-response handbook context package
   - direct owner of the installed support customer state memory package
   - direct owner of the installed support-response style profile package
@@ -105,7 +112,7 @@ The illustrative script uses that sample file so you can see the workspace in ac
 Common next steps:
 
 - edit `agents/*.agent.json` to refine local roles
-- edit the root `agent.json` to change the coordinator’s direct tools, Knowledge dependencies, Memory dependencies, or Profile dependencies
+- edit the root `agent.json` to change the coordinator’s direct tools, Loop dependency, Knowledge dependencies, Memory dependencies, or Profile dependencies
 - run `agentpm install` after manifest edits to regenerate `agent.lock`
 - add normal application code that decides when each local or published agent role should be used
 

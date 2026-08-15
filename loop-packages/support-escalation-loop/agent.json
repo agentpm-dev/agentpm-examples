@@ -1,0 +1,129 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "loop",
+  "name": "support-escalation-loop",
+  "version": "0.1.0",
+  "description": "Portable support orchestration loop for triage, response drafting, and escalation handoff decisions.",
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  },
+  "loop": {
+    "archetype": "support-escalation",
+    "entry_phase": "triage",
+    "limits": {
+      "max_steps": 8
+    },
+    "phases": [
+      {
+        "id": "triage",
+        "objective": "Assess the customer issue, determine whether a direct response is possible, and decide whether escalation is required.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "can-reply",
+            "description": "The issue can move into a direct customer response."
+          },
+          {
+            "id": "needs-escalation",
+            "description": "The issue requires a specialist handoff or explicit escalation review."
+          }
+        ]
+      },
+      {
+        "id": "draft-response",
+        "objective": "Prepare a customer-facing reply that states the current status, names ownership, and sets the next checkpoint clearly.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "ready-to-send",
+            "description": "The reply is complete and the thread can close without escalation."
+          },
+          {
+            "id": "needs-revision",
+            "description": "The current draft is incomplete or unclear and needs another pass through triage."
+          },
+          {
+            "id": "needs-escalation",
+            "description": "The draft surfaced a risk, ownership boundary, or missing authority that requires escalation."
+          }
+        ]
+      },
+      {
+        "id": "prepare-handoff",
+        "objective": "Capture the escalation reason, preserve the next-step context, and package the handoff clearly for the receiving owner.",
+        "access": {
+          "tools": false,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        }
+      }
+    ],
+    "transitions": [
+      {
+        "from": "triage",
+        "on": "can-reply",
+        "to": "draft-response"
+      },
+      {
+        "from": "triage",
+        "on": "needs-escalation",
+        "to": "prepare-handoff"
+      },
+      {
+        "from": "draft-response",
+        "on": "ready-to-send",
+        "to": "$end"
+      },
+      {
+        "from": "draft-response",
+        "on": "needs-revision",
+        "to": "triage"
+      },
+      {
+        "from": "draft-response",
+        "on": "needs-escalation",
+        "to": "prepare-handoff"
+      },
+      {
+        "from": "prepare-handoff",
+        "on": "complete",
+        "to": "$handoff"
+      }
+    ],
+    "checkpoints": [
+      {
+        "id": "approve-escalation-handoff",
+        "type": "approval",
+        "before_phase": "prepare-handoff",
+        "on_reject": "$abort"
+      }
+    ],
+    "error_policy": {
+      "tool_failure": {
+        "action": "retry",
+        "max_retries": 2,
+        "on_exhausted": "fail_phase"
+      },
+      "phase_failure": {
+        "action": "handoff"
+      }
+    }
+  }
+}
