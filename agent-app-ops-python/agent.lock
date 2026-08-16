@@ -1,12 +1,12 @@
 {
-  "generated": "2026-08-16T02:14:06.302097Z",
+  "generated": "2026-08-16T02:57:35.182548Z",
   "lockfile_version": 3,
   "packages": {
-    "agent:@zack/ops-console@0.1.4": {
-      "integrity": "0c0796cdebadec9fe5749c85fcf3c8102aa63ea67c5f458e086fc5c32d17b54e",
+    "agent:@zack/ops-console@0.1.5": {
+      "integrity": "91a22b565757c3084e27120cfcb6ea8e7ec9dfbda6cea39cb9c0fb85d49154d4",
       "kind": "agent",
       "name": "@zack/ops-console",
-      "version": "0.1.4"
+      "version": "0.1.5"
     },
     "loop:@zack/incident-response-loop@0.1.0": {
       "integrity": "6cd577ed037448479e8bfeb95fa592b3462f358a74c9dd8d88ad170287b5c9ec",
@@ -76,7 +76,7 @@
     }
   },
   "roots": {
-    "agent:@zack/ops-console@0.1.4": {
+    "agent:@zack/ops-console@0.1.5": {
       "loop": "loop:@zack/incident-response-loop@0.1.0",
       "memory": [
         "memory:@zack/conversation-continuity@0.1.0"

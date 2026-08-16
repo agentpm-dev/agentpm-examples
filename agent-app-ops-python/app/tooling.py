@@ -20,7 +20,7 @@ from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
 ROOT = Path(__file__).resolve().parents[1]
-AGENT_SPEC = "@zack/ops-console@0.1.4"
+AGENT_SPEC = "@zack/ops-console@0.1.5"
 EXTRA_TOOL_NAME = "@zack/summarize-text"
 
 

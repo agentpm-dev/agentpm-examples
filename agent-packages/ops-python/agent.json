@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "ops-console",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Operations assistant for incident assessment, execution, and review workflows, with packaged continuity memory, incident-response orchestration, and durable incident-operator communication style.",
   "loop": "@zack/incident-response-loop@0.1.0",
   "tools": [
@@ -53,7 +53,9 @@
         {
           "package": "@zack/conversation-continuity",
           "operations": [
-            "delete_conversation_continuity"
+            "delete_conversation_continuity",
+            "consolidate_recent_interactions",
+            "refresh_saved_note"
           ]
         }
       ]
@@ -71,9 +73,6 @@
             "package": "@zack/conversation-continuity",
             "spaces": [
               "conversation_state"
-            ],
-            "operations": [
-              "consolidate_recent_interactions"
             ]
           }
         ]
@@ -92,9 +91,6 @@
             "spaces": [
               "recent_interactions",
               "saved_notes"
-            ],
-            "operations": [
-              "refresh_saved_note"
             ]
           }
         ]
@@ -109,10 +105,6 @@
             "spaces": [
               "conversation_state",
               "saved_notes"
-            ],
-            "operations": [
-              "consolidate_recent_interactions",
-              "refresh_saved_note"
             ]
           }
         ]

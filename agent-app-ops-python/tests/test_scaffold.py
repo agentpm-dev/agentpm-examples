@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ScaffoldTests(unittest.TestCase):
     def test_runtime_loads_agent_tools_skills_and_generated_manifest(self) -> None:
         source = (ROOT / "app" / "tooling.py").read_text(encoding="utf-8")
-        self.assertIn('AGENT_SPEC = "@zack/ops-console@0.1.4"', source)
+        self.assertIn('AGENT_SPEC = "@zack/ops-console@0.1.5"', source)
         self.assertIn('EXTRA_TOOL_NAME = "@zack/summarize-text"', source)
         self.assertIn('load_agent(AGENT_SPEC)', source)
         self.assertIn('from agentpm import (', source)
