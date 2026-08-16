@@ -1,0 +1,134 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "loop",
+  "name": "devwork-triage-loop",
+  "version": "0.1.0",
+  "description": "Portable maintainer-review loop for inspecting issues, drafting follow-up comments, and deciding whether to resolve, revise, or hand off.",
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  },
+  "loop": {
+    "archetype": "maintainer-triage",
+    "entry_phase": "inspect-issue",
+    "limits": {
+      "max_steps": 10
+    },
+    "phases": [
+      {
+        "id": "inspect-issue",
+        "objective": "Inspect the issue thread, current repository state, and maintainer context to decide whether there is enough evidence to draft a follow-up or whether the work should hand off.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "draft-comment",
+            "description": "The issue has enough context to prepare a maintainer-facing follow-up comment."
+          },
+          {
+            "id": "handoff",
+            "description": "The issue should hand off because the current maintainer does not have enough authority, context, or repository access to proceed."
+          }
+        ]
+      },
+      {
+        "id": "draft-comment",
+        "objective": "Draft the next maintainer comment, summarize the current issue position, and capture any follow-up notes that should survive this review pass.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "ready-for-resolution",
+            "description": "The draft is ready for a final resolve-or-handoff decision."
+          },
+          {
+            "id": "needs-more-context",
+            "description": "The draft exposed a missing detail and the issue should return to inspection before a maintainer response is finalized."
+          }
+        ]
+      },
+      {
+        "id": "resolve-or-handoff",
+        "objective": "Decide whether to resolve the current review pass, revise the drafted comment, or hand the work off to another maintainer.",
+        "access": {
+          "tools": false,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "resolve",
+            "description": "The issue review pass is complete and the current maintainer decision can close the loop."
+          },
+          {
+            "id": "revise-comment",
+            "description": "The current comment needs another drafting pass before the maintainer decision is settled."
+          },
+          {
+            "id": "handoff",
+            "description": "The issue should hand off because the next step belongs to another maintainer or queue owner."
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from": "inspect-issue",
+        "on": "draft-comment",
+        "to": "draft-comment"
+      },
+      {
+        "from": "inspect-issue",
+        "on": "handoff",
+        "to": "$handoff"
+      },
+      {
+        "from": "draft-comment",
+        "on": "ready-for-resolution",
+        "to": "resolve-or-handoff"
+      },
+      {
+        "from": "draft-comment",
+        "on": "needs-more-context",
+        "to": "inspect-issue"
+      },
+      {
+        "from": "resolve-or-handoff",
+        "on": "resolve",
+        "to": "$end"
+      },
+      {
+        "from": "resolve-or-handoff",
+        "on": "revise-comment",
+        "to": "draft-comment"
+      },
+      {
+        "from": "resolve-or-handoff",
+        "on": "handoff",
+        "to": "$handoff"
+      }
+    ],
+    "error_policy": {
+      "tool_failure": {
+        "action": "handoff"
+      },
+      "phase_failure": {
+        "action": "abort"
+      }
+    }
+  }
+}

@@ -16,6 +16,7 @@ The current examples repo now shows both sides of the agent workflow:
 
 - `agent-packages/*` contains the publishable source manifests for example agents
 - `knowledge-packages/*` contains the publishable source manifests for first-wave example Knowledge packages
+- `loop-packages/*` contains the publishable source manifests for first-wave example Loop packages
 - `memory-packages/*` contains the publishable source manifests for first-wave example Memory Blueprints
 - `profile-packages/*` contains the publishable source manifests for first-wave example Instruction Profiles
 - `skill-packages/*` contains the publishable source manifests for first-wave example skills
@@ -60,6 +61,12 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`knowledge-packages/support-response-handbook`](knowledge-packages/support-response-handbook/)
     - [`knowledge-packages/devwork-maintainer-guide`](knowledge-packages/devwork-maintainer-guide/)
     - [`knowledge-packages/agentpm-docs`](knowledge-packages/agentpm-docs/)
+
+- **Loop packages**
+    - [`loop-packages/react-loop`](loop-packages/react-loop/)
+    - [`loop-packages/support-escalation-loop`](loop-packages/support-escalation-loop/)
+    - [`loop-packages/incident-response-loop`](loop-packages/incident-response-loop/)
+    - [`loop-packages/devwork-triage-loop`](loop-packages/devwork-triage-loop/)
 
 - **Memory packages**
     - [`memory-packages/support-customer-state`](memory-packages/support-customer-state/)
@@ -248,7 +255,7 @@ cd tools-python/table-extract && python -m unittest discover -s tests -p 'test_*
 cd agent-app-research-node && pnpm dev
 cd agent-app-ops-python && agentpm install && uv sync && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd agent-app-support-assistant-workspace && cp .env.example .env.local && agentpm install && uv sync && uv run python app/main.py
-cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.2 && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.5 && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd app-cli-automation-worker && cp .env.example .env.local && agentpm install && bash scripts/run-daily-brief.sh
 cd app-mcp-tool-server && cp .env.example .env.local && agentpm install && set -a && source .env.local && set +a && agentpm serve --mcp
 ```

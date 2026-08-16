@@ -5,6 +5,7 @@
 It generates a local project that:
 
 - synthesizes the root `agent.json` as a normal single-agent manifest
+- synthesizes the root `agent.json` with a published support Loop dependency
 - installs a published context-mode Knowledge package for support-response guidance
 - installs a published Memory Blueprint for durable support-state structure
 - installs a published Instruction Profile for durable support-response behavior
@@ -30,6 +31,8 @@ The generated project includes:
 
 This template intentionally combines:
 
+- a published Loop package:
+  - `@zack/support-escalation-loop@0.1.0`
 - a published Knowledge package:
   - `@zack/support-response-handbook@0.1.0`
 - a published Memory Blueprint package:
@@ -44,7 +47,7 @@ This template intentionally combines:
 
 That demonstrates the real AgentPM workspace model:
 
-- template-declared Knowledge, Memory, and Profile dependencies are installed and synthesized into the generated root `agent.json`
+- template-declared Loop, Knowledge, Memory, and Profile dependencies are installed and synthesized into the generated root `agent.json`
 - published agent roots live in `agentpm.workspace.json`
 - local agents live under `agents/`
 - normal `kind: "agent"` manifests do not gain recursive `agents[]`

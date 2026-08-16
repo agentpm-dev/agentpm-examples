@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-08T21:26:10.082409Z",
+  "generated": "2026-08-15T21:47:51.175335Z",
   "lockfile_version": 3,
   "packages": {
     "agent:@zack/ops-console@0.1.1": {
@@ -12,6 +12,12 @@
       "integrity": "ab126646b8a9860cc4fd03bc1402d24769ecc6f377e91004168bcd4c46c91568",
       "kind": "knowledge",
       "name": "@zack/support-response-handbook",
+      "version": "0.1.0"
+    },
+    "loop:@zack/support-escalation-loop@0.1.0": {
+      "integrity": "4f5c0fe7f65e60b214e34b4b9999e54cf119a1755b865391464d65e5613ff2cf",
+      "kind": "loop",
+      "name": "@zack/support-escalation-loop",
       "version": "0.1.0"
     },
     "memory:@zack/support-customer-state@0.1.0": {
@@ -103,6 +109,7 @@
       "knowledge": [
         "knowledge:@zack/support-response-handbook@0.1.0"
       ],
+      "loop": "loop:@zack/support-escalation-loop@0.1.0",
       "memory": [
         "memory:@zack/support-customer-state@0.1.0"
       ],

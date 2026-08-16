@@ -6,7 +6,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from agentpm import load
+from agentpm import load, load_loop
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,6 +15,7 @@ load_dotenv(ROOT / ".env.local", override=False)
 WORKSPACE_LABEL = "{{ workspace_label }}"
 SAMPLE_THREAD_PATH = ROOT / "{{ sample_thread_path }}"
 SUMMARY_SPEC = "@zack/summarize-text@0.1.8"
+SUPPORT_LOOP_SPEC = "@zack/support-escalation-loop@0.1.0"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -45,6 +46,13 @@ def main() -> None:
     print("\nPublished agent roots:")
     for agent_root in workspace.get("package_roots", {}).get("agents", []):
         print(f"- {agent_root['name']}@{agent_root['version']}")
+
+    support_loop = load_loop(SUPPORT_LOOP_SPEC)
+    print("\nInstalled loop details:")
+    print(f"- Package: {support_loop['name']}@{support_loop['version']}")
+    print(f"- Entry phase: {support_loop['loop']['entry_phase']}")
+    print(f"- Phases: {len(support_loop['loop']['phases'])}")
+    print(f"- Transitions: {len(support_loop['loop']['transitions'])}")
 
     # The root app uses its own direct tool dependency here. That keeps the
     # runtime example honest: the workspace can contain multiple local and

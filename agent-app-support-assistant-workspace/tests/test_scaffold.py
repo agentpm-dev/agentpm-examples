@@ -14,6 +14,7 @@ class ScaffoldTests(unittest.TestCase):
         self.assertIn("agents/answer-drafter.agent.json", readme)
         self.assertIn("agents/escalation-reviewer.agent.json", readme)
         self.assertIn("@zack/ops-console", readme)
+        self.assertIn("@zack/support-escalation-loop", readme)
         self.assertIn("@zack/support-customer-state", readme)
         self.assertIn("does not add recursive `agents[]`", readme)
 
@@ -22,6 +23,7 @@ class ScaffoldTests(unittest.TestCase):
         self.assertIn("teach the generated workspace shape", source)
         self.assertIn("recursive multi-agent orchestration semantics", source)
         self.assertIn("The root app uses its own direct tool dependency here.", source)
+        self.assertIn("Installed loop details:", source)
 
     def test_local_agents_and_sample_thread_exist(self) -> None:
         self.assertTrue((ROOT / "agents" / "answer-drafter.agent.json").exists())

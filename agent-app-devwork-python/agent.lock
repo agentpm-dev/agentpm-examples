@@ -1,17 +1,23 @@
 {
-  "generated": "2026-08-09T00:48:38.503874Z",
+  "generated": "2026-08-16T17:28:32.865935Z",
   "lockfile_version": 3,
   "packages": {
-    "agent:@zack/devwork-copilot@0.1.4": {
-      "integrity": "49df56f20297dd4983b5ef0dafeb1b09d8c5033b7ba30ec21c36b5a5f40eea43",
+    "agent:@zack/devwork-copilot@0.1.5": {
+      "integrity": "d7c3be2bbcb7a705f953c4c6cf89851a6fe0f880dec1080bf6e24754e2d3a9ce",
       "kind": "agent",
       "name": "@zack/devwork-copilot",
-      "version": "0.1.4"
+      "version": "0.1.5"
     },
     "knowledge:@zack/devwork-maintainer-guide@0.1.0": {
       "integrity": "47e267e55f8e4b866a5c882091d13121feb64006e3217d3da3f2be0d8d02bf52",
       "kind": "knowledge",
       "name": "@zack/devwork-maintainer-guide",
+      "version": "0.1.0"
+    },
+    "loop:@zack/devwork-triage-loop@0.1.0": {
+      "integrity": "8c7b9edce0019fdc23c35e880902a2634a2fd576e2d127e65680e8ba3496cafb",
+      "kind": "loop",
+      "name": "@zack/devwork-triage-loop",
       "version": "0.1.0"
     },
     "memory:@zack/devwork-maintainer-state@0.1.0": {
@@ -46,10 +52,11 @@
     }
   },
   "roots": {
-    "agent:@zack/devwork-copilot@0.1.4": {
+    "agent:@zack/devwork-copilot@0.1.5": {
       "knowledge": [
         "knowledge:@zack/devwork-maintainer-guide@0.1.0"
       ],
+      "loop": "loop:@zack/devwork-triage-loop@0.1.0",
       "memory": [
         "memory:@zack/devwork-maintainer-state@0.1.0"
       ],

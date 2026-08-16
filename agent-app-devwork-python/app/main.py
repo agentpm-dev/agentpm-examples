@@ -7,6 +7,7 @@ from app.settings import OPENAI_API_KEY, OPENAI_MODEL
 from app.tooling import (
     AGENT_SPEC,
     describe_memory_contract,
+    load_agent_loop_package,
     load_langchain_tools,
 )
 from app.workflow import DevworkState, build_graph
@@ -15,10 +16,12 @@ from app.workflow import DevworkState, build_graph
 def print_banner(
     manifest_name: str,
     loaded_skills: list[dict],
+    loop_package: dict | None,
     loaded_knowledge: list[dict],
     loaded_memory: list[dict],
     loaded_profiles: list[dict],
     metas: list[dict],
+    bindings: dict | None,
 ) -> None:
     print(f"\nDevwork Copilot: {manifest_name}")
     print(f"Agent package: {AGENT_SPEC}")
@@ -41,6 +44,14 @@ def print_banner(
             f"- {loaded_item.get('name')}@{loaded_item.get('version')}: "
             f"{loaded_item.get('description') or 'No description'} ({detail})"
         )
+    print(f"Loaded loop packages: {1 if loop_package else 0}")
+    if loop_package:
+        loaded_loop = loop_package["loaded"]
+        loop = loaded_loop["loop"]
+        print(f"- {loop_package['spec']}")
+        print(f"  Entry phase: {loop['entry_phase']}")
+        print(f"  Phases: {len(loop.get('phases', []))}")
+        print(f"  Transitions: {len(loop.get('transitions', []))}")
     print(f"Loaded memory packages: {len(loaded_memory)}")
     for package in loaded_memory:
         loaded_item = package["loaded"]
@@ -68,6 +79,31 @@ def print_banner(
         tone = communication.get("tone", [])
         if isinstance(tone, list) and tone:
             print("  Tone: " + ", ".join(value for value in tone if isinstance(value, str)))
+    if isinstance(bindings, dict):
+        print("Authored bindings:")
+        consumer_context = bindings.get("consumer_context")
+        if isinstance(consumer_context, dict) and isinstance(consumer_context.get("file"), str):
+            print(f"- Consumer context: {consumer_context['file']}")
+        global_bindings = bindings.get("global")
+        if isinstance(global_bindings, dict):
+            global_profiles = global_bindings.get("profiles")
+            if isinstance(global_profiles, list) and global_profiles:
+                print(f"- Global profiles: {', '.join(value for value in global_profiles if isinstance(value, str))}")
+            global_memory = global_bindings.get("memory")
+            if isinstance(global_memory, list) and global_memory:
+                print(f"- Global memory bindings: {len(global_memory)}")
+        phase_bindings = bindings.get("phases")
+        if isinstance(phase_bindings, dict) and phase_bindings:
+            print(f"- Phase bindings: {', '.join(sorted(phase_bindings.keys()))}")
+        mcp_bindings = bindings.get("mcp")
+        if isinstance(mcp_bindings, list) and mcp_bindings:
+            mcp_ids = [
+                item.get("id")
+                for item in mcp_bindings
+                if isinstance(item, dict) and isinstance(item.get("id"), str)
+            ]
+            if mcp_ids:
+                print(f"- MCP surfaces: {', '.join(mcp_ids)}")
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
         print(f"- {meta.get('name')}@{meta.get('version')}: {meta.get('description') or 'No description'}")
@@ -161,20 +197,24 @@ def main() -> None:
         tools,
         metas,
     ) = load_langchain_tools()
+    loop_package = load_agent_loop_package(loaded_agent)
     graph = build_graph(
         tools,
         render_skill_manuals(loaded_skills),
         render_profile_guidance(loaded_profiles),
     )
     state: DevworkState = {"messages": [], "pending_tool_calls": None}
+    bindings = loaded_agent["manifest"].get("bindings")
 
     print_banner(
         loaded_agent["manifest"]["name"],
         loaded_skills,
+        loop_package,
         loaded_knowledge,
         loaded_memory,
         loaded_profiles,
         metas,
+        bindings if isinstance(bindings, dict) else None,
     )
 
     while True:
@@ -195,10 +235,12 @@ def main() -> None:
             print_banner(
                 loaded_agent["manifest"]["name"],
                 loaded_skills,
+                loop_package,
                 loaded_knowledge,
                 loaded_memory,
                 loaded_profiles,
                 metas,
+                bindings if isinstance(bindings, dict) else None,
             )
             continue
         if line == "/reset":

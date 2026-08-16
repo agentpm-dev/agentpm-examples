@@ -9,6 +9,7 @@ from app.settings import OPENAI_API_KEY, OPENAI_MODEL
 from app.tooling import (
     AGENT_SPEC,
     describe_memory_contract,
+    load_agent_loop_package,
     load_agent_memory_packages,
     load_agent_profile_packages,
     load_langchain_tools,
@@ -30,8 +31,10 @@ def print_banner(
     manifest_name: str,
     loaded_skills: list[dict],
     metas: list[dict],
+    loop_package: dict | None,
     memory_packages: list[dict],
     profile_packages: list[dict],
+    bindings: dict | None,
 ) -> None:
     print(f"\n{WORKER_LABEL}: {manifest_name}")
     print(f"Agent package: {AGENT_SPEC}")
@@ -47,6 +50,14 @@ def print_banner(
     print(f"Loaded tools: {len(metas)}")
     for meta in metas:
         print(f"- {meta.get('name')}@{meta.get('version')}: {meta.get('description') or 'No description'}")
+    print(f"Loaded loop packages: {1 if loop_package else 0}")
+    if loop_package:
+        loaded_loop = loop_package["loaded"]
+        loop = loaded_loop["loop"]
+        print(f"- {loop_package['spec']}")
+        print(f"  Entry phase: {loop['entry_phase']}")
+        print(f"  Phases: {len(loop.get('phases', []))}")
+        print(f"  Transitions: {len(loop.get('transitions', []))}")
     print(f"Loaded memory packages: {len(memory_packages)}")
     for package in memory_packages:
         loaded_memory = package["loaded"]
@@ -74,6 +85,31 @@ def print_banner(
         tone = communication.get("tone", [])
         if isinstance(tone, list) and tone:
             print("  Tone: " + ", ".join(value for value in tone if isinstance(value, str)))
+    if isinstance(bindings, dict):
+        print("Authored bindings:")
+        consumer_context = bindings.get("consumer_context")
+        if isinstance(consumer_context, dict) and isinstance(consumer_context.get("file"), str):
+            print(f"- Consumer context: {consumer_context['file']}")
+        global_bindings = bindings.get("global")
+        if isinstance(global_bindings, dict):
+            global_profiles = global_bindings.get("profiles")
+            if isinstance(global_profiles, list) and global_profiles:
+                print(f"- Global profiles: {', '.join(value for value in global_profiles if isinstance(value, str))}")
+            global_memory = global_bindings.get("memory")
+            if isinstance(global_memory, list) and global_memory:
+                print(f"- Global memory bindings: {len(global_memory)}")
+        phase_bindings = bindings.get("phases")
+        if isinstance(phase_bindings, dict) and phase_bindings:
+            print(f"- Phase bindings: {', '.join(sorted(phase_bindings.keys()))}")
+        mcp_bindings = bindings.get("mcp")
+        if isinstance(mcp_bindings, list) and mcp_bindings:
+            mcp_ids = [
+                item.get("id")
+                for item in mcp_bindings
+                if isinstance(item, dict) and isinstance(item.get("id"), str)
+            ]
+            if mcp_ids:
+                print(f"- MCP surfaces: {', '.join(mcp_ids)}")
     print("\nCommands: /help /tools /reset /quit\n")
 
 
@@ -111,6 +147,7 @@ def render_skill_manuals(loaded_skills: list[dict]) -> str:
 
 def build_agent():
     loaded_agent, loaded_skills, tools, metas = load_langchain_tools()
+    loop_package = load_agent_loop_package(loaded_agent)
     memory_packages = load_agent_memory_packages(loaded_agent)
     profile_packages = load_agent_profile_packages(loaded_agent)
     skill_manuals = render_skill_manuals(loaded_skills)
@@ -175,7 +212,7 @@ def build_agent():
         tools=tools,
         system_prompt=system_prompt,
     )
-    return loaded_agent, loaded_skills, memory_packages, profile_packages, agent, metas
+    return loaded_agent, loaded_skills, loop_package, memory_packages, profile_packages, agent, metas
 
 
 def extract_final_text(result: dict) -> str:
@@ -197,15 +234,18 @@ def main() -> None:
     if not OPENAI_API_KEY:
         raise RuntimeError("Missing OPENAI_API_KEY. Create .env.local from .env.example and set the key.")
 
-    loaded_agent, loaded_skills, memory_packages, profile_packages, agent, metas = build_agent()
+    loaded_agent, loaded_skills, loop_package, memory_packages, profile_packages, agent, metas = build_agent()
     history: list[BaseMessage] = []
+    bindings = loaded_agent["manifest"].get("bindings")
 
     print_banner(
         loaded_agent["manifest"]["name"],
         loaded_skills,
         metas,
+        loop_package,
         memory_packages,
         profile_packages,
+        bindings if isinstance(bindings, dict) else None,
     )
 
     while True:
@@ -227,8 +267,10 @@ def main() -> None:
                 loaded_agent["manifest"]["name"],
                 loaded_skills,
                 metas,
+                loop_package,
                 memory_packages,
                 profile_packages,
+                bindings if isinstance(bindings, dict) else None,
             )
             continue
         if line == "/reset":

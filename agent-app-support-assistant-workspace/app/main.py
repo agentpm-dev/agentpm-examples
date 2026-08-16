@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from agentpm import (
     load,
     load_knowledge,
+    load_loop,
     load_memory,
     load_memory_contract,
     load_profile,
@@ -21,6 +22,7 @@ load_dotenv(ROOT / ".env.local", override=False)
 WORKSPACE_LABEL = "zack-workspace"
 SAMPLE_THREAD_PATH = ROOT / "sample-inputs/support-thread.md"
 SUMMARY_SPEC = "@zack/summarize-text@0.1.8"
+SUPPORT_ESCALATION_LOOP_SPEC = "@zack/support-escalation-loop@0.1.0"
 SUPPORT_HANDBOOK_SPEC = "@zack/support-response-handbook@0.1.0"
 SUPPORT_CUSTOMER_STATE_SPEC = "@zack/support-customer-state@0.1.0"
 SUPPORT_RESPONSE_STYLE_SPEC = "@zack/support-response-style@0.1.0"
@@ -60,6 +62,13 @@ def main() -> None:
     for agent_root in workspace.get("package_roots", {}).get("agents", []):
         print(f"- {agent_root['name']}@{agent_root['version']}")
 
+    print("\nRoot loop dependency:")
+    loop_ref = root_manifest.get("loop")
+    if isinstance(loop_ref, str):
+        print(f"- {loop_ref}")
+    elif isinstance(loop_ref, dict):
+        print(f"- {loop_ref['name']}@{loop_ref.get('version', '*')}")
+
     print("\nRoot knowledge dependencies:")
     for knowledge_ref in root_manifest.get("knowledge", []):
         if isinstance(knowledge_ref, str):
@@ -80,6 +89,16 @@ def main() -> None:
             print(f"- {profile_ref}")
         else:
             print(f"- {profile_ref['name']}@{profile_ref['version']}")
+
+    try:
+        support_loop = load_loop(SUPPORT_ESCALATION_LOOP_SPEC)
+        print("\nInstalled loop details:")
+        print(f"- Package: {SUPPORT_ESCALATION_LOOP_SPEC}")
+        print(f"- Entry phase: {support_loop['loop']['entry_phase']}")
+        print(f"- Phases: {len(support_loop['loop']['phases'])}")
+        print(f"- Transitions: {len(support_loop['loop']['transitions'])}")
+    except FileNotFoundError:
+        print("\nLoop package not installed yet. Run `agentpm install` first.")
 
     try:
         handbook = load_knowledge(SUPPORT_HANDBOOK_SPEC)

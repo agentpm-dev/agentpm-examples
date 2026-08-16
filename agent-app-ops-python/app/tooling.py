@@ -8,6 +8,7 @@ from typing import Any
 from agentpm import (
     load,
     load_agent,
+    load_loop,
     load_memory,
     load_memory_contract,
     load_profile,
@@ -19,7 +20,7 @@ from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
 ROOT = Path(__file__).resolve().parents[1]
-AGENT_SPEC = "@zack/ops-console@0.1.3"
+AGENT_SPEC = "@zack/ops-console@0.1.5"
 EXTRA_TOOL_NAME = "@zack/summarize-text"
 
 
@@ -63,6 +64,18 @@ def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, A
         spec = _spec_from_entry(entry)
         packages.append({"spec": spec, "loaded": load_memory(spec)})
     return packages
+
+
+def load_agent_loop_package(loaded_agent: dict[str, Any]) -> dict[str, Any] | None:
+    entry = loaded_agent.get("resolvedLoop")
+    if not isinstance(entry, dict):
+        return None
+    name = entry.get("name")
+    version = entry.get("version")
+    if not isinstance(name, str) or not isinstance(version, str):
+        return None
+    spec = f"{name}@{version}"
+    return {"spec": spec, "loaded": load_loop(spec)}
 
 
 def load_agent_profile_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:
