@@ -1,0 +1,139 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "loop",
+  "name": "react-loop",
+  "version": "0.1.0",
+  "description": "Portable ReAct loop for reasoning over context, taking actions, reflecting on results, and iterating until completion or handoff.",
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  },
+  "loop": {
+    "archetype": "react",
+    "entry_phase": "reason",
+    "limits": {
+      "max_steps": 10
+    },
+    "phases": [
+      {
+        "id": "reason",
+        "objective": "Assess the current context, form the next action plan, and decide whether to proceed into execution, continue reasoning, or hand off.",
+        "access": {
+          "tools": false,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "act",
+            "description": "The next step is clear enough to move into execution."
+          },
+          {
+            "id": "reason-more",
+            "description": "The loop should continue reasoning because the next action plan is not yet strong enough."
+          },
+          {
+            "id": "handoff",
+            "description": "The work should hand off because the current runtime lacks authority, context, or the right surface to continue."
+          }
+        ]
+      },
+      {
+        "id": "act",
+        "objective": "Execute the current plan, gather the new observations, and update working state so the next reflection pass has concrete results to inspect.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        }
+      },
+      {
+        "id": "reflect",
+        "objective": "Evaluate the latest action result, decide whether the work is complete, needs another reasoning pass, or should hand off.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "complete",
+            "description": "The loop has enough result quality and evidence to finish cleanly."
+          },
+          {
+            "id": "reason-more",
+            "description": "The loop should return to reasoning because another plan/action pass is needed."
+          },
+          {
+            "id": "handoff",
+            "description": "The work should hand off because reflection surfaced a boundary another owner should resolve."
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from": "reason",
+        "on": "act",
+        "to": "act"
+      },
+      {
+        "from": "reason",
+        "on": "reason-more",
+        "to": "reason"
+      },
+      {
+        "from": "reason",
+        "on": "handoff",
+        "to": "$handoff"
+      },
+      {
+        "from": "act",
+        "on": "complete",
+        "to": "reflect"
+      },
+      {
+        "from": "reflect",
+        "on": "complete",
+        "to": "$end"
+      },
+      {
+        "from": "reflect",
+        "on": "reason-more",
+        "to": "reason"
+      },
+      {
+        "from": "reflect",
+        "on": "handoff",
+        "to": "$handoff"
+      }
+    ],
+    "checkpoints": [
+      {
+        "id": "approve-next-action",
+        "type": "approval",
+        "before_phase": "act",
+        "on_reject": "reason"
+      }
+    ],
+    "error_policy": {
+      "tool_failure": {
+        "action": "retry",
+        "max_retries": 2,
+        "on_exhausted": "fail_phase"
+      },
+      "phase_failure": {
+        "action": "handoff"
+      }
+    }
+  }
+}
