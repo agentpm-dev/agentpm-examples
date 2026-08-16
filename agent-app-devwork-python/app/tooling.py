@@ -8,6 +8,7 @@ from agentpm import (
     load,
     load_agent,
     load_knowledge,
+    load_loop,
     load_memory,
     load_memory_contract,
     load_profile,
@@ -18,7 +19,7 @@ from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
-AGENT_SPEC = "@zack/devwork-copilot@0.1.4"
+AGENT_SPEC = "@zack/devwork-copilot@0.1.5"
 
 
 def collect_string_env() -> dict[str, str]:
@@ -39,6 +40,18 @@ def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, A
         spec = _spec_from_entry(entry)
         packages.append({"spec": spec, "loaded": load_memory(spec)})
     return packages
+
+
+def load_agent_loop_package(loaded_agent: dict[str, Any]) -> dict[str, Any] | None:
+    entry = loaded_agent.get("resolvedLoop")
+    if not isinstance(entry, dict):
+        return None
+    name = entry.get("name")
+    version = entry.get("version")
+    if not isinstance(name, str) or not isinstance(version, str):
+        return None
+    spec = f"{name}@{version}"
+    return {"spec": spec, "loaded": load_loop(spec)}
 
 
 def load_agent_profile_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:

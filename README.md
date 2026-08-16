@@ -65,6 +65,7 @@ Each tool is intentionally simple to highlight integration, not performance.
 - **Loop packages**
     - [`loop-packages/support-escalation-loop`](loop-packages/support-escalation-loop/)
     - [`loop-packages/incident-response-loop`](loop-packages/incident-response-loop/)
+    - [`loop-packages/devwork-triage-loop`](loop-packages/devwork-triage-loop/)
 
 - **Memory packages**
     - [`memory-packages/support-customer-state`](memory-packages/support-customer-state/)

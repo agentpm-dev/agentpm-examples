@@ -2,8 +2,15 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "devwork-copilot",
-  "version": "0.1.4",
-  "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions, maintainer workflow continuity, and a durable maintainer behavior profile.",
+  "version": "0.1.5",
+  "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions, packaged maintainer-review orchestration, workflow continuity, and a durable maintainer behavior profile.",
+  "loop": "@zack/devwork-triage-loop@0.1.0",
+  "tools": [
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.8"
+    }
+  ],
   "knowledge": [
     {
       "name": "@zack/devwork-maintainer-guide",
@@ -28,12 +35,77 @@
       "version": "0.1.0"
     }
   ],
-  "tools": [
-    {
-      "name": "@zack/summarize-text",
-      "version": "0.1.8"
+  "bindings": {
+    "consumer_context": {
+      "file": "maintainer-context.md"
+    },
+    "global": {
+      "profiles": [
+        "@zack/devwork-maintainer-style"
+      ],
+      "memory": [
+        {
+          "package": "@zack/devwork-maintainer-state",
+          "operations": [
+            "delete_maintainer_state",
+            "refresh_work_thread",
+            "consolidate_follow_up_notes"
+          ]
+        }
+      ]
+    },
+    "phases": {
+      "inspect-issue": {
+        "tools": [
+          "@zack/summarize-text"
+        ],
+        "skills": [
+          "@zack/issue-triage-playbook"
+        ],
+        "knowledge": [
+          "@zack/devwork-maintainer-guide"
+        ],
+        "memory": [
+          {
+            "package": "@zack/devwork-maintainer-state",
+            "spaces": [
+              "maintainer_profile",
+              "active_work_threads"
+            ]
+          }
+        ]
+      },
+      "draft-comment": {
+        "tools": [
+          "@zack/summarize-text"
+        ],
+        "knowledge": [
+          "@zack/devwork-maintainer-guide"
+        ],
+        "memory": [
+          {
+            "package": "@zack/devwork-maintainer-state",
+            "spaces": [
+              "active_work_threads",
+              "follow_up_notes"
+            ]
+          }
+        ]
+      },
+      "resolve-or-handoff": {
+        "memory": [
+          {
+            "package": "@zack/devwork-maintainer-state",
+            "spaces": [
+              "maintainer_profile",
+              "active_work_threads",
+              "follow_up_notes"
+            ]
+          }
+        ]
+      }
     }
-  ],
+  },
   "examples": [
     {
       "title": "Summarize an issue queue",
@@ -50,6 +122,10 @@
     {
       "title": "Prepare the next maintainer handoff",
       "prompt": "Review the current repository issues and summarize what the next maintainer should know, including current priorities, open follow-ups, unresolved questions, and anything that should carry forward."
+    },
+    {
+      "title": "Map the next maintainer step",
+      "prompt": "Inspect the issue thread, decide whether the next step is to draft a maintainer comment or hand the work off, and explain which packaged loop phase that maps to."
     },
     {
       "title": "Draft a maintainer follow-up",

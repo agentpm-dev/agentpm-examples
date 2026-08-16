@@ -2,6 +2,9 @@
 
 `devwork-copilot` is a published AgentPM agent package for maintainer and repository review workflows in Python.
 
+It includes a Loop for:
+- inspect -> draft -> resolve/handoff maintainer orchestration with an explicit revise path back into drafting
+
 It composes skills for:
 - issue triage workflow
 
@@ -14,6 +17,12 @@ It includes Memory for:
 It includes a Profile for:
 - concise maintainer tone, explicit approval boundaries, and pragmatic follow-through guidance
 
+It includes authored bindings for:
+- a shared maintainer behavior profile
+- maintainer-state cleanup as a global Memory capability
+- phase-scoped Knowledge, Skill, Tool, and Memory surfaces
+- a maintainer-specific consumer-context filename
+
 And it keeps direct agent-level tools for:
 - summarizing issue queues and maintainer context
 
@@ -22,6 +31,7 @@ Example prompts:
 - Read a set of repository issues and produce a concise maintainer briefing with action items and open questions.
 - Review an issue thread, retrieve the most relevant maintainer guidance, and draft a short comment that sets expectations clearly.
 - Review the current repository issues and summarize what the next maintainer should know, including current priorities, open follow-ups, unresolved questions, and anything that should carry forward.
+- Inspect the issue thread, decide whether the next step is to draft a maintainer comment or hand the work off, and explain which packaged loop phase that maps to.
 - Review the issue thread, summarize the current maintainer position, and draft the next follow-up comment.
 
 ## Local development
