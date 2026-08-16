@@ -1,0 +1,121 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "loop",
+  "name": "incident-response-loop",
+  "version": "0.1.0",
+  "description": "Portable incident-response loop for assess, execute, review, and revision-driven operational follow-through.",
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  },
+  "loop": {
+    "archetype": "incident-response",
+    "entry_phase": "assess",
+    "limits": {
+      "max_steps": 12
+    },
+    "phases": [
+      {
+        "id": "assess",
+        "objective": "Review the current incident state, identify the active owner and primary risks, and decide whether work should proceed or hand off immediately.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "proceed",
+            "description": "The incident has enough context to move into active execution."
+          },
+          {
+            "id": "handoff",
+            "description": "The incident should be handed off immediately because ownership, authority, or context is insufficient."
+          }
+        ]
+      },
+      {
+        "id": "execute",
+        "objective": "Carry out the current operational work, update the working state, and prepare the evidence needed for the next review pass.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        }
+      },
+      {
+        "id": "review",
+        "objective": "Review the current execution result, decide whether the incident can close, whether another execution pass is needed, or whether the work should hand off.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        },
+        "outcomes": [
+          {
+            "id": "complete",
+            "description": "The incident is resolved enough to close the loop cleanly."
+          },
+          {
+            "id": "needs-more-work",
+            "description": "The current result is incomplete and another execution pass is required."
+          },
+          {
+            "id": "handoff",
+            "description": "The work should hand off because progress is blocked, ownership changed, or escalation is required."
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from": "assess",
+        "on": "proceed",
+        "to": "execute"
+      },
+      {
+        "from": "assess",
+        "on": "handoff",
+        "to": "$handoff"
+      },
+      {
+        "from": "execute",
+        "on": "complete",
+        "to": "review"
+      },
+      {
+        "from": "review",
+        "on": "complete",
+        "to": "$end"
+      },
+      {
+        "from": "review",
+        "on": "needs-more-work",
+        "to": "execute"
+      },
+      {
+        "from": "review",
+        "on": "handoff",
+        "to": "$handoff"
+      }
+    ],
+    "error_policy": {
+      "tool_failure": {
+        "action": "retry",
+        "max_retries": 2,
+        "on_exhausted": "fail_phase"
+      },
+      "phase_failure": {
+        "action": "handoff"
+      }
+    }
+  }
+}

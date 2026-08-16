@@ -24,6 +24,8 @@ The code does not use separate hard-coded modes. It always loads the same instal
 This app:
 
 - loads the published `@zack/ops-console` agent package with the AgentPM Python SDK
+- reads the agent's `resolvedLoop`, loads the published `@zack/incident-response-loop` Loop package, and prints its entry phase, phase count, and transition count at startup
+- preserves the agent's authored `bindings` metadata and prints the named consumer-context, phase-binding, and MCP-surface summary at startup
 - reads the agent's direct `resolvedTools`
 - reads the agent's `resolvedSkills`, loads those Skill packages with `load_skill(...)`, and then loads each Skill's `resolvedTools`
 - reads the agent's `resolvedMemory`, loads the published `@zack/conversation-continuity` Memory Blueprint, and prints its installed spaces, lifecycle operations, and contract summary at startup
@@ -58,6 +60,8 @@ uv run python -m dotenv -f .env.local run -- python -m app.main
 
 With the current published `@zack/ops-console` package, that means:
 
+- the published `@zack/incident-response-loop` Loop loads from `resolvedLoop`, so you can inspect the packaged assess -> execute -> review orchestration contract
+- the agent's authored bindings surface the shared profile, Memory cleanup baseline, phase-specific package bindings, named MCP surfaces, and the expected `ops-context.md` consumer-context filename
 - direct agent tools like `csv-query` and `json-transform` load from the agent's own `resolvedTools`
 - Skill packages like incident handoff, Slack status updates, and issue triage load from `resolvedSkills`
 - the published `@zack/conversation-continuity` Memory Blueprint loads from `resolvedMemory` so you can inspect the installed continuity contract for conversation state and saved notes
@@ -97,6 +101,7 @@ When using `csv-query` against this fixture:
 - `Use the local incidents fixture at fixtures/incidents.csv, draft a calm status update for the Operations team, and do not send it anywhere yet.`
 - `Summarize the main operational risks in fixtures/incidents.csv and tell me which follow-up items should happen first.`
 - `Review the open incidents in fixtures/incidents.csv and prepare the next handoff with the current status, open risks, recent decisions, and anything that should carry forward.`
+- `Assess the incidents in fixtures/incidents.csv, decide whether the next step is active execution or handoff, and explain which packaged loop phase that maps to.`
 - `Using the columns incident_id, severity, status, opened_at, and summary from fixtures/incidents.csv, summarize the most urgent open incidents.`
 - `If GitHub credentials are available, list open issues in agentpm-dev/agentpm-examples and compare them to the incidents in fixtures/incidents.csv.`
 - `If GitHub credentials are available, compare the incidents in fixtures/incidents.csv to open repo issues and tell me what looks under-reported.`

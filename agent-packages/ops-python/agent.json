@@ -2,17 +2,16 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "ops-console",
-  "version": "0.1.3",
-  "description": "Operations assistant for reviewing issues, querying data, transforming JSON payloads, drafting Slack-ready updates, carrying continuity across active operational conversations, and applying a durable incident-operator communication style.",
-  "memory": [
+  "version": "0.1.4",
+  "description": "Operations assistant for incident assessment, execution, and review workflows, with packaged continuity memory, incident-response orchestration, and durable incident-operator communication style.",
+  "loop": "@zack/incident-response-loop@0.1.0",
+  "tools": [
     {
-      "name": "@zack/conversation-continuity",
-      "version": "0.1.0"
-    }
-  ],
-  "profiles": [
+      "name": "@zack/csv-query",
+      "version": "0.1.4"
+    },
     {
-      "name": "@zack/incident-operator-style",
+      "name": "@zack/json-transform",
       "version": "0.1.0"
     }
   ],
@@ -30,16 +29,110 @@
       "version": "0.1.0"
     }
   ],
-  "tools": [
+  "memory": [
     {
-      "name": "@zack/csv-query",
-      "version": "0.1.4"
-    },
-    {
-      "name": "@zack/json-transform",
+      "name": "@zack/conversation-continuity",
       "version": "0.1.0"
     }
   ],
+  "profiles": [
+    {
+      "name": "@zack/incident-operator-style",
+      "version": "0.1.0"
+    }
+  ],
+  "bindings": {
+    "consumer_context": {
+      "file": "ops-context.md"
+    },
+    "global": {
+      "profiles": [
+        "@zack/incident-operator-style"
+      ],
+      "memory": [
+        {
+          "package": "@zack/conversation-continuity",
+          "operations": [
+            "delete_conversation_continuity"
+          ]
+        }
+      ]
+    },
+    "phases": {
+      "assess": {
+        "tools": [
+          "@zack/csv-query"
+        ],
+        "skills": [
+          "@zack/issue-triage-playbook"
+        ],
+        "memory": [
+          {
+            "package": "@zack/conversation-continuity",
+            "spaces": [
+              "conversation_state"
+            ],
+            "operations": [
+              "consolidate_recent_interactions"
+            ]
+          }
+        ]
+      },
+      "execute": {
+        "tools": [
+          "@zack/csv-query",
+          "@zack/json-transform"
+        ],
+        "skills": [
+          "@zack/slack-status-update"
+        ],
+        "memory": [
+          {
+            "package": "@zack/conversation-continuity",
+            "spaces": [
+              "recent_interactions",
+              "saved_notes"
+            ],
+            "operations": [
+              "refresh_saved_note"
+            ]
+          }
+        ]
+      },
+      "review": {
+        "skills": [
+          "@zack/incident-handoff-checklist"
+        ],
+        "memory": [
+          {
+            "package": "@zack/conversation-continuity",
+            "spaces": [
+              "conversation_state",
+              "saved_notes"
+            ],
+            "operations": [
+              "consolidate_recent_interactions",
+              "refresh_saved_note"
+            ]
+          }
+        ]
+      }
+    },
+    "mcp": [
+      {
+        "id": "incident-data",
+        "tools": [
+          "@zack/csv-query"
+        ]
+      },
+      {
+        "id": "incident-updates",
+        "tools": [
+          "@zack/json-transform"
+        ]
+      }
+    ]
+  },
   "examples": [
     {
       "title": "Prepare an ops update",
@@ -50,12 +143,16 @@
       "prompt": "Inspect recent issues, combine them with structured data, and produce a short operational briefing with next steps."
     },
     {
+      "title": "Assess the next incident step",
+      "prompt": "Review the current incident state, identify the active owner and open risks, and decide whether the next step is active execution or handoff."
+    },
+    {
       "title": "Prepare the next handoff",
       "prompt": "Review the current incident thread and summarize what the next operator should know, including the current status, open risks, recent decisions, and anything that should carry forward."
     },
     {
-      "title": "Draft a precise incident update",
-      "prompt": "Prepare an incident update that states the current status, open risks, active owner, and next checkpoint."
+      "title": "Review whether work should continue",
+      "prompt": "Review the current execution result and decide whether the incident can close, needs another execution pass, or should hand off."
     }
   ],
   "readme": "README.md",
