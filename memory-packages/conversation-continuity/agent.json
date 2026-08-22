@@ -138,6 +138,7 @@
         },
         "preserve_provenance": true,
         "source_handling": "retain",
+        "output_mode": "replace_input",
         "trigger": {
           "every": "P7D",
           "type": "interval"
@@ -170,5 +171,5 @@
   "license": {
     "spdx": "MIT"
   },
-  "version": "0.1.0"
+  "version": "0.1.1"
 }
