@@ -5,7 +5,7 @@
       "path": "memory/contracts/conversation_state.conversation_summary.schema.json",
       "record_type": "conversation_summary",
       "schema_version": "1.0.0",
-      "sha256": "sha256:0abfc4f219c450fd28991d42affecbc132c484c506c9289bcb36be88711a1b34",
+      "sha256": "sha256:f649a58f0c8d78480915976afc5af96815d8a91f9c47671b95eb863bc4f8e118",
       "source_schema": "schemas/conversation-summary.schema.json",
       "space": "conversation_state"
     },
@@ -14,7 +14,7 @@
       "path": "memory/contracts/recent_interactions.interaction.schema.json",
       "record_type": "interaction",
       "schema_version": "1.0.0",
-      "sha256": "sha256:98f8f84f2855270ed8e9d6de0718ea0542c774ad057590994cd6b688d071cba1",
+      "sha256": "sha256:94c58fdbc49961fcb8779631637550c771f9669bf70d43246b4af757cf891060",
       "source_schema": "schemas/interaction.schema.json",
       "space": "recent_interactions"
     },
@@ -23,7 +23,7 @@
       "path": "memory/contracts/saved_notes.saved_note.schema.json",
       "record_type": "saved_note",
       "schema_version": "1.0.0",
-      "sha256": "sha256:6ec8c1396d8095dab508d7acca3de604d4c68f0b0c02f40366cf4bb38d985a75",
+      "sha256": "sha256:2dcc583ebdd6e4f547e6b29cd2254bbcf7a98063c9656eca9484ddf442c1ffc9",
       "source_schema": "schemas/saved-note.schema.json",
       "space": "saved_notes"
     }

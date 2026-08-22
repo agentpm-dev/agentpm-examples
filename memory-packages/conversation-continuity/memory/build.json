@@ -1,13 +1,13 @@
 {
-  "agentpm_version": "0.1.20",
-  "built_at": "2026-07-27T21:06:12Z",
+  "agentpm_version": "0.1.23",
+  "built_at": "2026-08-22T23:48:36Z",
   "contract_count": 3,
-  "contracts_hash": "sha256:251b315ef30c00bf5c284b7c2a9d095198d4791e4a7bc6608292d366d196f039",
-  "contracts_index_hash": "sha256:f4dd9f4a511131ebf98901f8719378e0322c46ab441cb0c82fab879c5aacfb5d",
+  "contracts_hash": "sha256:1f1d176e5fe5947f1f0b297c53c8fff5312e8ef44c4b9d202ede7658cb067d4d",
+  "contracts_index_hash": "sha256:2e1464ca634e5833b3b67856d288ad6947dd25d7ceefbe6b1fe9e5c089441143",
   "format_version": 1,
   "manifest_path": "agent.json",
-  "source_contract_inputs_hash": "sha256:2479d8def03e7abce8d53d3d529eb846f65b81b3aa43ffc3a76a8dcd497a0965",
-  "source_manifest_hash": "sha256:1c345c7d2c689a3360dc116335a742ba04332713d3c5cac79c82adb5bfbbc844",
+  "source_contract_inputs_hash": "sha256:96d4f7a6d32038bdc7b10707cd6b366d2226e547e0393f50e2ce1848f7b1af15",
+  "source_manifest_hash": "sha256:4cad97e557ad628f32dbdf175bb39f036c19883c615fa5971a0aa302dda6b731",
   "source_schemas": [
     {
       "path": "schemas/conversation-summary.schema.json",
