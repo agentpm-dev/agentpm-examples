@@ -1,5 +1,5 @@
 {
-  "$id": "agentpm://memory/conversation-continuity/0.1.0/conversation_state/conversation_summary/1.0.0",
+  "$id": "agentpm://memory/conversation-continuity/0.1.1/conversation_state/conversation_summary/1.0.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Resolved Memory record contract for package `conversation-continuity` space `conversation_state` and record type `conversation_summary`.",

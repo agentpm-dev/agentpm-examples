@@ -1,5 +1,5 @@
 {
-  "$id": "agentpm://memory/conversation-continuity/0.1.0/saved_notes/saved_note/1.0.0",
+  "$id": "agentpm://memory/conversation-continuity/0.1.1/saved_notes/saved_note/1.0.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Resolved Memory record contract for package `conversation-continuity` space `saved_notes` and record type `saved_note`.",
