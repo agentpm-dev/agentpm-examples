@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Local Harness workspace agent for exercising the M13 Pinecone/pgvector KnowledgeRuntime reference providers.",
+  "kind": "agent",
+  "knowledge": [
+    {
+      "name": "@zack/m13-reference-corpus",
+      "version": "0.1.0"
+    }
+  ],
+  "loop": "@zack/m13-reference-loop@0.1.0",
+  "bindings": {
+    "phases": {
+      "research": {
+        "knowledge": ["@zack/m13-reference-corpus"]
+      }
+    }
+  },
+  "memory": [],
+  "name": "m13-reference-harness-agent",
+  "profiles": [],
+  "skills": [],
+  "tools": [],
+  "version": "0.1.0"
+}

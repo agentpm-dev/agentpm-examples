@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Small loop for manual Harness M13 KnowledgeRuntime provider verification.",
+  "kind": "loop",
+  "license": {
+    "spdx": "MIT"
+  },
+  "loop": {
+    "archetype": "m13-knowledge-runtime-reference",
+    "entry_phase": "research",
+    "limits": {
+      "max_steps": 6
+    },
+    "phases": [
+      {
+        "access": {
+          "knowledge": true,
+          "tools": false
+        },
+        "id": "research",
+        "objective": "Use the mapped M13 reference Knowledge package for relevant vector retrieval, then answer with cited source details.",
+        "outcomes": [
+          {
+            "description": "The answer was produced from the mapped Knowledge package.",
+            "id": "answer"
+          },
+          {
+            "description": "The Knowledge surface was unavailable or insufficient.",
+            "id": "no-knowledge"
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from": "research",
+        "on": "answer",
+        "to": "$end"
+      },
+      {
+        "from": "research",
+        "on": "no-knowledge",
+        "to": "$end"
+      }
+    ]
+  },
+  "name": "m13-reference-loop",
+  "version": "0.1.0"
+}

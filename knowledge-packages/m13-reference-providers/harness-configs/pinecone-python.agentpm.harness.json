@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "knowledge": {
+    "runtimes": {
+      "pinecone-reference": {
+        "implementation": {
+          "type": "process",
+          "command": "uv",
+          "args": [
+            "run",
+            "--project",
+            "..",
+            "python",
+            "../providers/python/pinecone_runtime.py"
+          ],
+          "env": [
+            "AGENTPM_KNOWLEDGE_RUNTIME_ID",
+            "AGENTPM_KNOWLEDGE_PACKAGE",
+            "AGENTPM_KNOWLEDGE_VERSION",
+            "AGENTPM_KNOWLEDGE_CORPUS_HASH",
+            "AGENTPM_KNOWLEDGE_RETURN_CITATIONS",
+            "AGENTPM_EMBEDDING_PROVIDER",
+            "AGENTPM_EMBEDDING_MODEL",
+            "OPENAI_API_KEY",
+            "PINECONE_API_KEY",
+            "PINECONE_INDEX_HOST",
+            "PINECONE_NAMESPACE"
+          ],
+          "startup_timeout_ms": 15000,
+          "request_timeout_ms": 120000
+        }
+      }
+    },
+    "packages": {
+      "@zack/m13-reference-corpus": {
+        "runtime": "pinecone-reference"
+      }
+    }
+  },
+  "runtime": {
+    "limits": {
+      "max_steps": 8,
+      "max_model_calls_per_phase": 6,
+      "max_tool_calls_per_phase": 1,
+      "max_actions_per_phase": 12,
+      "max_tool_call_repairs": 1,
+      "max_structured_output_repairs": 4
+    }
+  },
+  "trace": {
+    "enabled": true,
+    "level": "verbose",
+    "content": "full"
+  }
+}

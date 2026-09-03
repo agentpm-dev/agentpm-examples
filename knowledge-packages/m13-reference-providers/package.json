@@ -1,0 +1,15 @@
+{
+  "name": "agentpm-examples-m13-reference-providers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pinecone:node": "node providers/node/pinecone-runtime.mjs",
+    "pgvector:node": "node providers/node/pgvector-runtime.mjs",
+    "test:node": "node --test test/*.mjs"
+  },
+  "dependencies": {
+    "@agentpm/sdk": "^0.1.14",
+    "pg": "^8.13.1"
+  }
+}

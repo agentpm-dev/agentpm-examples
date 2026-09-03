@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Small generated vector corpus for Harness Milestone 13 external KnowledgeRuntime reference providers.",
+  "kind": "knowledge",
+  "knowledge": {
+    "chunking": {
+      "chunk_size": 900,
+      "overlap": 100,
+      "strategy": "manual-generated-m13-reference-sections"
+    },
+    "corpus": {
+      "chunk_count": 4,
+      "chunks_path": "knowledge/chunks.jsonl",
+      "content_hash": "sha256:bc04df627590fcf7ac8f3e3d69ea2163428a517553218ba5c1756544941361a4",
+      "source_count": 2,
+      "sources_path": "knowledge/sources.jsonl"
+    },
+    "embedding": {
+      "dimensions": 1536,
+      "id": "default",
+      "metric": "cosine",
+      "model": "text-embedding-3-small",
+      "normalized": true,
+      "provider": "openai",
+      "vector_count": 4,
+      "vectors_hash": "sha256:87c39486598a59451c075943aa8f86c9edbc87bed74fd5d41375fb77ee0138a8",
+      "vectors_path": "knowledge/embeddings/default.f32"
+    },
+    "indexes": [
+      {
+        "embedding_id": "default",
+        "generated_by": "agentpm knowledge build",
+        "id": "default",
+        "path": "knowledge/indexes/default",
+        "type": "agentpm-local"
+      }
+    ],
+    "mode": "vector",
+    "provenance": {
+      "builder": {
+        "name": "agentpm-examples-m13-reference-corpus",
+        "version": "2026-09-02"
+      },
+      "generated_at": "2026-09-02T00:00:00Z",
+      "sources_manifest_path": "knowledge/provenance/sources-manifest.json"
+    },
+    "retrieval": {
+      "default_score_threshold": 0.2,
+      "default_top_k": 3,
+      "return_citations": true,
+      "strategy": "vector"
+    }
+  },
+  "license": {
+    "spdx": "MIT"
+  },
+  "name": "m13-reference-corpus",
+  "readme": "README.md",
+  "version": "0.1.0"
+}

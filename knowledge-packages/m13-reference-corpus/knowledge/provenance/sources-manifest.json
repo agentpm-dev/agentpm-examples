@@ -1,0 +1,17 @@
+{
+  "package": "@zack/m13-reference-corpus",
+  "version": "0.1.0",
+  "generated_for": "Harness Milestone 13 external KnowledgeRuntime reference providers",
+  "sources": [
+    {
+      "id": "src_ops_playbook",
+      "path": "knowledge/source-docs/alpha-ops.md",
+      "title": "Alpha Operations Playbook"
+    },
+    {
+      "id": "src_support_notes",
+      "path": "knowledge/source-docs/alpha-support.md",
+      "title": "Alpha Support Notes"
+    }
+  ]
+}

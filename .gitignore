@@ -5,6 +5,7 @@ pnpm-lock.yaml
 
 # python/uv
 .venv
+.pytest_cache/
 .pytype
 __pycache__/
 *.pyc
@@ -12,6 +13,7 @@ uv.lock
 
 # agentpm
 .agentpm/
+.agentpm-state/
 pub.txt
 
 # env

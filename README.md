@@ -61,6 +61,8 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`knowledge-packages/support-response-handbook`](knowledge-packages/support-response-handbook/)
     - [`knowledge-packages/devwork-maintainer-guide`](knowledge-packages/devwork-maintainer-guide/)
     - [`knowledge-packages/agentpm-docs`](knowledge-packages/agentpm-docs/)
+    - [`knowledge-packages/m13-reference-corpus`](knowledge-packages/m13-reference-corpus/)
+    - [`knowledge-packages/m13-reference-providers`](knowledge-packages/m13-reference-providers/)
 
 - **Loop packages**
     - [`loop-packages/react-loop`](loop-packages/react-loop/)

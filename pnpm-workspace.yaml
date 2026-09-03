@@ -1,3 +1,4 @@
 packages:
-  - 'tools-node/*'
-  - 'agent-app-*'
+  - tools-node/*
+  - agent-app-*
+  - knowledge-packages/m13-reference-providers
