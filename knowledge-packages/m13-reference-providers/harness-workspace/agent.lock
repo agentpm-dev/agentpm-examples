@@ -1,0 +1,28 @@
+{
+  "generated": "2026-09-02T00:00:00Z",
+  "lockfile_version": 3,
+  "packages": {
+    "knowledge:@zack/m13-reference-corpus@0.1.0": {
+      "integrity": "local-m13-reference-corpus",
+      "kind": "knowledge",
+      "name": "@zack/m13-reference-corpus",
+      "version": "0.1.0"
+    },
+    "loop:@zack/m13-reference-loop@0.1.0": {
+      "integrity": "local-m13-reference-loop",
+      "kind": "loop",
+      "name": "@zack/m13-reference-loop",
+      "version": "0.1.0"
+    }
+  },
+  "roots": {
+    "local:agent": {
+      "knowledge": [
+        "knowledge:@zack/m13-reference-corpus@0.1.0"
+      ],
+      "loop": "loop:@zack/m13-reference-loop@0.1.0",
+      "name": "m13-reference-harness-agent",
+      "version": "0.1.0"
+    }
+  }
+}

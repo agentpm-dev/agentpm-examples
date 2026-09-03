@@ -1,0 +1,14 @@
+[project]
+name = "agentpm-examples-m13-reference-providers"
+version = "0.1.0"
+description = "AgentPM Harness M13 KnowledgeRuntime reference providers"
+requires-python = ">=3.10"
+dependencies = ["agentpm>=0.1.15"]
+
+[project.optional-dependencies]
+pgvector = ["psycopg[binary]>=3.2.0"]
+test = ["pytest>=8.3.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+pythonpath = ["providers/python"]
