@@ -9,7 +9,7 @@ const args = process.env.AGENTPM_M16_LIVE_PROVIDER_ARGS_JSON
   ? JSON.parse(process.env.AGENTPM_M16_LIVE_PROVIDER_ARGS_JSON)
   : [];
 
-test("live MemoryRuntime provider passes advertised conformance scenario", { skip: !command }, async () => {
+test("live MemoryRuntime provider passes advertised conformance scenario", { skip: !command, timeout: 30000 }, async (t) => {
   const child = spawn(command, args, {
     stdio: ["pipe", "pipe", "pipe"],
     env: process.env,
@@ -33,6 +33,9 @@ test("live MemoryRuntime provider passes advertised conformance scenario", { ski
     while (pending.length) {
       pending.shift()(undefined);
     }
+  });
+  t.after(() => {
+    if (!exited) child.kill("SIGTERM");
   });
 
   let requestId = 0;

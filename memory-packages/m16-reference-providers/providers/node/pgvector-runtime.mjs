@@ -27,6 +27,10 @@ class PostgresMemoryStore {
     return store;
   }
 
+  async close() {
+    await this.pool.end();
+  }
+
   async ensureSchema() {
     await this.pool.query(`
       create table if not exists agentpm_memory_records (
@@ -553,8 +557,12 @@ if (!databaseUrl) {
 }
 const store = await PostgresMemoryStore.open(databaseUrl);
 
-await serveMemoryRuntimeProcess(
-  config.runtimeId,
-  store.handle.bind(store),
-  pgvectorCapabilities(config),
-);
+try {
+  await serveMemoryRuntimeProcess(
+    config.runtimeId,
+    store.handle.bind(store),
+    pgvectorCapabilities(config),
+  );
+} finally {
+  await store.close();
+}

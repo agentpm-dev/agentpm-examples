@@ -2,7 +2,6 @@
   "name": "agentpm-examples",
   "private": true,
   "dependencies": {
-    "@agentpm/sdk": "link:../agentpm-sdk-node",
     "@langchain/core": "^0.2.36",
     "@langchain/openai": "^0.3.17",
     "langchain": "^0.2.20"

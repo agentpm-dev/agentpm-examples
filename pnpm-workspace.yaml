@@ -2,6 +2,3 @@ packages:
   - tools-node/*
   - agent-app-*
   - knowledge-packages/m13-reference-providers
-
-overrides:
-  '@agentpm/sdk': link:../agentpm-sdk-node

@@ -28,6 +28,10 @@ class RedisMemoryStore {
     return new RedisMemoryStore(client);
   }
 
+  async close() {
+    await this.client.quit();
+  }
+
   async handle(method, payload) {
     const request = unwrapRequest(payload);
     switch (method) {
@@ -444,8 +448,12 @@ if (!redisUrl) {
 }
 const store = await RedisMemoryStore.open(redisUrl);
 
-await serveMemoryRuntimeProcess(
-  config.runtimeId,
-  store.handle.bind(store),
-  redisCapabilities(config),
-);
+try {
+  await serveMemoryRuntimeProcess(
+    config.runtimeId,
+    store.handle.bind(store),
+    redisCapabilities(config),
+  );
+} finally {
+  await store.close();
+}

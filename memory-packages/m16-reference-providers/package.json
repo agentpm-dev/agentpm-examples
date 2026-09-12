@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@agentpm/sdk": "^0.1.15",
-    "agentpm-sdk-node": "link:../../../../agentpm-sdk-node",
     "pg": "^8.13.1",
     "redis": "^4.7.0"
   }

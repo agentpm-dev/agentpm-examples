@@ -228,7 +228,8 @@ Expected:
 - Redis initializes as a MemoryRuntime through both Harness configs.
 - Spaces requiring only Redis-advertised modes remain available.
 - Semantic-only surfaces are suppressed rather than falling back to local SQLite.
-- Redis advertises `durable_trigger_state: true` and `atomic_batches: false`; Harness suppresses lifecycle operations that require atomic batch commits.
+- The raw Redis capability descriptor is covered by the provider conformance tests above, where Redis advertises `durable_trigger_state: true` and `atomic_batches: false`.
+- The Harness-observable check here is that lifecycle operations requiring atomic batch commits are suppressed; preflight does not print the raw capability flags.
 
 Run Redis-backed direct Memory writes to verify ordinary Memory still works while lifecycle operations remain suppressed:
 
