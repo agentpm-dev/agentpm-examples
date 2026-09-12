@@ -1,0 +1,28 @@
+{
+  "generated": "2026-09-11T00:00:00Z",
+  "lockfile_version": 3,
+  "packages": {
+    "memory:@zack/m16-reference-memory@0.1.0": {
+      "integrity": "local-m16-reference-memory",
+      "kind": "memory",
+      "name": "@zack/m16-reference-memory",
+      "version": "0.1.0"
+    },
+    "loop:@zack/m16-reference-loop@0.1.0": {
+      "integrity": "local-m16-reference-loop",
+      "kind": "loop",
+      "name": "@zack/m16-reference-loop",
+      "version": "0.1.0"
+    }
+  },
+  "roots": {
+    "local:agent": {
+      "loop": "loop:@zack/m16-reference-loop@0.1.0",
+      "memory": [
+        "memory:@zack/m16-reference-memory@0.1.0"
+      ],
+      "name": "m16-reference-harness-agent",
+      "version": "0.1.0"
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "$id": "agentpm://memory/m16-reference-memory/0.1.0/current_note/note/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `m16-reference-memory` space `current_note` and record type `note`.",
+  "properties": {
+    "content": {
+      "$id": "https://agentpm.dev/examples/m16/schemas/note.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-persist": true
+        },
+        "private_scratch": {
+          "type": "string",
+          "x-agentpm-persist": false
+        },
+        "topic": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-persist": true
+        }
+      },
+      "required": [
+        "body"
+      ],
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "delete_user_memory",
+            "refresh_current_note",
+            "summarize_notes"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "note"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "current_note"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ],
+  "title": "m16-reference-memory current_note note record contract",
+  "type": "object"
+}

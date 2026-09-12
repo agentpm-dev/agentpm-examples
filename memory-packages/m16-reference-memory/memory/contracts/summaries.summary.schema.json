@@ -1,0 +1,100 @@
+{
+  "$id": "agentpm://memory/m16-reference-memory/0.1.0/summaries/summary/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `m16-reference-memory` space `summaries` and record type `summary`.",
+  "properties": {
+    "content": {
+      "$id": "https://agentpm.dev/examples/m16/schemas/summary.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "source_count": {
+          "minimum": 1,
+          "type": "integer",
+          "x-agentpm-persist": true
+        },
+        "summary": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-persist": true
+        }
+      },
+      "required": [
+        "summary"
+      ],
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "delete_user_memory",
+            "refresh_current_note",
+            "summarize_notes"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "summary"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "summaries"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ],
+  "title": "m16-reference-memory summaries summary record contract",
+  "type": "object"
+}

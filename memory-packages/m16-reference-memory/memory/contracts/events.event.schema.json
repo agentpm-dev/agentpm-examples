@@ -1,0 +1,110 @@
+{
+  "$id": "agentpm://memory/m16-reference-memory/0.1.0/events/event/1.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Resolved Memory record contract for package `m16-reference-memory` space `events` and record type `event`.",
+  "properties": {
+    "content": {
+      "$id": "https://agentpm.dev/examples/m16/schemas/event.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-persist": true
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string",
+          "x-agentpm-persist": true
+        }
+      },
+      "required": [
+        "body"
+      ],
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ordinal": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "delete_user_memory",
+            "refresh_current_note",
+            "summarize_notes"
+          ],
+          "type": "string"
+        },
+        "source_record_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "type": "object"
+    },
+    "record_type": {
+      "const": "event"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "conversation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "user",
+        "conversation"
+      ],
+      "type": "object"
+    },
+    "space": {
+      "const": "events"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content",
+    "ordinal"
+  ],
+  "title": "m16-reference-memory events event record contract",
+  "type": "object"
+}

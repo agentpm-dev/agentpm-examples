@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Local Harness workspace agent for exercising the M16 MemoryRuntime reference providers.",
+  "kind": "agent",
+  "knowledge": [],
+  "loop": "@zack/m16-reference-loop@0.1.0",
+  "bindings": {
+    "phases": {
+      "remember": {
+        "memory": [
+          {
+            "package": "@zack/m16-reference-memory",
+            "spaces": ["current_note", "notes", "events", "summaries"],
+            "operations": [
+              "summarize_notes",
+              "refresh_current_note",
+              "delete_user_memory"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "memory": [
+    {
+      "name": "@zack/m16-reference-memory",
+      "version": "0.1.0"
+    }
+  ],
+  "name": "m16-reference-harness-agent",
+  "profiles": [],
+  "skills": [],
+  "tools": [],
+  "version": "0.1.0"
+}

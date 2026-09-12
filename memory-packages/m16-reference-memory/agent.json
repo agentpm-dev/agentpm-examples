@@ -1,0 +1,163 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Small Memory Blueprint for exercising PostgreSQL/pgvector and Redis MemoryRuntime reference providers.",
+  "kind": "memory",
+  "memory": {
+    "scopes": {
+      "user": {
+        "description": "The end user whose records are stored."
+      },
+      "conversation": {
+        "description": "The active conversation thread."
+      }
+    },
+    "record_types": {
+      "note": {
+        "description": "A durable user note.",
+        "schema": "schemas/note.schema.json",
+        "version": "1.0.0"
+      },
+      "summary": {
+        "description": "A derived note summary.",
+        "schema": "schemas/summary.schema.json",
+        "version": "1.0.0"
+      },
+      "event": {
+        "description": "An ordered memory event.",
+        "schema": "schemas/event.schema.json",
+        "version": "1.0.0"
+      }
+    },
+    "spaces": {
+      "current_note": {
+        "description": "One current note document per user.",
+        "model": "document",
+        "record_types": ["note"],
+        "retrieval": {
+          "modes": ["key"]
+        },
+        "retention": {
+          "on_expire": "archive",
+          "ttl": "P30D"
+        },
+        "scope": ["user"]
+      },
+      "notes": {
+        "description": "Durable note collection.",
+        "model": "collection",
+        "record_types": ["note"],
+        "retrieval": {
+          "modes": ["key", "filter", "chronological", "full_text"]
+        },
+        "retention": {
+          "on_expire": "archive",
+          "ttl": "P30D"
+        },
+        "capacity": {
+          "max_records": 100
+        },
+        "scope": ["user"]
+      },
+      "events": {
+        "description": "Ordered conversation memory events.",
+        "model": "sequence",
+        "record_types": ["event"],
+        "retrieval": {
+          "modes": ["key", "chronological"]
+        },
+        "constraints": {
+          "append_only": true
+        },
+        "capacity": {
+          "max_records": 100
+        },
+        "scope": ["user", "conversation"]
+      },
+      "summaries": {
+        "description": "Derived summaries created by lifecycle operations.",
+        "model": "collection",
+        "record_types": ["summary"],
+        "retrieval": {
+          "modes": ["key", "filter", "chronological", "full_text"]
+        },
+        "retention": {
+          "on_expire": "archive",
+          "ttl": "P90D"
+        },
+        "scope": ["user"]
+      }
+    },
+    "operations": {
+      "summarize_notes": {
+        "type": "consolidate",
+        "description": "Consolidate accumulated notes into one durable summary.",
+        "trigger": {
+          "type": "record_count",
+          "space": "notes",
+          "threshold": 3
+        },
+        "inputs": [
+          {
+            "space": "notes",
+            "record_type": "note"
+          }
+        ],
+        "output": {
+          "space": "summaries",
+          "record_type": "summary"
+        },
+        "source_handling": "delete_after_success",
+        "preserve_provenance": true
+      },
+      "refresh_current_note": {
+        "type": "transform",
+        "description": "Refresh the current note in place.",
+        "trigger": {
+          "type": "interval",
+          "every": "P7D"
+        },
+        "inputs": [
+          {
+            "space": "current_note",
+            "record_type": "note"
+          }
+        ],
+        "output": {
+          "space": "current_note",
+          "record_type": "note"
+        },
+        "source_handling": "retain",
+        "output_mode": "replace_input",
+        "preserve_provenance": true
+      },
+      "delete_user_memory": {
+        "type": "delete",
+        "description": "Delete all M16 reference memory for one user on external request.",
+        "trigger": {
+          "type": "external"
+        },
+        "targets": [
+          {
+            "space": "current_note"
+          },
+          {
+            "space": "notes"
+          },
+          {
+            "space": "events"
+          },
+          {
+            "space": "summaries"
+          }
+        ],
+        "cascade_derived_records": true
+      }
+    }
+  },
+  "name": "m16-reference-memory",
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  },
+  "version": "0.1.0"
+}
