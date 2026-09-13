@@ -1,0 +1,16 @@
+{
+  "name": "agentpm-examples-m16-reference-providers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pgvector:node": "node providers/node/pgvector-runtime.mjs",
+    "redis:node": "node providers/node/redis-runtime.mjs",
+    "test:node": "node --test test/*.mjs"
+  },
+  "dependencies": {
+    "@agentpm/sdk": "^0.1.15",
+    "pg": "^8.13.1",
+    "redis": "^4.7.0"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentpm.dev/examples/m16/schemas/note.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["body"],
+  "properties": {
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-persist": true
+    },
+    "topic": {
+      "type": "string",
+      "minLength": 1,
+      "x-agentpm-persist": true
+    },
+    "private_scratch": {
+      "type": "string",
+      "x-agentpm-persist": false
+    }
+  }
+}

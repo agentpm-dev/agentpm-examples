@@ -1,0 +1,42 @@
+{
+  "contracts": [
+    {
+      "model": "document",
+      "path": "memory/contracts/current_note.note.schema.json",
+      "record_type": "note",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:6e6039a581b89f3d6ce13901211ec5abae16c0f1b45cb28afb0f7d18f3fc027f",
+      "source_schema": "schemas/note.schema.json",
+      "space": "current_note"
+    },
+    {
+      "model": "sequence",
+      "path": "memory/contracts/events.event.schema.json",
+      "record_type": "event",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:e360d5d9462683e3de48441d1a0adc747e1409fa0296c9dd6d4d66e36899ccd8",
+      "source_schema": "schemas/event.schema.json",
+      "space": "events"
+    },
+    {
+      "model": "collection",
+      "path": "memory/contracts/notes.note.schema.json",
+      "record_type": "note",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:4d32fb6d470200275bb6c5bc6b97bb025d0d5a6284907fff909dec3a823b781d",
+      "source_schema": "schemas/note.schema.json",
+      "space": "notes"
+    },
+    {
+      "model": "collection",
+      "path": "memory/contracts/summaries.summary.schema.json",
+      "record_type": "summary",
+      "schema_version": "1.0.0",
+      "sha256": "sha256:447efa40f8e6eed606542e56bf9604338e4fbf743fbfde3a757d56883f16c637",
+      "source_schema": "schemas/summary.schema.json",
+      "space": "summaries"
+    }
+  ],
+  "format_version": 1,
+  "type": "agentpm-memory-contract-index"
+}

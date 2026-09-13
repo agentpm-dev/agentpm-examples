@@ -1,0 +1,52 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "description": "Small loop for manual Harness M16 MemoryRuntime provider verification.",
+  "kind": "loop",
+  "license": {
+    "spdx": "MIT"
+  },
+  "loop": {
+    "archetype": "m16-memory-runtime-reference",
+    "entry_phase": "remember",
+    "limits": {
+      "max_steps": 6
+    },
+    "phases": [
+      {
+        "access": {
+          "memory": {
+            "read": true,
+            "write": true
+          },
+          "tools": false
+        },
+        "id": "remember",
+        "objective": "Use the mapped M16 reference Memory package as requested, then complete.",
+        "outcomes": [
+          {
+            "description": "The Memory operation completed.",
+            "id": "done"
+          },
+          {
+            "description": "The Memory surface was unavailable or insufficient.",
+            "id": "no-memory"
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from": "remember",
+        "on": "done",
+        "to": "$end"
+      },
+      {
+        "from": "remember",
+        "on": "no-memory",
+        "to": "$end"
+      }
+    ]
+  },
+  "name": "m16-reference-loop",
+  "version": "0.1.0"
+}
