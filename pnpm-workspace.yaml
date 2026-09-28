@@ -1,4 +1,5 @@
 packages:
   - tools-node/*
   - agent-app-*
+  - app-harness-*
   - knowledge-packages/m13-reference-providers

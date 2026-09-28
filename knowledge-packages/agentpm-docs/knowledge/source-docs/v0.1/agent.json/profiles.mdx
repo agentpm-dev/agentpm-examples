@@ -1,0 +1,302 @@
+---
+title: Profiles
+section: agent.json
+order: 18
+description: Author portable Instruction Profiles that package role, objectives, communication style, and behavioral constraints.
+next: agent.json/loops
+---
+
+# Profiles
+
+Author portable Instruction Profiles that package role, objectives, communication style, and behavioral constraints.
+
+## What is a profile?
+
+A `kind: "profile"` manifest is a structured authored-behavior package.
+
+It exists to package:
+
+- role and operating identity
+- explicit objectives
+- communication style and vocabulary preferences
+- boundaries and authored constraints
+- optional compatibility hints for host systems
+
+An Instruction Profile is metadata, not execution. It has:
+
+- no build command
+- no generated output
+- no runtime execution model
+- no parameters or variables
+- no install-time prompts
+
+<Callout type="info" title="Author intent, not runtime enforcement">
+  Profile constraints are declared behavioral guidance. AgentPM preserves and displays them, but it does not enforce them at runtime.
+</Callout>
+
+## Scaffold a profile
+
+```bash
+agentpm init --kind profile --name support-style --description "Support communication profile for customer-facing agents"
+```
+
+Generated skeleton (`agent.json`):
+
+```json
+{
+  "kind": "profile",
+  "name": "support-style",
+  "version": "0.1.0",
+  "description": "Support communication profile for customer-facing agents",
+  "readme": "README.md",
+  "profile": {
+    "identity": {
+      "role": "Customer support assistant"
+    },
+    "objectives": [
+      "Resolve the user's issue clearly and efficiently."
+    ],
+    "communication": {
+      "tone": ["calm", "helpful"],
+      "verbosity": "balanced"
+    }
+  }
+}
+```
+
+`agentpm init --kind profile` creates only authored source files:
+
+```text
+support-style/
+  agent.json
+  README.md
+```
+
+## Field reference
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `$schema` | string | no | Optional schema URI |
+| `kind` | enum | **yes** | Must be `"profile"` |
+| `name` | string | **yes** | Package name |
+| `version` | semver | **yes** | Package version |
+| `description` | string | **yes** | Registry/package description |
+| `readme` | string | no | Optional README path; common package behavior |
+| `license` | object | no | Optional `{ spdx, file }`; common package behavior |
+| `profile.identity` | object | **yes** | Authored role and optional identity metadata |
+| `profile.objectives` | array | **yes** | At least one objective |
+| `profile.principles` | array | no | Optional authored principles |
+| `profile.audience` | object | no | Optional audience guidance and adaptation notes |
+| `profile.communication` | object | **yes** | Tone, verbosity, optional formatting/guidelines/vocabulary |
+| `profile.boundaries` | array | no | Optional “do not” or escalation boundaries |
+| `profile.constraints` | array | no | Optional authored constraints |
+| `profile.compatibility` | object | no | Optional minimum context and capability hints |
+
+## Required core
+
+Every valid Profile includes:
+
+- `profile.identity.role`
+- at least one `profile.objectives[]` entry
+- at least one `profile.communication.tone[]` entry
+- `profile.communication.verbosity`
+
+Supported verbosity values:
+
+- `concise`
+- `balanced`
+- `detailed`
+
+Tone values are intentionally open-ended authored strings.
+
+## Full example
+
+```json
+{
+  "kind": "profile",
+  "name": "support-style",
+  "version": "0.1.0",
+  "description": "Support communication profile for customer-facing agents.",
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE"
+  },
+  "profile": {
+    "identity": {
+      "role": "Customer support assistant",
+      "description": "Guide a support workflow with calm, direct, action-oriented communication.",
+      "expertise": [
+        "triage",
+        "customer communication",
+        "escalation handling"
+      ]
+    },
+    "objectives": [
+      "Resolve the user's issue clearly and efficiently.",
+      "Preserve trust by stating next steps and ownership."
+    ],
+    "principles": [
+      "State what is known before speculating.",
+      "Prefer actionable language over vague reassurance."
+    ],
+    "audience": {
+      "description": "External customers seeking help with an ongoing issue.",
+      "assumed_knowledge": "Their immediate problem symptoms and the product area they are working in.",
+      "adaptation": [
+        "Use simpler wording for first-contact responses.",
+        "Increase procedural detail when handing off to an internal operator."
+      ]
+    },
+    "communication": {
+      "tone": [
+        "calm",
+        "direct",
+        "empathetic"
+      ],
+      "verbosity": "balanced",
+      "guidelines": [
+        "Lead with the status or action the user cares about most.",
+        "When there is delay or uncertainty, explain the next checkpoint."
+      ],
+      "formatting": [
+        "Use short paragraphs.",
+        "Use bullets only when they improve scanability."
+      ],
+      "vocabulary": {
+        "prefer": [
+          "next step",
+          "current status",
+          "I'll follow up"
+        ],
+        "avoid": [
+          "ASAP",
+          "hopefully"
+        ]
+      }
+    },
+    "boundaries": [
+      "Do not promise refunds, credits, or policy exceptions without approval.",
+      "Do not claim an incident is resolved until the evidence is explicit."
+    ],
+    "constraints": [
+      {
+        "id": "state-owner-before-time",
+        "strength": "required",
+        "instruction": "When a follow-up is needed, name the owner before naming the timeframe."
+      },
+      {
+        "id": "include-escalation-trigger",
+        "strength": "preferred",
+        "instruction": "When escalation is possible, explain the trigger that would cause it."
+      }
+    ],
+    "compatibility": {
+      "minimum_context_tokens": 2000,
+      "requires": {
+        "tool_use": true
+      },
+      "recommends": {
+        "structured_output": true
+      }
+    }
+  }
+}
+```
+
+## Constraints
+
+Constraint objects contain:
+
+- `id`
+- `strength`
+- `instruction`
+
+`strength` is one of:
+
+- `required`
+- `preferred`
+
+Constraint IDs are lowercase kebab-case and max out at 64 characters.
+
+## Profile vs skill
+
+Use a **Profile** when you are authoring:
+
+- role and identity
+- response style
+- communication rules
+- boundaries or policy reminders
+
+Use a **Skill** when you are authoring:
+
+- a procedure
+- a checklist
+- decision steps
+- tool usage instructions
+
+Concrete example:
+
+- “Write like a steady incident commander who summarizes risk clearly” → **Profile**
+- “Follow this incident handoff checklist and use these tools in this order” → **Skill**
+
+These are complementary. An Agent can install both a Skill and a Profile.
+
+## Dependencies and package boundaries
+
+Profile packages do **not** declare package dependencies.
+
+That means a Profile manifest must not contain:
+
+- `tools`
+- `skills`
+- `knowledge`
+- `memory`
+- `profiles`
+- `agents`
+
+Profiles can be consumed by:
+
+- Agents through top-level `profiles[]`
+- Templates through `template.dependencies.profiles[]`
+
+## Install and load flows
+
+Direct install:
+
+```bash
+agentpm install @zack/support-style@0.1.0
+```
+
+That writes the installed package under:
+
+```text
+.agentpm/profiles/zack/support-style/0.1.0/
+```
+
+Node SDK:
+
+```ts
+import { loadProfile } from '@agentpm/sdk';
+
+const profile = await loadProfile('@zack/support-style@0.1.0');
+console.log(profile.profile.communication);
+```
+
+Python SDK:
+
+```py
+from agentpm import load_profile
+
+profile = load_profile("@zack/support-style@0.1.0")
+print(profile["profile"]["communication"])
+```
+
+## README and license behavior
+
+Profiles use the same common README/license behavior as other package kinds:
+
+- `readme` is optional package documentation
+- `license` is optional package metadata
+
+Neither one becomes part of the structured `profile` contract consumed by loaders.

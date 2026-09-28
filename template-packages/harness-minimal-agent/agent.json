@@ -1,0 +1,92 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "harness-minimal-agent",
+  "version": "0.1.0",
+  "description": "Minimal AgentPM Harness starter that installs one published Agent package and runs it through the reference Harness TUI or headless CLI.",
+  "template": {
+    "display_name": "Minimal Harness Agent",
+    "use_case": "harness-start",
+    "execution_surfaces": [
+      "agentpm-run"
+    ],
+    "stack": [
+      "workspace",
+      "shell"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "harness-minimal-agent"
+      },
+      {
+        "name": "workspace_label",
+        "description": "Human-readable label shown in the generated README and Harness TUI header.",
+        "required": true,
+        "default": "Minimal Harness Agent"
+      },
+      {
+        "name": "default_user_scope",
+        "description": "Default local user scope value used by the sample Harness config.",
+        "required": true,
+        "default": "local-maintainer"
+      },
+      {
+        "name": "default_repository_scope",
+        "description": "Default local repository scope value used by the sample Harness config.",
+        "required": true,
+        "default": "agentpm-dev/agentpm-examples"
+      },
+      {
+        "name": "openai_model",
+        "description": "Default OpenAI model identifier used by agentpm.harness.json. Set credentials at runtime, not as a template variable.",
+        "required": true,
+        "default": "gpt-4o-mini"
+      },
+      {
+        "name": "ollama_model",
+        "description": "Default local Ollama model identifier used by agentpm.ollama.harness.json.",
+        "required": true,
+        "default": "llama3.1"
+      }
+    ],
+    "dependencies": {
+      "tools": [],
+      "agents": [
+        {
+          "name": "@zack/devwork-copilot",
+          "version": "0.1.6"
+        }
+      ]
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.local.example .env.local"
+      },
+      {
+        "label": "Export local env for this shell",
+        "command": "set -a; source .env.local; set +a"
+      },
+      {
+        "label": "Check Harness readiness",
+        "command": "agentpm harness --json"
+      },
+      {
+        "label": "Open the Harness TUI",
+        "command": "agentpm harness"
+      },
+      {
+        "label": "Run one headless prompt",
+        "command": "agentpm harness --headless --input \"Review this generated workspace and summarize what the installed Agent can do.\" --report reports/first-run.json"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

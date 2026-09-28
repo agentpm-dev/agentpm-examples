@@ -1,0 +1,157 @@
+---
+title: harness
+section: CLI
+order: 12
+description: Run an installed Agent through the AgentPM Harness in TUI, headless, or machine mode.
+next: cli/export
+---
+
+# harness
+
+Run an installed Agent through the AgentPM Harness.
+
+## Overview
+
+`agentpm harness` is the built-in Agent execution surface. It resolves one installed Agent, builds a Harness Session, runs the Agent's authored Loop through the Rust HarnessEngine, and writes report/trace artifacts for the Run.
+
+```bash
+agentpm harness [AGENT]
+```
+
+`AGENT` may be omitted only when the workspace has exactly one runnable Agent. If multiple runnable Agents are available, the TUI prompts for one; headless and machine mode require an explicit selector.
+
+## Execution Surfaces
+
+### Interactive TUI
+
+```bash
+agentpm harness @zack/support-agent@0.1.0
+```
+
+The default terminal UI keeps one Harness Session open, shows preflight readiness, starts one Run per submitted message, renders approvals and Memory-operation controls, and can execute repeated Runs sequentially. While a Run is active, the composer does not start another Run.
+
+Interactive mode may prompt for missing Agent, model, provider, scope, or approval values. Prompted values are recorded with `interactive` source metadata.
+
+### One-shot Headless
+
+```bash
+agentpm harness @zack/support-agent@0.1.0 \
+  --headless \
+  --input "Summarize the incident." \
+  --report reports/run-1.json
+```
+
+Headless mode is for scripts. It bootstraps, executes exactly one Run, prints the terminal user-facing output on stdout, writes diagnostics to stderr/report/trace, then shuts down Session-owned services.
+
+Inputs:
+
+- `--input <TEXT>` passes direct Run text.
+- `--input-file <FILE>` reads Run text from a file.
+- stdin is used when neither option is supplied and stdin is piped.
+
+Headless mode never auto-approves checkpoints. A Run that reaches an approval checkpoint without a controller terminates with `approval_required`.
+
+### Machine/SDK
+
+```bash
+agentpm harness @zack/support-agent@0.1.0 --machine
+```
+
+Machine mode is a newline-delimited JSON protocol for SDKs and host applications. Stdout is protocol-only; do not parse human prose from it. The Session can run multiple sequential Runs, register host services, route Hooks/approvals/provider calls, invoke external Memory operations, and shut down explicitly.
+
+## Options
+
+```bash
+agentpm harness [AGENT] [--config FILE] [--state-dir DIR] [--scope KEY=VALUE ...]
+agentpm harness [AGENT] --headless [--input TEXT | --input-file FILE] [--report FILE]
+agentpm harness [AGENT] --machine
+agentpm harness [AGENT] --json [--verbose]
+```
+
+- `AGENT`: installed Agent package ref or local Agent selector.
+- `--config <FILE>`: use a specific `agentpm.harness.json`.
+- `--state-dir <DIR>`: override `runtime.state_dir`.
+- `--scope KEY=VALUE`: supply trusted runtime scope values such as `user=user-123`; repeatable.
+- `--headless`: run one non-TUI Run.
+- `--machine`: use the Harness machine protocol.
+- `--input <TEXT>`: direct headless Run input.
+- `--input-file <FILE>`: headless Run input file.
+- `--report <FILE>`: headless report path override.
+- `--json`: emit preflight JSON instead of rendering the TUI.
+- `--verbose`: include detailed preflight text sections for non-TUI preflight output.
+
+## Config Precedence And Sources
+
+Runtime values resolve in this order:
+
+1. explicit SDK/application per-run option or host registration
+2. explicit CLI option
+3. `agentpm.harness.json`
+4. standard environment/provider conventions
+5. Harness default
+
+Portable Agent and Loop metadata are not part of this override chain. Runtime config may realize or narrow the authored graph, but it cannot override authored phase access, checkpoints, transitions, or package dependencies.
+
+Resolved source metadata appears in preflight, reports, events, and the TUI readiness rail. Source labels include `default`, `config_file`, `cli_override`, `sdk_override`, `interactive`, and `environment`.
+
+## State Directory
+
+`.agentpm/` remains installed dependency state. Harness runtime records are written under `.agentpm-state/` by default.
+
+Use `runtime.state_dir` or `--state-dir` when you need a different state location. Generated workspaces should gitignore `.agentpm-state/`.
+
+## Limits
+
+Harness enforces runtime safety limits from config or defaults:
+
+- phase steps
+- model calls per phase
+- logical Tool calls per phase
+- total semantic actions per phase
+- repair attempts for Tool arguments, structured completion, and Memory operations
+
+Reaching a limit emits a typed limit event and terminates through the documented Run failure path rather than silently truncating execution.
+
+## Approvals And Cancellation
+
+Approvals are resolved through one ApprovalRuntime path:
+
+- SDK/application approval callback
+- configured process/host approval controller
+- built-in TUI approval controls
+- connected machine host controller
+
+Plain headless without a controller does not auto-approve or auto-deny; it terminates `approval_required`.
+
+TUI and machine Sessions can cancel an active Run. Cancellation is cooperative at Harness yield points and provider/runtime boundaries; long external calls can only stop as quickly as their runtime supports cancellation or timeout.
+
+## Terminal Statuses
+
+Reports and machine results use stable terminal statuses:
+
+- `ended`
+- `handed_off`
+- `approval_required`
+- `cancelled`
+- `failed`
+- `aborted`
+- `limit_reached`
+
+Headless uses successful process exit for successful terminal statuses and non-zero exit for failure, cancellation, approval-required, and limit paths.
+
+## Reports And Traces
+
+Each Run writes a JSON report and JSONL trace as far as possible. The report includes terminal status, phase summaries, checkpoints, action/runtime summaries, usage, diagnostics, report/trace paths, and terminal output when available.
+
+Trace behavior is controlled by `trace.level` and `trace.content` in Harness config. Even `content: "full"` must not serialize values Harness classifies as secrets.
+
+## Consumer Context
+
+Consumer Context is snapshotted once per Run. Editing the context file during a Run does not affect that Run; the next Run re-reads it. There is no dedicated context-loading Hook. Normal prompt/context-shaping Hooks may shape the assembled model request after the authoritative file has been loaded.
+
+## Related Pages
+
+- [Harness Config](../advanced/harness-config)
+- [Harness Protocols](../advanced/harness-protocols)
+- [Harness Providers And State](../advanced/harness-providers)
+- [Harness SDK APIs](../sdks/harness)

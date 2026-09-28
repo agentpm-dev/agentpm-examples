@@ -136,12 +136,15 @@ Templates may declare:
 - direct agent package dependencies in `template.dependencies.agents`
 - direct skill dependencies in `template.dependencies.skills`
 - direct knowledge dependencies in `template.dependencies.knowledge`
+- direct memory dependencies in `template.dependencies.memory`
+- direct profile dependencies in `template.dependencies.profiles`
+- one direct loop dependency in `template.dependencies.loop`
 
 They may also scaffold extra local manifests under `agents/`.
 
 Generated projects handle those separately:
 
-- the root `agent.json` remains a normal single-agent manifest and can include resolved `tools[]`, `skills[]`, and `knowledge[]`
+- the root `agent.json` remains a normal single-agent manifest and can include resolved `tools[]`, `skills[]`, `knowledge[]`, `memory[]`, `profiles[]`, and singular `loop`
 - extra local generated agents live under `agents/`
 - registry agent package roots are recorded in `agentpm.workspace.json`
 
@@ -169,6 +172,8 @@ Template authors should maintain two different READMEs:
 - `template.files_root/README.md` — for the generated project and any render-variable examples
 
 The root generated `agent.json` is owned by `agentpm new`, so template authors should not place a root `agent.json` inside `template.files_root`.
+
+If the template declares `template.dependencies.loop`, `agentpm new` resolves and installs that Loop and writes the exact resolved reference into the synthesized root `agent.json → loop`.
 
 If a template wants additional local generated agents, place them under:
 

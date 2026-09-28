@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "providers": {
+    "embeddings": {
+      "local-openai-embeddings": {
+        "implementation": {
+          "type": "host",
+          "request_timeout_ms": 120000
+        }
+      }
+    }
+  },
+  "scopes": {
+    "user": "embedding-provider-user"
+  },
+  "knowledge": {
+    "embedding_matches": [
+      {
+        "match": {
+          "provider": "openai",
+          "model": "text-embedding-3-small",
+          "dimensions": 1536,
+          "normalized": true
+        },
+        "embedding_provider": "local-openai-embeddings"
+      }
+    ]
+  },
+  "approvals": {
+    "controller": {
+      "implementation": {
+        "type": "host"
+      }
+    }
+  },
+  "trace": {
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "Harness Embedding Provider",
+      "subtitle": "Embedding provider host"
+    }
+  }
+}

@@ -2,13 +2,13 @@
 title: Node SDK
 section: SDKs
 order: 19
-description: Install packages with the CLI, load tools, and inspect installed agents, skills, and knowledge packages from Node.
+description: Install packages with the CLI, load tools, and inspect installed agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops from Node.
 next: sdks/python
 ---
 
 # Node SDK
 
-Install packages with the CLI, load tools, and inspect installed agents, skills, and knowledge packages from Node.
+Install packages with the CLI, load tools, and inspect installed agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops from Node.
 
 ## Goal
 
@@ -18,6 +18,9 @@ Install the Node SDK and use:
 - `loadAgent()` to inspect an installed agent package and its resolved packages
 - `loadSkill()` to inspect an installed skill package and its resolved tools
 - `loadKnowledge()` to inspect an installed knowledge package and its mode-specific metadata
+- `loadMemory()` to inspect an installed memory blueprint package and its generated contracts
+- `loadProfile()` to inspect an installed instruction profile package and its authored metadata
+- `loadLoop()` to inspect an installed loop package and its authored orchestration metadata
 
 ## 1) Install a tool
 
@@ -39,6 +42,9 @@ That writes:
 
 - the installed agent under `.agentpm/agents/<namespace>/<name>/<version>`
 - its resolved knowledge packages under `.agentpm/knowledge/<namespace>/<name>/<version>`
+- its resolved memory packages under `.agentpm/memory/<namespace>/<name>/<version>`
+- its resolved profile packages under `.agentpm/profiles/<namespace>/<name>/<version>`
+- its resolved loop package under `.agentpm/loops/<namespace>/<name>/<version>`
 - its resolved skills under `.agentpm/skills/<namespace>/<name>/<version>`
 - its resolved tools under `.agentpm/tools/<namespace>/<name>/<version>`
 
@@ -62,6 +68,36 @@ agentpm install @zack/python-docs@0.1.0
 That writes:
 
 - the installed knowledge package under `.agentpm/knowledge/<namespace>/<name>/<version>`
+
+You can also install a published memory package directly:
+
+```bash
+agentpm install @zack/profile-memory@0.1.0
+```
+
+That writes:
+
+- the installed memory package under `.agentpm/memory/<namespace>/<name>/<version>`
+
+You can also install a published profile package directly:
+
+```bash
+agentpm install @zack/support-style@0.1.0
+```
+
+That writes:
+
+- the installed profile package under `.agentpm/profiles/<namespace>/<name>/<version>`
+
+You can also install a published loop package directly:
+
+```bash
+agentpm install @zack/incident-response-loop@1.0.0
+```
+
+That writes:
+
+- the installed loop package under `.agentpm/loops/<namespace>/<name>/<version>`
 
 ## 2) Install the Node SDK
 
@@ -195,6 +231,9 @@ What `loadAgent()` returns:
 - the installed agent manifest
 - the installed agent root path
 - `resolvedKnowledge`, which are the exact knowledge package refs represented in `agent.lock`
+- `resolvedMemory`, which are the exact memory package refs represented in `agent.lock`
+- `resolvedProfiles`, which are the exact profile package refs represented in `agent.lock`
+- `resolvedLoop`, which is the exact singular loop ref represented in `agent.lock`
 - reserved refs (`knowledge`, `memory`, `profiles`) from the lockfile metadata path
 - `resolvedTools`, which are the exact tool package refs represented in `agent.lock`
 - `resolvedSkills`, which are the exact skill package refs represented in `agent.lock`
@@ -204,6 +243,10 @@ Compatibility note:
 - `resolvedKnowledge` is populated from the modern first-class `root.knowledge` entries in `agent.lock`.
 - `reserved.knowledge` is legacy pass-through metadata from older lockfile shapes. For current installs, treat `resolvedKnowledge` as authoritative and expect `reserved.knowledge` to usually be empty.
 - If your workspace still has an older lockfile shape where Knowledge refs only exist under `reserved.knowledge`, rerun `agentpm install` to rewrite the lockfile.
+- `resolvedLoop` is populated from the modern first-class `root.loop` entry in `agent.lock`.
+- `resolvedProfiles` is populated from the modern first-class `root.profiles` entries in `agent.lock`.
+- `reserved.profiles` is legacy pass-through metadata from older lockfile shapes. For current installs, treat `resolvedProfiles` as authoritative and expect `reserved.profiles` to usually be empty.
+- `manifest.loop` and `manifest.bindings` preserve the authored declarative metadata from the installed `agent.json`.
 
 What it does **not** do:
 
@@ -248,6 +291,73 @@ console.log(knowledge.indexPaths);
 
 `loadKnowledge()` returns an inspectable Knowledge object. Knowledge packages are not runnable SDK objects by themselves.
 
+## 8) Loading an installed memory package
+
+Use `loadMemory()` when you want authored Memory Blueprint metadata, parsed build metadata, the persisted contract index, and on-demand access to resolved contracts.
+
+```ts
+import { loadMemory, loadMemoryContract } from '@agentpm/sdk';
+
+const memory = await loadMemory('@zack/profile-memory@0.1.0');
+const contract = loadMemoryContract(memory, {
+  space: 'profile',
+  recordType: 'user_preference',
+});
+
+console.log(memory.memory.spaces);
+console.log(memory.build);
+console.log(memory.contractIndex);
+console.log(memory.contracts);
+console.log(contract);
+```
+
+`loadMemory()` returns an inspectable Memory object. Memory packages are not runnable SDK objects by themselves and do not provide live record CRUD behavior.
+
+## 9) Loading an installed profile package
+
+Use `loadProfile()` when you want authored Instruction Profile metadata from an installed registry package.
+
+```ts
+import { loadProfile } from '@agentpm/sdk';
+
+const profile = await loadProfile('@zack/support-style@0.1.0');
+
+console.log(profile.profile.identity.role);
+console.log(profile.profile.objectives);
+console.log(profile.profile.communication);
+```
+
+`loadProfile()` returns an inspectable Profile object. Profiles are metadata only:
+
+- the installed profile manifest
+- the installed package root path
+- parsed authored `profile` metadata
+
+It does not compile prompts, interpret README content as instructions, enforce constraints, or execute runtime behavior.
+
+## 10) Loading an installed loop package
+
+Use `loadLoop()` when you want authored Loop metadata from an installed registry package.
+
+```ts
+import { loadLoop } from '@agentpm/sdk';
+
+const loop = await loadLoop('@zack/incident-response-loop@1.0.0');
+
+console.log(loop.loop.entry_phase);
+console.log(loop.loop.phases);
+console.log(loop.loop.transitions);
+console.log(loop.loop.error_policy);
+```
+
+`loadLoop()` returns an inspectable Loop object containing:
+
+- the installed loop manifest
+- the installed package root path
+- parsed authored `loop` metadata
+
+It does not execute the graph, choose a model, resolve Agent phase bindings, validate Memory selectors against installed blueprints, start MCP, or read `consumer_context.file`. Use `HarnessClient` when you want the SDK to host `agentpm harness --machine`.
+
 ### `load()` stays tool-only
 
 ```ts
@@ -258,9 +368,18 @@ await load('@zack/incident-commander@0.1.0');
 
 await load('@zack/python-docs@0.1.0');
 // throws: use loadKnowledge("@zack/python-docs@0.1.0") instead
+
+await load('@zack/profile-memory@0.1.0');
+// throws: use loadMemory("@zack/profile-memory@0.1.0") instead
+
+await load('@zack/support-style@0.1.0');
+// throws: use loadProfile("@zack/support-style@0.1.0") instead
+
+await load('@zack/incident-response-loop@1.0.0');
+// throws: use loadLoop("@zack/incident-response-loop@1.0.0") instead
 ```
 
-## 8) Execution contract (how tools must behave)
+## 11) Execution contract (how tools must behave)
 
 For a tool to work with the SDK, it must follow this process protocol:
 - **STDIN**: SDK writes one JSON object (tool **inputs**) to the subprocess **stdin**.
@@ -295,7 +414,7 @@ async function main() {
 if (import.meta.url === `file://${process.argv[1]}`) main();
 ```
 
-## 9) What load() enforces for safety
+## 12) What load() enforces for safety
 
 - **Interpreter allow-list**
     - Allowed: `node`, `nodejs`, `python`, `python3`, or versioned like `python3.11`.
@@ -309,7 +428,7 @@ if (import.meta.url === `file://${process.argv[1]}`) main();
 - **Environment merging**
     - Merges manifest `entrypoint.env` + `load(opts).env` + safe base env.
 
-## 9) How the subprocess is spawned (high level)
+## 13) How the subprocess is spawned (high level)
 
 - **Working dir (`cwd`)**: `entrypoint.cwd` (default `.`) relative to the tool root.
 - **Isolated run dirs**: a unique temp `run/` folder with dedicated `HOME` and `TMPDIR`.
@@ -321,7 +440,7 @@ if (import.meta.url === `file://${process.argv[1]}`) main();
 </Callout>
 
 
-## 10) Troubleshooting
+## 14) Troubleshooting
 
 - **Interpreter not found**
     - Ensure `node`/`python` is on `PATH`. The error message prints the PATH searched.
@@ -340,7 +459,7 @@ if (import.meta.url === `file://${process.argv[1]}`) main();
 - **Skill installed on disk but not in the lockfile**
     - `loadSkill()` uses the installed skill directory **and** the `agent.lock` root entry together. If the lockfile is missing the skill root, reinstall it.
 
-## 11) Best practices
+## 15) Best practices
 
 - **Define strong IO schemas** so agents construct correct arguments.
 - **Keep logs off stdout**; stdout is reserved for the final JSON.

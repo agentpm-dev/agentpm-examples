@@ -2,13 +2,13 @@
 title: install
 section: CLI
 order: 7
-description: Install tools, skills, knowledge packages, or agents, resolve package dependencies, and write an updated lockfile.
+description: Install tools, skills, knowledge packages, memory packages, instruction profiles, loops, or agents, resolve package dependencies, and write an updated lockfile.
 next: cli/new
 ---
 
 # install
 
-Install tools, skills, knowledge packages, or agents, resolve package dependencies, and make the resulting packages available to your app.
+Install tools, skills, knowledge packages, memory blueprints, instruction profiles, loops, or agents, resolve package dependencies, and make the resulting packages available to your app.
 
 <Callout type="info" title="Templates use agentpm new, not install">
   Workflow templates are consumed with `agentpm new`, not `agentpm install`. Generated multi-root workspace projects may later use `agentpm install` to regenerate `agent.lock`, but `agentpm install <spec>` is not the entrypoint for template consumption.
@@ -19,7 +19,7 @@ Install tools, skills, knowledge packages, or agents, resolve package dependenci
 `agentpm install` supports two workflows:
 
 - **manifest-driven install** from a local `kind: "agent"` or `kind: "skill"` manifest
-- **direct package install** for a tool, skill, knowledge, or agent spec
+- **direct package install** for a tool, skill, knowledge, memory, profile, loop, or agent spec
 
 In both cases, AgentPM resolves package versions, downloads artifacts, installs them into the normalized `.agentpm` layout, and writes `agent.lock`.
 
@@ -33,8 +33,11 @@ agentpm install [<spec>] [--manifest <path>] [--frozen] [--refresh] [--update-ra
   - If it resolves to a **tool**, AgentPM installs the tool directly.
   - If it resolves to a **skill**, AgentPM installs the skill artifact and resolves/installs its tool dependencies.
   - If it resolves to a **knowledge** package, AgentPM installs the knowledge artifact directly.
-  - If it resolves to an **agent**, AgentPM installs the agent artifact and then resolves/installs its tool, skill, and knowledge dependencies.
-  - In a local `kind: "agent"` project, direct **tool** installs add/update `agent.json → tools[]`, direct **skill** installs add/update `agent.json → skills[]`, and direct **knowledge** installs add/update `agent.json → knowledge[]`.
+  - If it resolves to a **memory** package, AgentPM installs the memory artifact directly.
+  - If it resolves to a **profile**, AgentPM installs the profile artifact directly.
+  - If it resolves to a **loop**, AgentPM installs the loop artifact directly.
+  - If it resolves to an **agent**, AgentPM installs the agent artifact and then resolves/installs its tool, skill, knowledge, memory, profile, and loop dependencies.
+  - In a local `kind: "agent"` project, direct **tool** installs add/update `agent.json → tools[]`, direct **skill** installs add/update `agent.json → skills[]`, direct **knowledge** installs add/update `agent.json → knowledge[]`, direct **memory** installs add/update `agent.json → memory[]`, direct **profile** installs add/update `agent.json → profiles[]`, and a direct **loop** install adds/updates singular `agent.json → loop`.
 - **`--manifest <path>` (default: `agent.json`)**. Path to the local manifest to read/write.
 - **`--frozen`**. Fail if anything would change the resolved set (no re-resolution or lock updates).
 - **`--refresh`**. Force re-resolution and re-download even if everything looks satisfied locally (bypass caches).
@@ -44,7 +47,7 @@ agentpm install [<spec>] [--manifest <path>] [--frozen] [--refresh] [--update-ra
 - **`--token <PAT>` (env: `AGENTPM_TOKEN`)**. Personal Access Token for headless auth (overrides env/file).
 
 <Callout type="info" title="Scope">
-  Agents resolve `tools[]`, `skills[]`, and `knowledge[]`. Skills resolve `tools[]`. `memory` and `profiles` remain reserved metadata.
+  Agents resolve `tools[]`, `skills[]`, `knowledge[]`, `memory[]`, `profiles[]`, and optional singular `loop`. Skills resolve `tools[]`.
 </Callout>
 
 <Callout type="info" title="Token resolution order">
@@ -110,6 +113,33 @@ This installs:
 
 - the knowledge artifact under `.agentpm/knowledge/zack/python-docs/0.1.0/`
 
+### Install a published memory package directly
+```bash
+agentpm install @zack/profile-memory@0.1.0
+```
+
+This installs:
+
+- the memory artifact under `.agentpm/memory/zack/profile-memory/0.1.0/`
+
+### Install a published profile package directly
+```bash
+agentpm install @zack/support-style@0.1.0
+```
+
+This installs:
+
+- the profile artifact under `.agentpm/profiles/zack/support-style/0.1.0/`
+
+### Install a published loop directly
+```bash
+agentpm install @zack/incident-response-loop@1.0.0
+```
+
+This installs:
+
+- the loop artifact under `.agentpm/loops/zack/incident-response-loop/1.0.0/`
+
 ### Re-resolve and re-download everything
 ```bash
 agentpm install --refresh
@@ -135,13 +165,18 @@ agentpm install @zack/summarize@0.1.2 --update-range
    - tools → `.agentpm/tools/...`
    - skills → `.agentpm/skills/...`
    - knowledge → `.agentpm/knowledge/...`
-   - agents → `.agentpm/agents/...`
-5. **Writes updates** when installing a direct tool, skill, or knowledge spec in a local agent project (adds or updates `tools[]`, `skills[]`, or `knowledge[]`).
+  - memory → `.agentpm/memory/...`
+  - profiles → `.agentpm/profiles/...`
+  - loops → `.agentpm/loops/...`
+  - agents → `.agentpm/agents/...`
+5. **Writes updates** when installing a direct tool, skill, knowledge, memory, profile, or loop spec in a local agent project (adds or updates `tools[]`, `skills[]`, `knowledge[]`, `memory[]`, `profiles[]`, or singular `loop`).
 
 **Install locations**
 - Prepared tools: `.agentpm/tools/<namespace>/<name>/<version>`
 - Installed skill packages: `.agentpm/skills/<namespace>/<name>/<version>`
 - Installed knowledge packages: `.agentpm/knowledge/<namespace>/<name>/<version>`
+- Installed memory packages: `.agentpm/memory/<namespace>/<name>/<version>`
+- Installed loop packages: `.agentpm/loops/<namespace>/<name>/<version>`
 - Installed agent packages: `.agentpm/agents/<namespace>/<name>/<version>`
 - Download cache (tgz artifacts): `.agentpm/cache` (used unless you pass `--refresh`)
 
@@ -171,6 +206,18 @@ agentpm install @zack/summarize@0.1.2 --update-range
       "name": "@zack/python-docs",
       "version": "0.1.0",
       "integrity": "f1aa…921b"
+    },
+    "memory:@zack/profile-memory@0.1.0": {
+      "kind": "memory",
+      "name": "@zack/profile-memory",
+      "version": "0.1.0",
+      "integrity": "a8e1…114c"
+    },
+    "loop:@zack/incident-response-loop@1.0.0": {
+      "kind": "loop",
+      "name": "@zack/incident-response-loop",
+      "version": "1.0.0",
+      "integrity": "d9b1…55aa"
     }
   },
   "roots": {
@@ -180,10 +227,9 @@ agentpm install @zack/summarize@0.1.2 --update-range
       "tools": ["tool:@zack/summarize@0.1.2"],
       "skills": ["skill:@zack/incident-commander@0.1.0"],
       "knowledge": ["knowledge:@zack/python-docs@0.1.0"],
-      "reserved": {
-        "memory": [],
-        "profiles": []
-      }
+      "memory": ["memory:@zack/profile-memory@0.1.0"],
+      "profiles": ["profile:@zack/support-style@0.1.0"],
+      "loop": "loop:@zack/incident-response-loop@1.0.0"
     }
   }
 }
@@ -200,8 +246,8 @@ agentpm install @zack/summarize@0.1.2 --update-range
 - On install, the lockfile **pins** versions and checksums.
 - `--frozen` will **fail** if the resolved set would change (protects CI from drift).
 - `--refresh` re-resolves and re-downloads; if versions change (e.g., semver ranges), the lockfile is updated accordingly.
-- Existing older lockfiles are still read where practical, but Skill- or Knowledge-containing graphs are written as `lockfile_version: 3`.
-- Reinstalling from an older lock that still used `reserved.skills` or `reserved.knowledge` rewrites the lock into the modern shape: resolvable entries move into first-class root `skills` and `knowledge`, and migrated reserved entries are removed from the rewritten lock.
+- Existing older lockfiles are still read where practical, but Skill-, Knowledge-, or Memory-containing graphs are written as `lockfile_version: 3`.
+- Reinstalling from an older lock that still used `reserved.skills`, `reserved.knowledge`, or `reserved.memory` rewrites the lock into the modern shape: resolvable entries move into first-class root `skills`, `knowledge`, and `memory`, and migrated reserved entries are removed from the rewritten lock.
 
 **Best practices**
 - Commit `agent.lock` to **version control**.
@@ -214,7 +260,7 @@ agentpm install @zack/summarize@0.1.2 --update-range
 
 - **Manifest-driven install**
   - Run `agentpm install` in a project with a local `kind: "agent"` or `kind: "skill"` manifest.
-  - For local agents, AgentPM resolves declared `tools[]`, `skills[]`, and `knowledge[]`.
+  - For local agents, AgentPM resolves declared `tools[]`, `skills[]`, `knowledge[]`, `memory[]`, and `profiles[]`.
   - For local skills, AgentPM resolves declared `tools[]`.
   - `agent.lock` records the local manifest as `local:agent` or `local:skill`.
 
@@ -223,8 +269,11 @@ agentpm install @zack/summarize@0.1.2 --update-range
   - If that package resolves to a tool, AgentPM installs the tool directly into `.agentpm/tools/...`.
   - If that package resolves to a skill, AgentPM installs the skill package into `.agentpm/skills/...`, then resolves and installs its tools into `.agentpm/tools/...`.
   - If that package resolves to a knowledge package, AgentPM installs the package into `.agentpm/knowledge/...`.
-  - If that package resolves to an agent, AgentPM installs the agent package into `.agentpm/agents/...`, then resolves and installs its tools, skills, and knowledge.
-  - `agent.lock` records installed registry agents, skills, and knowledge packages with roots like `agent:@namespace/name@version`, `skill:@namespace/name@version`, and `knowledge:@namespace/name@version`.
+  - If that package resolves to a memory package, AgentPM installs the package into `.agentpm/memory/...`.
+  - If that package resolves to a profile, AgentPM installs the package into `.agentpm/profiles/...`.
+  - If that package resolves to a loop, AgentPM installs the package into `.agentpm/loops/...`.
+  - If that package resolves to an agent, AgentPM installs the agent package into `.agentpm/agents/...`, then resolves and installs its tools, skills, knowledge, memory, profiles, and loop.
+  - `agent.lock` records installed registry agents, skills, knowledge packages, memory packages, profile packages, and loops with roots like `agent:@namespace/name@version`, `skill:@namespace/name@version`, `knowledge:@namespace/name@version`, `memory:@namespace/name@version`, `profile:@namespace/name@version`, and `loop:@namespace/name@version`.
 
 ## Verify registry attestation on install
 
@@ -281,14 +330,14 @@ agentpm install @namespace/my-tool@0.3.1
 
 ## Errors & troubleshooting
 
-- **Reserved field warnings under `--strict`**. `memory` and `profiles` remain reserved future-facing metadata. `skills` and `knowledge` are first-class for agents.
+- **Kind compatibility**. If a declared dependency resolves to the wrong stored package kind, install fails before download or lockfile updates.
 - **Unsupported older lock under `--frozen`**. If an older lockfile cannot represent the requested Skill-aware graph, rerun `agentpm install` without `--frozen` to regenerate `agent.lock` v3.
 - **Frozen mismatch**. If `--frozen` fails, you’re attempting to change the resolved set. Remove `--frozen` or commit the intended updates first.
 - **Stale cache**. If you suspect a bad/corrupt artifact or want to force re-fetch, use `--refresh`.
 
 ## Recommended workflow
 
-1. Declare tools, skills, and knowledge in `agent.json`, or install packages via `agentpm install @namespace/name@version`.
+1. Declare tools, skills, knowledge, memory, profiles, and an optional `loop` in `agent.json`, or install packages via `agentpm install @namespace/name@version`.
 2. Run `agentpm install` locally; commit manifest and `agent.lock` changes.
 3. In CI, run:
 ```bash

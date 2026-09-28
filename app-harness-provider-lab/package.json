@@ -1,0 +1,12 @@
+{
+  "name": "app-harness-provider-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup:bindings": "node scripts/configure-agent-bindings.mjs",
+    "harness:headless": "node scripts/run-headless.mjs",
+    "test": "node --test tests/*.mjs"
+  },
+  "devDependencies": {}
+}

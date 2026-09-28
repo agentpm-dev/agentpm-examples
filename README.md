@@ -45,6 +45,12 @@ Each tool is intentionally simple to highlight integration, not performance.
 - **Agents**
     - [`agent-app-research-node`](agent-app-research-node/)
     - [`agent-app-ops-python`](agent-app-ops-python/)
+    - [`app-harness-minimal-agent`](app-harness-minimal-agent/)
+    - [`app-harness-sdk-host-node`](app-harness-sdk-host-node/)
+    - [`app-harness-sdk-host-python`](app-harness-sdk-host-python/)
+    - [`app-harness-embedding-provider`](app-harness-embedding-provider/)
+    - [`app-harness-provider-lab`](app-harness-provider-lab/)
+    - [`app-harness-mcp-bridge`](app-harness-mcp-bridge/)
     - [`agent-app-support-assistant-workspace`](agent-app-support-assistant-workspace/)
     - [`agent-app-devwork-python`](agent-app-devwork-python/)
     - [`app-cli-automation-worker`](app-cli-automation-worker/)
@@ -87,6 +93,12 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`skill-packages/research-brief-playbook`](skill-packages/research-brief-playbook/)
 
 - **Workflow templates**
+    - [`template-packages/harness-minimal-agent`](template-packages/harness-minimal-agent/)
+    - [`template-packages/harness-sdk-host-node`](template-packages/harness-sdk-host-node/)
+    - [`template-packages/harness-sdk-host-python`](template-packages/harness-sdk-host-python/)
+    - [`template-packages/harness-embedding-provider`](template-packages/harness-embedding-provider/)
+    - [`template-packages/harness-provider-lab`](template-packages/harness-provider-lab/)
+    - [`template-packages/harness-mcp-bridge`](template-packages/harness-mcp-bridge/)
     - [`template-packages/research-assistant-node`](template-packages/research-assistant-node/)
     - [`template-packages/triage-worker-python`](template-packages/triage-worker-python/)
     - [`template-packages/cli-automation-worker`](template-packages/cli-automation-worker/)
@@ -116,6 +128,18 @@ The current recommended agent examples in this repo are:
   - LangGraph workflow with explicit approval gating
   - Consumes the published `@zack/devwork-copilot` agent package
   - Best for showing stateful workflows and safe write actions
+- `app-harness-minimal-agent`
+  - Minimal `agentpm harness` workspace
+  - Generated from the `@zack/harness-minimal-agent` workflow template once the cleaned `@zack/devwork-copilot@0.1.6` package is published
+  - Best for learning the shortest Harness path: install one Agent package, check preflight, open the TUI, or run one headless prompt with a report
+- `app-harness-sdk-host-node`
+  - Node SDK-hosted Harness workspace
+  - Generated from the `@zack/harness-sdk-host-node` workflow template
+  - Best for learning how a Node app hosts the model provider, Hooks, approvals, events, and report access while Harness owns Loop execution
+- `app-harness-sdk-host-python`
+  - Python SDK-hosted Harness workspace
+  - Generated from the `@zack/harness-sdk-host-python` workflow template
+  - Best for learning the same hosted Harness pattern from Python
 - `app-cli-automation-worker`
   - Shell-first `agentpm run` workflow
   - Generated from the published `@zack/cli-automation-worker` workflow template
@@ -192,6 +216,19 @@ This repo currently demonstrates:
   - `agentpm new @namespace/template-name target-dir`
   - the generated app receives a root `agent.json`, `agent.lock`, `agentpm.workspace.json`, and `.agentpm/template.json`
   - the app then loads the installed tools declared in the generated local manifest
+
+- **Harness template-generated workspace**
+  - `agentpm new @namespace/harness-minimal-agent target-dir`
+  - the generated workspace receives Harness config files and a consumer-context file
+  - `agentpm harness --json` checks preflight readiness
+  - `agentpm harness` opens the interactive TUI
+  - `agentpm harness --headless --report reports/run.json --input "..."` runs the same Agent from scripts or CI
+
+- **Harness SDK-hosted apps**
+  - `agentpm new @namespace/harness-sdk-host-node target-dir`
+  - `agentpm new @namespace/harness-sdk-host-python target-dir`
+  - the generated app starts `agentpm harness --machine` from the SDK
+  - the app hosts the model provider, Hooks, approval controller, cancellation behavior, event stream, and report handling
 
 - **manifest/package authoring**
   - `agent-packages/*` contains the source manifests used to publish the example agents

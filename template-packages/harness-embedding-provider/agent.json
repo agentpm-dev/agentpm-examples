@@ -1,0 +1,94 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "harness-embedding-provider",
+  "version": "0.1.0",
+  "description": "AgentPM Harness starter that hosts a local embedding provider for the published AgentPM docs Knowledge package.",
+  "template": {
+    "display_name": "Harness Embedding Provider",
+    "use_case": "harness-embedding-provider",
+    "execution_surfaces": [
+      "node-sdk"
+    ],
+    "stack": [
+      "node",
+      "workspace"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "harness-embedding-provider"
+      },
+      {
+        "name": "workspace_label",
+        "description": "Human-readable label shown in the generated README, Harness config, and terminal output.",
+        "required": true,
+        "default": "Harness Embedding Provider"
+      },
+      {
+        "name": "default_user_scope",
+        "description": "Default user scope supplied by the SDK client when it launches Harness.",
+        "required": true,
+        "default": "embedding-provider-user"
+      },
+      {
+        "name": "openai_model",
+        "description": "Default OpenAI model identifier used by agentpm.harness.json. Set credentials at runtime, not as a template variable.",
+        "required": true,
+        "default": "gpt-4o-mini"
+      }
+    ],
+    "dependencies": {
+      "tools": [],
+      "knowledge": [
+        {
+          "name": "@zack/agentpm-docs",
+          "version": "0.1.1"
+        }
+      ],
+      "agents": [],
+      "loop": "@zack/react-loop@0.1.0"
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.local.example .env.local"
+      },
+      {
+        "label": "Install Node dependencies",
+        "command": "pnpm install"
+      },
+      {
+        "label": "Configure local Agent Knowledge bindings",
+        "command": "pnpm setup:bindings"
+      },
+      {
+        "label": "Check standalone Harness readiness",
+        "command": "agentpm harness --json"
+      },
+      {
+        "label": "Open the Harness TUI",
+        "command": "agentpm harness"
+      },
+      {
+        "label": "Check SDK-hosted embedding readiness",
+        "command": "pnpm dev -- --preflight-only"
+      },
+      {
+        "label": "Run one Knowledge-backed prompt",
+        "command": "pnpm dev -- \"Use the AgentPM docs Knowledge package to explain how Harness SDK-hosted providers work.\""
+      },
+      {
+        "label": "Run scaffold tests",
+        "command": "pnpm test"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

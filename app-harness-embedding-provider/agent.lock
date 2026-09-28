@@ -1,0 +1,29 @@
+{
+  "generated": "2026-09-27T19:48:21.348215Z",
+  "lockfile_version": 3,
+  "packages": {
+    "knowledge:@zack/agentpm-docs@0.1.1": {
+      "integrity": "aefe7fb3cb019e4e42dd791ecddfad84e8bd9b356cf6a95140c5d858a51616ef",
+      "kind": "knowledge",
+      "name": "@zack/agentpm-docs",
+      "version": "0.1.1"
+    },
+    "loop:@zack/react-loop@0.1.0": {
+      "integrity": "6f5b639b35a617c3a9cea3195da89c616df94766c897b28b1ecf62679b44d828",
+      "kind": "loop",
+      "name": "@zack/react-loop",
+      "version": "0.1.0"
+    }
+  },
+  "roots": {
+    "local:agent": {
+      "knowledge": [
+        "knowledge:@zack/agentpm-docs@0.1.1"
+      ],
+      "loop": "loop:@zack/react-loop@0.1.0",
+      "name": "app-harness-embedding-provider",
+      "tools": [],
+      "version": "0.1.0"
+    }
+  }
+}

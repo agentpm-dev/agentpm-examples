@@ -100,10 +100,11 @@ agentpm lint --fix
 **Warnings (unless --strict)**:
 - Missing `$schema`. Message: `Missing $schema; editors may lack IntelliSense`.
 - Empty `description`. Message: `description should not be empty`.
-- Reserved future-facing reference fields when populated. Example message: `` `memory` is validated and preserved, but not resolved in Phase 3. `` AgentPM accepts `memory` and `profiles` so you can track future references now, but current install and runtime flows do not resolve them yet.
 
 **Semantic error checks (beyond schema)**:
 - Interpreter mismatch between `runtime.type` and `entrypoint.command`. Error message example: `runtime.type should match entrypoint.command (python vs node)`.
+- Loop graph validation for `kind: "loop"` manifests (entry phase, transitions, reachable terminals, checkpoints, and error-policy consistency).
+- Agent binding membership validation for `kind: "agent"` manifests (`bindings` package identities must already be declared in the matching top-level dependency collection).
 
 <Callout type="info" title="Why this matters">
     Lint catches issues early so installs and publishes are predictable. agentpm publish runs lint automatically and will block the publish on any lint errors.
@@ -120,6 +121,16 @@ agentpm lint --fix
 2. Use `agentpm lint --format=json` in CI to gate merges.
 3. Add `--strict` for release branches to enforce clean manifests.
 4. Let `--fix` add `$schema` automatically; commit the change.
+
+## Loop and binding boundary
+
+For Loop and Agent binding manifests, `agentpm lint` intentionally stays local:
+
+- it validates Loop graph structure and determinism
+- it validates that Agent bindings reference already-declared top-level package identities
+- it does **not** resolve Loop phase IDs against an installed Loop package
+- it does **not** resolve Memory spaces or operations against installed Memory Blueprints
+- it does **not** compare Loop access intent with Agent bindings and reject conflicts
 
 ## Notes & gotchas
 - **`$schema` field**. Including `$schema` enables IDE IntelliSense and makes the schema version explicit. Lint will add it for you with `--fix`.

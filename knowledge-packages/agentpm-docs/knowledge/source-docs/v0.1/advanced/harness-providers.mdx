@@ -1,0 +1,133 @@
+---
+title: Harness Providers And State
+section: Advanced
+order: 29
+description: External Knowledge and Memory provider boundaries, local SQLite Memory state, and capability-scoping guidance.
+next: examples/example-project
+---
+
+# Harness Providers And State
+
+Harness can use built-in local runtimes, configured process services, or SDK-hosted providers. Runtime providers realize installed AgentPM packages; they do not change the package contracts.
+
+## External Knowledge Providers
+
+Reference providers cover Pinecone and pgvector Knowledge retrieval. A configured external Knowledge runtime must attest that the installed package/version/corpus it is asked to serve has already been realized in that backend.
+
+Harness does not provision Pinecone indexes, pgvector tables, upload corpora, synchronize chunks, or repair stale external indexes. Those are deployment/data-pipeline responsibilities outside Harness execution.
+
+External Knowledge mappings are explicit:
+
+```json
+{
+  "knowledge": {
+    "runtimes": {
+      "pinecone-prod": {
+        "implementation": {
+          "type": "process",
+          "command": "python",
+          "args": ["runtime/pinecone_knowledge.py"],
+          "env": ["PINECONE_API_KEY"]
+        }
+      }
+    },
+    "packages": {
+      "@zack/agentpm-docs": {
+        "runtime": "pinecone-prod"
+      }
+    }
+  }
+}
+```
+
+If `@zack/agentpm-docs` is mapped to `pinecone-prod` and that runtime is unavailable or rejects the package/version, Harness reports the package unavailable. It does not silently fall back to local retrieval.
+
+## External Memory Providers
+
+Reference Memory providers cover PostgreSQL/pgvector and Redis/Redis Stack. A MemoryRuntime must advertise the Memory Blueprint capabilities it supports and report unsupported features rather than claiming compatibility.
+
+Harness does not create databases, migrations, Redis indexes, pgvector extensions, records, triggers, or synchronization jobs for external stores. It sends portable MemoryRuntime requests to the configured provider after preflight has resolved trusted scope values and package bindings.
+
+```json
+{
+  "memory": {
+    "runtimes": {
+      "postgres-prod": {
+        "implementation": {
+          "type": "process",
+          "command": "python",
+          "args": ["runtime/postgres_memory.py"],
+          "env": ["DATABASE_URL"]
+        }
+      }
+    },
+    "packages": {
+      "@zack/conversation-continuity": {
+        "runtime": "postgres-prod"
+      }
+    }
+  }
+}
+```
+
+Pinecone is not a complete MemoryRuntime by itself because it cannot faithfully realize the full Memory Blueprint contract.
+
+## Local SQLite Memory
+
+When a Memory package is not mapped to an external runtime, Harness uses local SQLite state under the Harness state directory.
+
+Default layout:
+
+```text
+.agentpm-state/
+  memory.sqlite3
+```
+
+The exact internal table names and migrations are Harness-owned runtime state, not portable package metadata. Deleting `.agentpm/` must not be required to clear Memory, and reinstalling packages must not rewrite `.agentpm-state/`.
+
+Current local schema version is `2`. Harness initializes and migrates the database on open, stores the version in `memory_meta`, rejects databases newer than the CLI supports, and enables foreign keys. Version `1` creates:
+
+- `memory_records`
+- `memory_sequence_state`
+- `memory_operation_state`
+- `memory_vectors`
+
+Version `2` adds lifecycle failure tracking columns to `memory_operation_state`: `last_failed_at` and `last_failure_json`.
+
+Primary keys are contract-shaped:
+
+- `memory_records`: `package`, `package_version`, `space`, `scope_hash`, `id`
+- `memory_operation_state`: `package`, `package_version`, `operation`, `scope_hash`
+- `memory_vectors`: `package`, `package_version`, `space`, `scope_hash`, `record_id`, `embedding_provider`, `embedding_model`
+
+The store configures WAL-friendly behavior and a busy timeout for local concurrent access, but it remains a local runtime implementation detail rather than a portable Memory Blueprint artifact.
+
+Local Memory supports arbitrary trusted scope keys from the Memory Blueprint and runtime config. Keys such as `user` or `conversation` have no built-in semantics; they are trusted values supplied by CLI, SDK, config, or interactive prompt.
+
+Semantic local retrieval is only advertised when `memory.local.semantic` names a ready embedding provider:
+
+```json
+{
+  "memory": {
+    "local": {
+      "semantic": {
+        "embedding_provider": "corp-embedder",
+        "model": "corp-memory-v1",
+        "dimensions": 768
+      }
+    }
+  }
+}
+```
+
+Without that block, local Memory does not advertise semantic retrieval. Local semantic retrieval stores f32 vectors under Harness-owned state and uses cosine similarity. It does not require sqlite-vec.
+
+Lifecycle trigger state and externally invoked Memory operation state are persisted in the Harness state directory for the configured runtime. `agentpm memory inspect` remains a package/contract inspection command; live records are inspected through Harness reports, traces, provider tools, or provider-specific admin surfaces.
+
+## Shareable Export Semantics
+
+Memory records and derived runtime state are not part of publish/install metadata. When an export or report includes a Memory payload, `x-agentpm-shareable` marks whether that payload may be safely shared outside its runtime context. Non-shareable state should stay local to the runtime/report audience and must not be treated as portable package content.
+
+## Capability Scope
+
+Provider availability is only one part of capability design. Loop authors should also scope per-phase access deliberately, especially for investigative Tools. See [Scope tools deliberately](/docs/v0.1/agent.json/loops#scope-tools-deliberately) in the Loop authoring reference.

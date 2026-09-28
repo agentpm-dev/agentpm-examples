@@ -1,6 +1,6 @@
 {
   "package": "@zack/agentpm-docs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "source_root": "agentpm-api/docs/v0.1",
   "copied_source_root": "knowledge/source-docs/v0.1",
   "chunking": {
@@ -10,7 +10,7 @@
   },
   "builder": {
     "name": "agentpm-examples-agentpm-docs-pipeline",
-    "version": "2026-07-12"
+    "version": "2026-09-27"
   },
   "sources": [
     {
@@ -19,6 +19,27 @@
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/advanced/environment-variables",
       "title": "Environment Variables",
       "description": "Pass secrets and runtime knobs to tools running in managed subprocesses."
+    },
+    {
+      "id": "src_advanced-harness-config",
+      "path": "knowledge/source-docs/v0.1/advanced/harness-config.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/advanced/harness-config",
+      "title": "Harness Config",
+      "description": "Reference for agentpm.harness.json version 1."
+    },
+    {
+      "id": "src_advanced-harness-protocols",
+      "path": "knowledge/source-docs/v0.1/advanced/harness-protocols.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/advanced/harness-protocols",
+      "title": "Harness Protocols",
+      "description": "Public machine, process-service, Tool machine, Knowledge query, and MCP machine integration surfaces used by Harness."
+    },
+    {
+      "id": "src_advanced-harness-providers",
+      "path": "knowledge/source-docs/v0.1/advanced/harness-providers.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/advanced/harness-providers",
+      "title": "Harness Providers And State",
+      "description": "External Knowledge and Memory provider boundaries, local SQLite Memory state, and capability-scoping guidance."
     },
     {
       "id": "src_advanced-mixed-runtimes-with-docker",
@@ -32,7 +53,7 @@
       "path": "knowledge/source-docs/v0.1/agent.json/agents.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/agents",
       "title": "Agents",
-      "description": "Compose tools, skills, and knowledge behind a single agent manifest."
+      "description": "Compose tools, skills, knowledge, memory, profiles, and an optional loop behind a single agent manifest."
     },
     {
       "id": "src_agent-json-introduction",
@@ -47,6 +68,27 @@
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/knowledge",
       "title": "Knowledge",
       "description": "Author prepared context packages for direct context loading or local vector retrieval."
+    },
+    {
+      "id": "src_agent-json-loops",
+      "path": "knowledge/source-docs/v0.1/agent.json/loops.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/loops",
+      "title": "Loops",
+      "description": "Author portable Loop packages that define phases, outcomes, transitions, checkpoints, and error policy."
+    },
+    {
+      "id": "src_agent-json-memory",
+      "path": "knowledge/source-docs/v0.1/agent.json/memory.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/memory",
+      "title": "Memory",
+      "description": "Author Memory Blueprints that define durable record shapes, retrieval semantics, and declarative lifecycle policy."
+    },
+    {
+      "id": "src_agent-json-profiles",
+      "path": "knowledge/source-docs/v0.1/agent.json/profiles.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/agent.json/profiles",
+      "title": "Profiles",
+      "description": "Author portable Instruction Profiles that package role, objectives, communication style, and behavioral constraints."
     },
     {
       "id": "src_agent-json-skills",
@@ -77,18 +119,25 @@
       "description": "Generate a starter skill scaffold from an AgentPM tool."
     },
     {
+      "id": "src_cli-harness",
+      "path": "knowledge/source-docs/v0.1/cli/harness.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/harness",
+      "title": "harness",
+      "description": "Run an installed Agent through the AgentPM Harness in TUI, headless, or machine mode."
+    },
+    {
       "id": "src_cli-init",
       "path": "knowledge/source-docs/v0.1/cli/init.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/init",
       "title": "init",
-      "description": "Scaffold a new AgentPM package by generating a starter agent.json manifest for a tool, skill, agent, template, or knowledge package."
+      "description": "Scaffold a new AgentPM package by generating a starter agent.json manifest for a tool, skill, knowledge, memory, profile, loop, agent, or template package."
     },
     {
       "id": "src_cli-install-cmd",
       "path": "knowledge/source-docs/v0.1/cli/install-cmd.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/install-cmd",
       "title": "install",
-      "description": "Install tools, skills, knowledge packages, or agents, resolve package dependencies, and write an updated lockfile."
+      "description": "Install tools, skills, knowledge packages, memory packages, instruction profiles, loops, or agents, resolve package dependencies, and write an updated lockfile."
     },
     {
       "id": "src_cli-install",
@@ -126,6 +175,13 @@
       "description": "Log in and cache credentials for the CLI."
     },
     {
+      "id": "src_cli-memory",
+      "path": "knowledge/source-docs/v0.1/cli/memory.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/memory",
+      "title": "memory",
+      "description": "Build and inspect local or installed Memory Blueprint packages and verify their generated contract state."
+    },
+    {
       "id": "src_cli-namespace",
       "path": "knowledge/source-docs/v0.1/cli/namespace.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/namespace",
@@ -144,7 +200,7 @@
       "path": "knowledge/source-docs/v0.1/cli/publish.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/cli/publish",
       "title": "publish",
-      "description": "Validate and package your tool, skill, knowledge, agent, or template, then upload the signed artifact to the registry."
+      "description": "Validate and package your tool, skill, knowledge, memory, profile, loop, agent, or template, then upload the signed artifact to the registry."
     },
     {
       "id": "src_cli-run",
@@ -231,25 +287,32 @@
       "description": "Automated malware/threat screening for published tool versions."
     },
     {
+      "id": "src_sdks-harness",
+      "path": "knowledge/source-docs/v0.1/sdks/harness.mdx",
+      "public_uri": "https://agentpackagemanager.com/docs/v0.1/sdks/harness",
+      "title": "Harness SDK APIs",
+      "description": "Run Harness from Node or Python over the machine protocol with host providers, Hooks, approvals, and cancellation."
+    },
+    {
       "id": "src_sdks-node",
       "path": "knowledge/source-docs/v0.1/sdks/node.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/sdks/node",
       "title": "Node SDK",
-      "description": "Install packages with the CLI, load tools, and inspect installed agents, skills, and knowledge packages from Node."
+      "description": "Install packages with the CLI, load tools, and inspect installed agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops from Node."
     },
     {
       "id": "src_sdks-python",
       "path": "knowledge/source-docs/v0.1/sdks/python.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/sdks/python",
       "title": "Python SDK",
-      "description": "Install packages with the CLI, load tools, and inspect installed agents, skills, and Knowledge packages from Python."
+      "description": "Install packages with the CLI, load tools, and inspect installed agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops from Python."
     },
     {
       "id": "src_sdks-tool-discovery",
       "path": "knowledge/source-docs/v0.1/sdks/tool-discovery.mdx",
       "public_uri": "https://agentpackagemanager.com/docs/v0.1/sdks/tool-discovery",
       "title": "Package Discovery",
-      "description": "Where the SDK looks for installed tools, skills, and installed agents on disk."
+      "description": "Where the SDK looks for installed tools, skills, knowledge, memory, profiles, loops, and installed agents on disk."
     },
     {
       "id": "src_security-mfa",

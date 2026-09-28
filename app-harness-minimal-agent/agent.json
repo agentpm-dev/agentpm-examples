@@ -1,0 +1,11 @@
+{
+  "description": "Generated from harness-minimal-agent@0.1.0.",
+  "kind": "agent",
+  "knowledge": [],
+  "memory": [],
+  "name": "app-harness-minimal-agent",
+  "profiles": [],
+  "skills": [],
+  "tools": [],
+  "version": "0.1.0"
+}

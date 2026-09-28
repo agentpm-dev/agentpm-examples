@@ -1,0 +1,19 @@
+{
+  "manifests": [
+    "agent.json"
+  ],
+  "package_roots": {
+    "agents": [
+      {
+        "name": "@zack/devwork-copilot",
+        "version": "0.1.6"
+      }
+    ],
+    "knowledge": [],
+    "memory": [],
+    "profiles": [],
+    "skills": [],
+    "tools": []
+  },
+  "schema_version": 1
+}

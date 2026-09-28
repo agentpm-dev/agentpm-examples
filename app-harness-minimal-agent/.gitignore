@@ -1,0 +1,6 @@
+.env.local
+.agentpm-state/
+.agentpm-state-*/
+reports/*.json
+reports/*.jsonl
+!reports/.gitkeep

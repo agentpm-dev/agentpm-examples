@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "provider-lab-model",
+    "model": "deterministic-provider-lab"
+  },
+  "providers": {
+    "models": {
+      "provider-lab-model": {
+        "implementation": {
+          "type": "process",
+          "command": "node",
+          "args": [
+            "runtime/model-provider.mjs"
+          ],
+          "cwd": ".",
+          "env": [
+            "PROVIDER_LAB_MODEL_ID"
+          ],
+          "request_timeout_ms": 120000
+        }
+      }
+    },
+    "embeddings": {
+      "local-openai-embeddings": {
+        "implementation": {
+          "type": "process",
+          "command": "node",
+          "args": [
+            "runtime/openai-embedding-provider.mjs"
+          ],
+          "cwd": ".",
+          "env": [
+            "OPENAI_API_KEY",
+            "OPENAI_EMBEDDING_BASE_URL"
+          ],
+          "request_timeout_ms": 120000
+        }
+      }
+    }
+  },
+  "scopes": {
+    "user": "{{ default_user_scope }}",
+    "conversation": "provider-lab-conversation"
+  },
+  "knowledge": {
+    "runtimes": {
+      "reference-knowledge": {
+        "implementation": {
+          "type": "process",
+          "command": "node",
+          "args": [
+            "runtime/reference-knowledge-runtime.mjs"
+          ],
+          "cwd": ".",
+          "env": [
+            "PROVIDER_LAB_KNOWLEDGE_RUNTIME_ID"
+          ],
+          "request_timeout_ms": 120000
+        }
+      }
+    },
+    "packages": {
+      "@zack/devwork-maintainer-guide": {
+        "runtime": "reference-knowledge"
+      }
+    },
+    "embedding_matches": [
+      {
+        "match": {
+          "provider": "openai",
+          "model": "text-embedding-3-small",
+          "dimensions": 1536,
+          "normalized": true
+        },
+        "embedding_provider": "local-openai-embeddings"
+      }
+    ]
+  },
+  "memory": {
+    "runtimes": {
+      "reference-memory": {
+        "implementation": {
+          "type": "process",
+          "command": "node",
+          "args": [
+            "runtime/reference-memory-runtime.mjs"
+          ],
+          "cwd": ".",
+          "env": [
+            "PROVIDER_LAB_MEMORY_RUNTIME_ID"
+          ],
+          "request_timeout_ms": 120000
+        }
+      }
+    },
+    "packages": {
+      "@zack/support-customer-state": {
+        "runtime": "reference-memory"
+      }
+    }
+  },
+  "approvals": {
+    "controller": {
+      "implementation": {
+        "type": "process",
+        "command": "node",
+        "args": [
+          "runtime/approval-controller.mjs"
+        ],
+        "cwd": ".",
+        "request_timeout_ms": 120000
+      }
+    }
+  },
+  "runtime": {
+    "limits": {
+      "max_steps": 10,
+      "max_model_calls_per_phase": 12,
+      "max_actions_per_phase": 6
+    }
+  },
+  "trace": {
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "{{ workspace_label }}",
+      "subtitle": "Process provider lab"
+    }
+  }
+}

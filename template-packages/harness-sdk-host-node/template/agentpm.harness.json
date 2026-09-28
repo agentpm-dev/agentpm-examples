@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "node-host-model",
+    "model": "deterministic-node-host"
+  },
+  "providers": {
+    "models": {
+      "node-host-model": {
+        "implementation": {
+          "type": "host"
+        }
+      }
+    }
+  },
+  "scopes": {
+    "user": "{{ default_user_scope }}"
+  },
+  "hooks": {
+    "implementations": {
+      "sdk-before-model": {
+        "implementation": {
+          "type": "host"
+        }
+      }
+    },
+    "bindings": [
+      {
+        "hook": "before_model_request",
+        "implementation": "sdk-before-model"
+      }
+    ]
+  },
+  "approvals": {
+    "controller": {
+      "implementation": {
+        "type": "host"
+      }
+    }
+  },
+  "trace": {
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "{{ workspace_label }}",
+      "subtitle": "Node SDK host"
+    }
+  }
+}

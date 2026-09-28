@@ -12,32 +12,35 @@ What is AgentPM™ and how it fits into your agent stack.
 
 ## What is AgentPM™?
 
-AgentPM is the **package layer for agent systems**: a spec, a registry, a CLI, and SDKs that make tool, skill, knowledge, agent, and template packages portable across runtimes and host languages.
-- **The spec (`agent.json`)**. A single manifest format for executable **tool artifacts**, procedural **skill artifacts**, prepared **Knowledge artifacts**, compositional **agent artifacts**, and reusable **template artifacts**.
+AgentPM is the **package layer for agent systems**: a spec, a registry, a CLI, and SDKs that make tool, skill, knowledge, memory, profile, loop, agent, and template packages portable across runtimes and host languages.
+- **The spec (`agent.json`)**. A single manifest format for executable **tool artifacts**, procedural **skill artifacts**, prepared **knowledge artifacts**, portable **memory blueprint artifacts**, authored **instruction profile artifacts**, declarative **loop artifacts**, compositional **agent artifacts**, and reusable **template artifacts**.
 - **The package manager & registry**. Publish signed package artifacts and install them deterministically with integrity and provenance.
-- **The CLI**. `agentpm init/lint/login/publish/install/new/whoami`; `verify` and `eval` coming soon.
-- **SDKs (Node & Python)**. Load tools by name/version, or load installed agents, skills, and Knowledge packages as inspectable metadata plus resolved package refs. Tools execute in a **managed subprocess** (with timeouts, env, and resource limits), so there’s **no lock-in** and no in-process dependency tangle.
+- **The CLI**. `agentpm init/lint/login/publish/install/new/run/serve/harness/whoami`; `verify` and `eval` coming soon.
+- **SDKs (Node & Python)**. Load tools by name/version, or load installed agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops as inspectable metadata plus resolved package refs. Tools execute in a **managed subprocess** (with timeouts, env, and resource limits), so there’s **no lock-in** and no in-process dependency tangle.
 
 ## Why AgentPM?
 Because agent systems need reusable, versioned building blocks they can trust across stacks and languages. AgentPM gives you:
 - **tool artifacts** for executable capabilities,
 - **skill artifacts** for reusable operational know-how,
 - **Knowledge artifacts** for prepared context and retrieval corpora,
+- **Memory Blueprint artifacts** for durable record contracts and lifecycle declarations,
+- **Instruction Profile artifacts** for portable role, objective, and communication guidance,
+- **Loop artifacts** for portable orchestration structure,
 - **agent artifacts** for portable composition,
 - **deterministic installs with provenance**, and
 - **adapters/SDKs** so one package can move across different agent runtimes and host languages without hand-rolled glue.
 
 ## Key features
 
-- **agent.json spec** for `kind: "tool"`, `kind: "skill"`, `kind: "knowledge"`, `kind: "agent"`, and `kind: "template"`.
+- **agent.json spec** for `kind: "tool"`, `kind: "skill"`, `kind: "knowledge"`, `kind: "memory"`, `kind: "profile"`, `kind: "loop"`, `kind: "agent"`, and `kind: "template"`.
 - **Language-agnostic packaging**. Write tools in Node or Python and call them from either SDK.
 - **Agent package install + load**. Install published agent packages and inspect their resolved tool references from the SDKs.
 - **Load → callable**. SDKs turn a tool into a function you can hand to your agent (or call directly).
 - **Deterministic installs**. Versioned artifacts with declared runtime requirements and required environment variables—making agent deployments repeatable.
 - **Security & provenance**. Checksums and signing surfaced in CLI/registry.
 - **Namespaces & scopes**. Public and private namespaces with tokens/MFA.
-- **Modern search & discovery**. Registry search and package pages span tools, skills, Knowledge packages, agents, templates, and namespaces.
-- **Current dependency model**. Agents can resolve **tools**, **skills**, and **knowledge**; skills can resolve **tools**; templates can reference tools, agents, skills, and knowledge. `memory` and `profiles` remain reserved for future package kinds.
+- **Modern search & discovery**. Registry search and package pages span tools, skills, knowledge packages, memory blueprints, instruction profiles, agents, templates, and namespaces.
+- **Current dependency model**. Agents can resolve **tools**, **skills**, **knowledge**, **memory**, **profiles**, and one **loop**; skills can resolve **tools**; templates can reference tools, agents, skills, knowledge, memory, profiles, and one direct loop.
 - **Verify (coming soon)**. Manifest-driven contract tests (schema conformance, example runs, invariants, portability matrix, and SLOs). Produces a signed report that gates publish.
 - **Evals (coming soon)**. Scenario-level scorecards (accuracy/robustness/latency/cost) that complement `verify`; results appear on the registry for transparent comparison.
 
@@ -46,6 +49,9 @@ Because agent systems need reusable, versioned building blocks they can trust ac
 - **Tool artifact**. Executable package with `entrypoint`, `runtime`, inputs/outputs, and packaged files. Tools are what the SDKs actually invoke.
 - **Skill artifact**. Procedural package with a primary `SKILL.md` entrypoint plus optional references, scripts, and descriptive compatibility metadata.
 - **Knowledge artifact**. Prepared context package for direct context injection or local vector retrieval, depending on `knowledge.mode`.
+- **Memory Blueprint artifact**. Declarative package for durable record shapes, retrieval semantics, lifecycle policy, and generated resolved contracts.
+- **Instruction Profile artifact**. Authored package for identity, objectives, communication style, boundaries, and constraints.
+- **Loop artifact**. Declarative package for phases, outcomes, transitions, checkpoints, limits, and failure policy.
 - **Agent artifact**. Composition package that captures tool dependencies, example prompts, and package metadata for a reusable agent definition.
 - **Template packages**. Publishable package kinds for reusable workflow starters.
 

@@ -1,0 +1,314 @@
+---
+title: Harness Config
+section: Advanced
+order: 27
+description: Reference for agentpm.harness.json version 1.
+next: advanced/harness-protocols
+---
+
+# Harness Config
+
+`agentpm.harness.json` is the consumer-owned runtime configuration file for `agentpm harness`. It is optional, source-control friendly, and not packaged with the Agent.
+
+If the file exists, `version` is required. Version 1 is strict: unknown fields are rejected except for open ID-keyed registries/maps and provider-specific `model.options`.
+
+All relative paths resolve from the discovered workspace root, not from the config file's own directory.
+
+## Minimal Config
+
+```json
+{
+  "version": 1
+}
+```
+
+A missing config file is equivalent to version-1 defaults plus CLI, SDK, and environment values.
+
+## Complete Version-1 Reference
+
+This example is intentionally populated so every nested registry/mapping shape is concrete. Real workspaces should omit unused sections rather than emitting empty objects.
+
+```json
+{
+  "version": 1,
+  "model": {
+    "provider": "openai",
+    "model": "gpt-5",
+    "options": {
+      "temperature": 0.2
+    }
+  },
+  "providers": {
+    "models": {
+      "company-model": {
+        "implementation": {
+          "type": "process",
+          "command": "python",
+          "args": ["runtime/company_model_provider.py"],
+          "cwd": ".",
+          "env": ["COMPANY_MODEL_API_KEY"],
+          "startup_timeout_ms": 15000,
+          "request_timeout_ms": 120000,
+          "restart": {
+            "max_attempts": 1,
+            "backoff_ms": 250
+          }
+        }
+      }
+    },
+    "embeddings": {
+      "example-4d": {
+        "implementation": {
+          "type": "process",
+          "command": "python",
+          "args": ["runtime/example_embedder.py"],
+          "env": []
+        }
+      }
+    }
+  },
+  "scopes": {
+    "user": "user-42",
+    "conversation": "incident-abc"
+  },
+  "runtime": {
+    "state_dir": ".agentpm-state",
+    "limits": {
+      "max_steps": 100,
+      "max_model_calls_per_phase": 24,
+      "max_tool_calls_per_phase": 16,
+      "max_actions_per_phase": 64,
+      "max_tool_call_repairs": 2,
+      "max_structured_output_repairs": 2,
+      "max_memory_operation_repairs": 2
+    }
+  },
+  "hooks": {
+    "implementations": {
+      "workspace-policy": {
+        "implementation": {
+          "type": "process",
+          "command": "python",
+          "args": ["runtime/hooks.py"],
+          "env": ["POLICY_SERVICE_TOKEN"]
+        }
+      }
+    },
+    "bindings": [
+      {
+        "hook": "before_model_request",
+        "implementation": "workspace-policy",
+        "failure_policy": "closed"
+      },
+      {
+        "hook": "before_tool_call",
+        "implementation": "workspace-policy",
+        "failure_policy": "closed"
+      },
+      {
+        "hook": "before_memory_write",
+        "implementation": "workspace-policy",
+        "failure_policy": "continue"
+      }
+    ]
+  },
+  "knowledge": {
+    "runtimes": {
+      "pinecone-prod": {
+        "implementation": {
+          "type": "process",
+          "command": "python",
+          "args": ["runtime/pinecone_knowledge.py"],
+          "env": ["PINECONE_API_KEY"]
+        }
+      }
+    },
+    "packages": {
+      "@zack/agentpm-docs": {
+        "runtime": "pinecone-prod"
+      }
+    },
+    "embedding_matches": [
+      {
+        "match": {
+          "provider": "bring-your-own",
+          "model": "example-normalized-4d",
+          "dimensions": 4,
+          "normalized": true
+        },
+        "embedding_provider": "example-4d"
+      }
+    ]
+  },
+  "memory": {
+    "write_review": {
+      "points": ["phase_end", "run_end"]
+    },
+    "local": {
+      "semantic": {
+        "embedding_provider": "example-4d",
+        "model": "example-normalized-4d",
+        "dimensions": 4
+      }
+    },
+    "runtimes": {
+      "postgres-prod": {
+        "implementation": {
+          "type": "process",
+          "command": "python",
+          "args": ["runtime/postgres_memory.py"],
+          "env": ["DATABASE_URL"]
+        }
+      }
+    },
+    "packages": {
+      "@zack/conversation-continuity": {
+        "runtime": "postgres-prod"
+      }
+    }
+  },
+  "mcp": {
+    "imports": {
+      "github": {
+        "transport": "stdio",
+        "command": "github-mcp-server",
+        "args": [],
+        "env": ["GITHUB_TOKEN"],
+        "scope": {
+          "mode": "phases",
+          "phases": ["assess", "execute"]
+        },
+        "tools": ["get_issue", "search_issues"],
+        "startup_timeout_ms": 15000,
+        "request_timeout_ms": 120000,
+        "restart": {
+          "max_attempts": 1,
+          "backoff_ms": 250
+        }
+      },
+      "company-search": {
+        "transport": "http",
+        "url": "https://mcp.example.com/mcp",
+        "headers": {
+          "Authorization": {
+            "env": "COMPANY_MCP_AUTHORIZATION"
+          },
+          "X-Workspace": {
+            "value": "support"
+          }
+        },
+        "scope": {
+          "mode": "global"
+        }
+      }
+    },
+    "exports": {
+      "enabled": true,
+      "host": "127.0.0.1"
+    }
+  },
+  "approvals": {
+    "controller": {
+      "implementation": {
+        "type": "process",
+        "command": "python",
+        "args": ["runtime/approval_controller.py"],
+        "env": []
+      }
+    },
+    "timeout_ms": 300000
+  },
+  "trace": {
+    "enabled": true,
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "AgentPM Harness",
+      "subtitle": null,
+      "accent": null
+    }
+  }
+}
+```
+
+## Implementation Descriptors
+
+Custom model providers, embedding providers, Hooks, Knowledge runtimes, Memory runtimes, and approval controllers use a shared implementation descriptor.
+
+Process-backed:
+
+```json
+{
+  "type": "process",
+  "command": "python",
+  "args": ["runtime/provider.py"],
+  "cwd": ".",
+  "env": ["PROVIDER_API_KEY"],
+  "startup_timeout_ms": 15000,
+  "request_timeout_ms": 120000,
+  "restart": {
+    "max_attempts": 1,
+    "backoff_ms": 250
+  }
+}
+```
+
+Host-backed:
+
+```json
+{
+  "type": "host",
+  "request_timeout_ms": 120000
+}
+```
+
+`process` implementations speak the `agentpm-service` protocol over persistent stdin/stdout. `host` implementations are supplied by a connected machine/SDK client. Harness never silently replaces an unavailable configured implementation.
+
+## Model And Provider Config
+
+Built-in model providers are:
+
+- `openai`
+- `anthropic`
+- `ollama`
+
+Other `model.provider` values must match `providers.models`. Model IDs are open strings and are not enumerated by AgentPM. `model.options` is provider-specific JSON and must not contain secrets.
+
+## Hooks
+
+Version-1 Hook IDs:
+
+- `before_model_request`
+- `before_tool_selection`
+- `before_tool_call`
+- `before_knowledge_request`
+- `after_knowledge_retrieval`
+- `before_memory_read`
+- `before_memory_write`
+- `before_memory_operation`
+
+`failure_policy` is `closed` or `continue` and defaults to `closed`.
+
+## MCP
+
+`mcp.imports` brings external MCP servers into phase execution according to explicit scope. `mcp.exports` hosts Agent-authored outward MCP surfaces. Exported MCP surfaces are Session-owned, not Run-owned; calls to them do not become part of the active Run merely because their timing overlaps it.
+
+## Trace And Branding
+
+Trace defaults:
+
+```json
+{
+  "trace": {
+    "enabled": true,
+    "level": "normal",
+    "content": "redacted"
+  }
+}
+```
+
+`trace.level` is `minimal`, `normal`, or `verbose`. `trace.content` is `none`, `redacted`, or `full`.
+
+Branding is limited to name, subtitle, and accent. Harness does not provide arbitrary TUI layout/theme/plugin scripting.

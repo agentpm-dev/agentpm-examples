@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env.local
+.agentpm-state/
+reports/*.json
+reports/*.jsonl
+reports/*.txt
+
+!.env.local.example
+!reports/.gitkeep

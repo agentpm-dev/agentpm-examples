@@ -3,7 +3,7 @@ title: Namespaces
 section: Security
 order: 23
 description: Namespace kinds, visibility, private access, roles, billing, and CLI auth behavior.
-next: security/mfa
+next: security/pats
 ---
 
 # Namespaces
@@ -163,7 +163,11 @@ To install from a private namespace, you need:
 
 - valid AgentPM auth
 - access to the namespace
-- an internal billing state that still allows the install
+- a namespace entitlement state that still allows the install
+
+For invited members of a private org namespace, this billing check is not based on the member having their own paid plan.
+It is based on whether the private namespace still has active backing entitlement, which is currently keyed to the
+namespace owner's Team entitlement state.
 
 ### Interactive login
 

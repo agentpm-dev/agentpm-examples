@@ -16,7 +16,7 @@ Execute an installed AgentPM tool from the shell without going through an SDK.
 
 ### Command synopsis
 ```bash
-agentpm run <spec> [--input <JSON>] [--input-file <path>] [--timeout-ms <ms>]
+agentpm run <spec> [--input <JSON>] [--input-file <path>] [--timeout-ms <ms>] [--machine]
 ```
 
 ### Arguments
@@ -28,6 +28,7 @@ agentpm run <spec> [--input <JSON>] [--input-file <path>] [--timeout-ms <ms>]
 - **`--input <JSON>`**. Inline JSON payload to send to the tool on stdin.
 - **`--input-file <path>`**. Read the JSON payload from a file.
 - **`--timeout-ms <ms>`**. Override the manifest timeout for this invocation only.
+- **`--machine`**. Emit a stable machine-readable result envelope on stdout.
 
 <Callout type="info" title="Input validation scope">
   `agentpm run` validates only that the input is valid JSON. It does not validate the payload against the tool’s manifest `inputs` schema.
@@ -70,6 +71,11 @@ agentpm run @zack/echo-json --input-file payload.json
 agentpm run @zack/slow-tool --input '{}' --timeout-ms 100
 ```
 
+### Emit a machine-readable envelope
+```bash
+agentpm run @zack/echo-json --machine --input '{"message":"hello"}'
+```
+
 ## Resolution behavior
 
 - Unversioned specs prefer the version pinned in `agent.lock`.
@@ -84,6 +90,7 @@ If no matching prepared tool is installed, the command exits non-zero with a cle
 - Valid tool JSON is written to stdout.
 - Diagnostics and failures are written to stderr.
 - The command exits non-zero on failure.
+- With `--machine`, stdout is a stable JSON envelope with `schema_version`, `status`, and either `output` or a typed `error`.
 
 ## Troubleshooting
 

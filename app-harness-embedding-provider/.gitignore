@@ -1,0 +1,8 @@
+.agentpm/
+.agentpm-state/
+.env.local
+dist/
+node_modules/
+reports/*.json
+reports/*.jsonl
+reports/*.txt

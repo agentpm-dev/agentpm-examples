@@ -1,0 +1,428 @@
+---
+title: Memory
+section: agent.json
+order: 17
+description: Author Memory Blueprints that define durable record shapes, retrieval semantics, and declarative lifecycle policy.
+next: agent.json/profiles
+---
+
+# Memory
+
+Author Memory Blueprints that define durable record shapes, retrieval semantics, and declarative lifecycle policy.
+
+## What is a Memory Blueprint?
+
+A `kind: "memory"` package is a **portable memory contract**. It describes:
+
+- the scopes a host must supply
+- the record types a system may persist
+- the spaces those records live in
+- retrieval semantics, retention hints, and capacity hints
+- declarative lifecycle operations such as consolidate, transform, and delete
+
+Memory Blueprints are **not** a hosted store, scheduler, or live runtime. AgentPM packages the structure and generated contracts for memory, but it does not yet bind those contracts to a storage backend or execute lifecycle policy for you.
+
+<Callout type="info" title="Current boundary">
+  AgentPM validates, builds, publishes, installs, and inspects Memory Blueprints as package artifacts. Connecting a blueprint to a concrete memory store or runtime belongs outside this package contract.
+</Callout>
+
+## When to use Memory
+
+Choose **Memory** when the reusable artifact is:
+
+- a durable profile contract
+- a conversation-history shape
+- a notes or facts collection shape
+- a consolidation policy you want to version alongside those contracts
+
+Choose **Knowledge** when the artifact is prepared context or retrieval corpus content.
+
+Choose an **Agent** when you want to reference installed tools, skills, knowledge packages, and memory blueprints together in one composition package.
+
+## Scaffold a Memory Blueprint
+
+```bash
+agentpm init --kind memory --name conversation-continuity --description "Describe the durable memory contract this blueprint provides."
+```
+
+Generated skeleton (`agent.json`):
+
+```json
+{
+  "kind": "memory",
+  "name": "conversation-continuity",
+  "version": "0.1.0",
+  "description": "Describe the durable memory contract this blueprint provides.",
+  "readme": "README.md",
+  "memory": {
+    "scopes": {
+      "user": {
+        "description": "The user whose memory is being retained."
+      }
+    },
+    "record_types": {
+      "user_preference": {
+        "version": "1.0.0",
+        "description": "Durable structured preferences for one user.",
+        "schema": "schemas/user-preference.schema.json"
+      }
+    },
+    "spaces": {
+      "profile": {
+        "description": "The current durable profile for one user.",
+        "model": "document",
+        "record_types": ["user_preference"],
+        "scope": ["user"],
+        "retrieval": {
+          "modes": ["key"]
+        }
+      }
+    }
+  }
+}
+```
+
+Starter layout:
+
+```text
+conversation-continuity/
+  agent.json
+  README.md
+  schemas/
+    user-preference.schema.json
+```
+
+## Field reference
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `$schema` | string | no | Optional schema URI |
+| `kind` | enum | **yes** | Must be `"memory"` |
+| `name` | string | **yes** | Package name |
+| `version` | semver | **yes** | Package version |
+| `description` | string | **yes** | Human-readable summary |
+| `readme` | string | no | Optional README path |
+| `license` | object | no | Optional SPDX/license metadata |
+| `memory.scopes` | object | **yes** | Declared reusable scope keys |
+| `memory.record_types` | object | **yes** | Declared logical record types and authored content schemas |
+| `memory.spaces` | object | **yes** | Declared logical storage shapes and accepted record types |
+| `memory.operations` | object | no | Declarative lifecycle policy |
+
+## Scopes
+
+`memory.scopes` declares the reusable scope dimensions referenced elsewhere in the blueprint.
+
+Example:
+
+```json
+{
+  "memory": {
+    "scopes": {
+      "user": { "description": "The end user." },
+      "conversation": { "description": "The active conversation." }
+    }
+  }
+}
+```
+
+Each space lists the scope keys it requires:
+
+```json
+{
+  "scope": ["user", "conversation"]
+}
+```
+
+## Record types
+
+`memory.record_types` maps each logical record type to:
+
+- a schema-relative JSON Schema file
+- a record schema version
+- an optional description
+
+Example:
+
+```json
+{
+  "memory": {
+    "record_types": {
+      "interaction": {
+        "version": "1.0.0",
+        "description": "One ordered interaction record.",
+        "schema": "schemas/interaction.schema.json"
+      },
+      "user_preference": {
+        "version": "1.0.0",
+        "description": "Durable user preference profile.",
+        "schema": "schemas/user-preference.schema.json"
+      }
+    }
+  }
+}
+```
+
+The referenced file must stay inside the package root and compile as JSON Schema Draft 2020-12.
+
+## Spaces
+
+Spaces define the logical storage model and accepted record types.
+
+### Supported models
+
+- `document`
+- `collection`
+- `sequence`
+
+### Example
+
+```json
+{
+  "memory": {
+    "spaces": {
+      "profile": {
+        "description": "One durable profile document per user.",
+        "model": "document",
+        "record_types": ["user_preference"],
+        "scope": ["user"],
+        "retrieval": {
+          "modes": ["key"]
+        },
+        "retention": {
+          "ttl": "P180D",
+          "on_expire": "delete"
+        }
+      },
+      "history": {
+        "description": "Recent ordered interaction history.",
+        "model": "sequence",
+        "record_types": ["interaction"],
+        "scope": ["user", "conversation"],
+        "retrieval": {
+          "modes": ["chronological"]
+        },
+        "capacity": {
+          "max_records": 200
+        },
+        "constraints": {
+          "append_only": true
+        }
+      }
+    }
+  }
+}
+```
+
+### Retrieval modes
+
+The MVP retrieval modes are:
+
+- `key`
+- `filter`
+- `chronological`
+- `semantic`
+- `full_text`
+
+Model rules:
+
+- `document` spaces require `key`
+- `sequence` spaces require `chronological`
+- `document` spaces cannot be `append_only`
+
+### Retention, capacity, and constraints
+
+- `retention.ttl` uses the supported positive ISO 8601 duration subset
+- `retention.on_expire` declares the intended action such as `delete`
+- `capacity.max_records` declares a bounded record count for applicable spaces
+- `constraints.append_only` marks spaces where records should only be appended
+
+These are part of the package contract and validation surface. AgentPM does not yet enforce them against a live store.
+
+## Lifecycle operations
+
+`memory.operations` defines declarative lifecycle policy. The MVP operations are:
+
+- `consolidate`
+- `transform`
+- `delete`
+
+Example:
+
+```json
+{
+  "memory": {
+    "operations": {
+      "refresh_profile": {
+        "type": "transform",
+        "description": "Refresh the durable user profile from the current structured record.",
+        "inputs": [
+          { "space": "profile", "record_type": "user_preference" }
+        ],
+        "output": {
+          "space": "profile",
+          "record_type": "user_preference"
+        },
+        "output_mode": "replace_input",
+        "source_handling": "retain",
+        "preserve_provenance": true,
+        "trigger": {
+          "type": "interval",
+          "every": "P14D"
+        }
+      }
+    }
+  }
+}
+```
+
+For `transform` operations, `output_mode` controls how the generated output is applied:
+
+- `create` records the transform result as a new output record and is the default when omitted.
+- `replace_input` updates the single input record in place. It requires exactly one input, the output must use the same `space` and `record_type` as that input, and `source_handling` must be `retain`.
+
+### Triggers
+
+The MVP trigger types are:
+
+- `interval`
+- `record_count`
+- `capacity`
+- `external`
+
+These are authored declarations only. AgentPM validates them, but it does not yet run a lifecycle scheduler or host trigger engine.
+
+## Governance annotations
+
+Authored source schemas may include supported `x-agentpm-*` annotations:
+
+- `x-agentpm-data-class`
+- `x-agentpm-sensitivity`
+- `x-agentpm-persist`
+- `x-agentpm-shareable`
+
+Supported semantics:
+
+| Annotation | Type | Meaning |
+|---|---|---|
+| `x-agentpm-data-class` | enum | Product-facing data class for the field |
+| `x-agentpm-sensitivity` | enum | Relative sensitivity level |
+| `x-agentpm-persist` | boolean | Whether the field is intended to persist |
+| `x-agentpm-shareable` | boolean | Whether the field is intended to be shareable across boundaries |
+
+AgentPM validates supported names and values, preserves those annotations into generated contracts, and rejects unknown `x-agentpm-*` extensions.
+
+## Canonical logical record envelope
+
+`agentpm memory build` generates one resolved contract per declared space-and-record-type pairing. Each resolved contract wraps the authored `content` schema in a standard logical envelope.
+
+Required logical envelope fields:
+
+- `id`
+- `record_type`
+- `space`
+- `scope`
+- `schema_version`
+- `created_at`
+- `content`
+
+Optional logical envelope fields:
+
+- `updated_at`
+- `expires_at`
+- `provenance`
+
+Sequence spaces additionally require:
+
+- `ordinal`
+
+Example generated contract shape:
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "record_type": { "const": "user_preference" },
+    "space": { "const": "profile" },
+    "schema_version": { "const": "1.0.0" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user"],
+      "properties": {
+        "user": { "type": "string", "minLength": 1 }
+      }
+    },
+    "content": {
+      "$id": "content",
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "record_type",
+    "space",
+    "scope",
+    "schema_version",
+    "created_at",
+    "content"
+  ]
+}
+```
+
+## Generated outputs
+
+After a successful build, AgentPM writes:
+
+```text
+memory/
+  build.json
+  contracts/
+    index.json
+    profile.user_preference.schema.json
+```
+
+- `memory/contracts/index.json` inventories resolved contracts
+- each generated contract is self-contained and installed-package-safe
+- `memory/build.json` records deterministic authored-input and generated-output hashes
+
+## Publish readiness
+
+Memory packages must be built before publish:
+
+```bash
+agentpm memory build
+agentpm publish --dry-run
+```
+
+Publish checks that:
+
+- authored inputs are still current
+- `memory/build.json` is supported and consistent
+- `memory/contracts/index.json` is supported and consistent
+- every indexed generated contract is present and unchanged
+
+If authored inputs changed, rebuild first:
+
+```bash
+agentpm memory build
+```
+
+## Agent and template dependencies
+
+Agents may declare first-class top-level Memory dependencies:
+
+```json
+{
+  "memory": [
+    "@zack/profile-memory@0.1.0",
+    { "name": "@zack/history-memory", "version": "^0.1.0" }
+  ]
+}
+```
+
+Templates may declare first-class Memory dependencies under `template.dependencies.memory`.
+
+Memory packages themselves do **not** declare package dependencies on tools, skills, knowledge, agents, templates, profiles, loops, or other memory packages.

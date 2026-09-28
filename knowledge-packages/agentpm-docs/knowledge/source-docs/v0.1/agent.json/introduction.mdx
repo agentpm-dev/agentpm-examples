@@ -13,7 +13,7 @@ What the manifest is, why it matters, and how the schema keeps things predictabl
 ## What is `agent.json`?
 
 `agent.json` is the **single source of truth** for an AgentPM package or project. It describes:
-- **Kind** — a **tool** (single runnable package), a **skill** (procedural package), a **knowledge** package (prepared context or retrieval corpus), an **agent** (composes tools, skills, and knowledge), or a **template** (generates a project scaffold).
+- **Kind** — a **tool** (single runnable package), a **skill** (procedural package), a **knowledge** package (prepared context or retrieval corpus), a **memory** package (durable memory contract and lifecycle policy), a **profile** package (portable authored role and communication guidance), a **loop** package (declarative orchestration contract), an **agent** (composes tools, skills, knowledge, memory, profiles, and an optional loop), or a **template** (generates a project scaffold).
 - **Behavior & interface** — names, versions, entrypoint, inputs/outputs, files, env vars.
 - **Operational details** — runtime, timeouts, auth modes, and more.
 
@@ -34,11 +34,11 @@ https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentp
 
 At a glance:
 - **File**: `agentpm.manifest.schema.json`
-- **Kinds**: `tool`, `skill`, `knowledge`, `agent`, and `template`
+- **Kinds**: `tool`, `skill`, `knowledge`, `memory`, `profile`, `loop`, `agent`, and `template`
 - **Strictness**: `additionalProperties: false` — **unknown fields are rejected**
 
 <Callout type="tip" title="Tip">
-  Use agentpm init to scaffold a minimal, valid `agent.json` for any supported kind. We’ll dive into exact fields for tools, skills, knowledge packages, agents, and templates on the next pages.
+  Use agentpm init to scaffold a minimal, valid `agent.json` for any supported kind. We’ll dive into exact fields for tools, skills, knowledge packages, memory blueprints, instruction profiles, loops, agents, and templates on the next pages.
 </Callout>
 
 ## Design notes
