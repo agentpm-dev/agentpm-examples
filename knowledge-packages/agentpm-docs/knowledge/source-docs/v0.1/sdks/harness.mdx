@@ -1,0 +1,142 @@
+---
+title: Harness SDK APIs
+section: SDKs
+order: 21
+description: Run Harness from Node or Python over the machine protocol with host providers, Hooks, approvals, and cancellation.
+next: sdks/tool-discovery
+---
+
+# Harness SDK APIs
+
+The Node and Python SDKs are typed machine-protocol clients around the Rust HarnessEngine. They start `agentpm harness --machine`, register host services, stream events, and return structured Run results.
+
+## Node
+
+```ts
+import { HarnessClient, type BeforeToolCallHookHandler } from '@agentpm/sdk';
+
+const harness = new HarnessClient({
+  agent: '@zack/support-agent@0.1.0',
+  cwd: process.cwd(),
+});
+
+harness.registerModelProvider('company-model', async ({ request }) => ({
+  id: 'turn-1',
+  assistant_content: 'Approved response from host model.',
+  actions: [],
+  finish_reason: 'stop',
+  usage: {
+    model_calls: 1,
+    input_tokens: 20,
+    output_tokens: 8,
+  },
+  provider_metadata: { model: request.selection.model },
+}));
+
+const beforeToolCall: BeforeToolCallHookHandler = async (input) => ({
+  decision: 'continue',
+  patch: { arguments: input.arguments },
+});
+
+harness.onBeforeToolCall(beforeToolCall);
+harness.onApproval(async () => 'approve');
+
+const result = await harness.run('Use the configured agent.');
+await harness.shutdown();
+```
+
+Useful APIs:
+
+- `initialize()` and `preflight()` inspect the Session before running.
+- `run(input)` starts one Run and waits for terminal result.
+- `startRun(input)` is the lower-level equivalent that accepts extra payload fields.
+- `cancelRun()` cancels the active Run.
+- `invokeMemoryOperation(payload)` invokes an external Memory operation while a Run is active.
+- `onEvent(listener)` subscribes to Harness events.
+- `eventsIterator()` yields buffered and future events.
+- `registerModelProvider()`, `registerEmbeddingProvider()`, `registerKnowledgeRuntime()`, `registerMemoryRuntime()`, and `registerHostProvider()` register SDK-hosted providers.
+- `onBeforeModelRequest()`, `onBeforeToolSelection()`, `onBeforeToolCall()`, `onBeforeKnowledgeRequest()`, `onAfterKnowledgeRetrieval()`, `onBeforeMemoryRead()`, `onBeforeMemoryWrite()`, and `onBeforeMemoryOperation()` register Hook helpers.
+- `onApproval()` registers an approval controller.
+
+## Python
+
+```py
+from agentpm import HarnessClient
+
+harness = HarnessClient(agent="@zack/support-agent@0.1.0")
+
+def model_provider(request):
+    return {
+        "id": "turn-1",
+        "assistant_content": "Approved response from host model.",
+        "actions": [],
+        "finish_reason": "stop",
+        "usage": {
+            "model_calls": 1,
+            "input_tokens": 20,
+            "output_tokens": 8,
+        },
+        "provider_metadata": {"model": request["selection"]["model"]},
+    }
+
+def before_tool_call(input):
+    return {
+        "decision": "continue",
+        "patch": {"arguments": input["arguments"]},
+    }
+
+harness.register_model_provider("company-model", model_provider)
+harness.on_before_tool_call(before_tool_call)
+harness.on_approval(lambda checkpoint: "approve")
+
+result = harness.run("Use the configured agent.")
+harness.shutdown()
+```
+
+Useful APIs mirror the Node client:
+
+- `initialize()` and `preflight()`
+- `run(input)` and `start_run(input)`
+- `cancel_run()`
+- `invoke_memory_operation(payload)`
+- `on_event(listener)` and `events()`
+- `register_model_provider()`, `register_embedding_provider()`, `register_knowledge_runtime()`, `register_memory_runtime()`, and `register_host_provider()`
+- `on_before_model_request()`, `on_before_tool_selection()`, `on_before_tool_call()`, `on_before_knowledge_request()`, `on_after_knowledge_retrieval()`, `on_before_memory_read()`, `on_before_memory_write()`, and `on_before_memory_operation()`
+- `on_approval()`
+
+## Host Providers
+
+Register host services before starting a Run. Host capability advertisement is role-specific:
+
+- model providers advertise provider/model identity, semantic-action support, structured-output support, multimodal-input support, optional context window, and usage reporting.
+- embedding providers advertise supported embedding spaces.
+- Knowledge runtimes advertise package/version/corpus realization and supported retrieval features.
+- Memory runtimes advertise supported Memory Blueprint capabilities.
+- approval controllers advertise approval support and optional cancellation support.
+
+Harness rejects configured `type: "host"` implementations that do not have an active SDK registration. It does not fall back to a built-in runtime for that configured ID.
+
+## Hook Decisions
+
+Hook handlers return either:
+
+```json
+{ "decision": "continue", "patch": {} }
+```
+
+or:
+
+```json
+{ "decision": "reject", "message": "Policy rejected this operation." }
+```
+
+Returning `undefined` in Node or `None` in Python is treated as continue with no patch. Each Hook sees a constrained snapshot for its Hook ID and cannot mutate arbitrary Harness state.
+
+## Provider Processes
+
+For CLI-launched providers, both SDKs also expose process-service helpers:
+
+- Node: `serveKnowledgeRuntimeProcess()` and `serveMemoryRuntimeProcess()`
+- Python: `serve_knowledge_runtime_process()` and `serve_memory_runtime_process()`
+
+These serve the public `agentpm-service` protocol for process-backed Knowledge and Memory runtimes. The reference Pinecone/pgvector Knowledge providers and PostgreSQL/pgvector/Redis Memory providers are examples to copy from, not provider-specific SDK exports.

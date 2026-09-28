@@ -2,25 +2,25 @@
 title: init
 section: CLI
 order: 4
-description: Scaffold a new AgentPM package by generating a starter agent.json manifest for a tool, skill, agent, template, or knowledge package.
+description: Scaffold a new AgentPM package by generating a starter agent.json manifest for a tool, skill, knowledge, memory, profile, loop, agent, or template package.
 next: cli/login
 ---
 
 # init
 
-Scaffold a new AgentPM package by generating a starter `agent.json` manifest for a tool, skill, agent, template, or knowledge package.
+Scaffold a new AgentPM package by generating a starter `agent.json` manifest for a tool, skill, knowledge, memory, profile, loop, agent, or template package.
 
 ## Overview
 
-`agentpm init` creates the minimal manifest you’ll complete later. Choose a kind (`tool`, `skill`, `agent`, `template`, or `knowledge`), set a name/description, and optionally an output directory.
+`agentpm init` creates the minimal manifest you’ll complete later. Choose a kind (`tool`, `skill`, `knowledge`, `memory`, `profile`, `loop`, `agent`, or `template`), set a name/description, and optionally an output directory.
 
 ### Command synopsis
 ```bash
-agentpm init [--kind <tool|skill|agent|template|knowledge>] [--mode <context|vector>] [--name <string>] [--description <string>] [--out-dir <path>]
+agentpm init [--kind <tool|skill|knowledge|memory|profile|loop|agent|template>] [--mode <context|vector>] [--name <string>] [--description <string>] [--out-dir <path>]
 ```
 
 ### Arguments
-- **`--kind` (default: `tool`)**. What to scaffold: a single tool, a procedural skill, a composed agent, a workflow template package, or a Knowledge package.
+- **`--kind` (default: `tool`)**. What to scaffold: a single tool, a procedural skill, a knowledge package, a memory blueprint package, an instruction profile package, a loop package, a composed agent, or a workflow template package.
 - **`--mode` (default: `context`)**. Only used with `--kind knowledge`. Choose `context` for direct context documents or `vector` for a prepared retrieval corpus starter.
 - **`--name` (default: `my-tool`)**. Name for the tool/agent (used in the manifest).
 - **`--description` (default: `Starter AgentPM project`)**. Short human-readable description.
@@ -204,6 +204,171 @@ Generates `agent.json`:
 
 The generated `README.md` for vector mode explains the prepared corpus placeholders and calls out that `knowledge/indexes/default` is generated later by `agentpm knowledge build`.
 
+### Create a memory blueprint
+```bash
+agentpm init --kind memory --name conversation-continuity --description "Describe the durable memory contract this blueprint provides."
+```
+
+Creates:
+
+```text
+conversation-continuity/
+  agent.json
+  README.md
+  schemas/
+    user-preference.schema.json
+```
+
+Generates `agent.json`:
+
+```json
+{
+  "kind": "memory",
+  "name": "conversation-continuity",
+  "version": "0.1.0",
+  "description": "Describe the durable memory contract this blueprint provides.",
+  "readme": "README.md",
+  "memory": {
+    "scopes": {
+      "user": {
+        "description": "The user whose memory is being retained."
+      }
+    },
+    "record_types": {
+      "user_preference": {
+        "version": "1.0.0",
+        "description": "Durable structured preferences for one user.",
+        "schema": "schemas/user-preference.schema.json"
+      }
+    },
+    "spaces": {
+      "profile": {
+        "description": "The current durable profile for one user.",
+        "model": "document",
+        "record_types": ["user_preference"],
+        "scope": ["user"],
+        "retrieval": {
+          "modes": ["key"]
+        }
+      }
+    }
+  }
+}
+```
+
+The generated `README.md` explains the authored files, when to run `agentpm memory build`, how to use `agentpm memory inspect`, and that the blueprint does not provide a live memory store by itself.
+
+### Create a loop
+```bash
+agentpm init --kind loop --name incident-response-loop --description "Portable incident triage and response loop"
+```
+
+Creates:
+
+```text
+incident-response-loop/
+  agent.json
+  README.md
+```
+
+Generates `agent.json`:
+
+```json
+{
+  "kind": "loop",
+  "name": "incident-response-loop",
+  "version": "0.1.0",
+  "description": "Portable incident triage and response loop",
+  "readme": "README.md",
+  "loop": {
+    "archetype": "investigate_review_respond",
+    "entry_phase": "assess",
+    "phases": [
+      {
+        "id": "assess",
+        "objective": "Assess the request and decide whether work should proceed.",
+        "outcomes": [
+          {
+            "id": "proceed",
+            "description": "The work should move forward."
+          },
+          {
+            "id": "handoff",
+            "description": "The work should be handed off."
+          }
+        ]
+      },
+      {
+        "id": "execute",
+        "objective": "Perform the active work for the request."
+      },
+      {
+        "id": "review",
+        "objective": "Review whether the work is complete or needs another pass.",
+        "outcomes": [
+          {
+            "id": "needs-more-work",
+            "description": "Another execution pass is required."
+          },
+          {
+            "id": "ready",
+            "description": "The work is complete and ready to end."
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      { "from": "assess", "on": "proceed", "to": "execute" },
+      { "from": "assess", "on": "handoff", "to": "$handoff" },
+      { "from": "execute", "on": "complete", "to": "review" },
+      { "from": "review", "on": "needs-more-work", "to": "execute" },
+      { "from": "review", "on": "ready", "to": "$end" }
+    ]
+  }
+}
+```
+
+The generated `README.md` explains Loop versus Agent responsibilities, implicit `complete`, graph-defined control flow, and that the README is documentation only.
+
+### Create an instruction profile
+```bash
+agentpm init --kind profile --name support-style --description "Portable support communication profile"
+```
+
+Creates:
+
+```text
+support-style/
+  agent.json
+  README.md
+```
+
+Generates `agent.json`:
+
+```json
+{
+  "kind": "profile",
+  "name": "support-style",
+  "version": "0.1.0",
+  "description": "Portable support communication profile",
+  "readme": "README.md",
+  "profile": {
+    "identity": {
+      "role": "Customer support assistant"
+    },
+    "objectives": [
+      "Resolve the user's issue clearly and efficiently."
+    ],
+    "communication": {
+      "tone": ["calm", "helpful"],
+      "verbosity": "balanced"
+    }
+  }
+}
+```
+
+The generated `README.md` explains the Profile-versus-Skill boundary, notes that constraints express author intent rather than runtime enforcement, and clarifies that README text is package documentation rather than executable runtime instruction.
+
 ### Create a workflow template
 
 ```bash
@@ -263,7 +428,7 @@ The generated manifests are intentional skeletons—you’ll need to finish them
 - For agents:
     - Add tools to the `tools[]` array (via `agentpm install <tool>` or by editing then running `agentpm install`).
     - Replace the placeholder example prompt with a real user request your agent should handle.
-    - Leave `memory` and `profiles` empty unless you intentionally want to reserve those fields for future use.
+    - Leave dependency arrays empty unless you intentionally want the agent to resolve them.
 - For tools:
     - Fill in `entrypoint.command` (and `args` if needed).
     - Define `inputs` and `outputs` schemas.
@@ -281,6 +446,18 @@ The generated manifests are intentional skeletons—you’ll need to finish them
     - Replace the placeholder files under `knowledge/` with your real content.
     - Keep `mode: "context"` for direct context bundles, or use `--mode vector` when starting a prepared retrieval corpus.
     - Run `agentpm knowledge build` before publishing so the derived metadata and local vector index are current.
+- For memory packages:
+    - Replace the starter schema and authored `memory` metadata with the real scopes, record types, spaces, and optional lifecycle operations your blueprint needs.
+    - Run `agentpm memory build` before publishing so `memory/build.json` and the generated contracts are current.
+    - Use `agentpm memory inspect` to verify the authored metadata, generated contracts, and freshness status before publishing.
+- For profile packages:
+    - Fill in the authored `profile` structure with real identity, objectives, communication guidance, and any optional constraints.
+    - Keep README content as package documentation; the structured `profile` object is the runtime-facing contract.
+    - Do not add runtime fields, build output, parameters, variables, or install-time prompts.
+- For loop packages:
+    - Replace the starter phases, outcomes, and transitions with the real control-flow contract you want to publish.
+    - Keep loop packages declarative: author phases, checkpoints, limits, and error policy metadata, but do not add runtime/provider configuration.
+    - Use `agentpm lint` to validate graph semantics locally before publishing.
 
 Run a quick check:
 ```bash
@@ -292,7 +469,7 @@ agentpm lint
 </Callout>
 
 After linting and completing the manifest:
-- Use `agentpm install` to fetch declared tools, skills, and knowledge (for agents) or declared tools (for skills).
+- Use `agentpm install` to fetch declared tools, skills, knowledge, memory, profiles, and an optional loop (for agents) or declared tools (for skills).
 - Use `agentpm new` to verify local or published templates.
 - When ready to share, head to `agentpm publish`.
 

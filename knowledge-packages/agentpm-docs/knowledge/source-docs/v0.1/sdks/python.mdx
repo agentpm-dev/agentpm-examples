@@ -2,13 +2,13 @@
 title: Python SDK
 section: SDKs
 order: 20
-description: Install packages with the CLI, load tools, and inspect installed agents, skills, and Knowledge packages from Python.
-next: sdks/tool-discovery
+description: Install packages with the CLI, load tools, and inspect installed agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops from Python.
+next: sdks/harness
 ---
 
 # Python SDK
 
-Install packages with the CLI, load tools, and inspect installed agents, skills, and Knowledge packages from Python.
+Install packages with the CLI, load tools, and inspect installed agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops from Python.
 
 ## Goal
 
@@ -17,6 +17,10 @@ Install the Python SDK and use:
 - `load()` to call a published tool
 - `load_agent()` to inspect an installed agent package and its resolved packages
 - `load_skill()` to inspect an installed skill package and its resolved tools
+- `load_knowledge()` to inspect an installed knowledge package and its mode-specific metadata
+- `load_memory()` to inspect an installed memory blueprint package and its generated contracts
+- `load_profile()` to inspect an installed instruction profile package and its authored metadata
+- `load_loop()` to inspect an installed loop package and its authored orchestration metadata
 
 ## 1) Install a tool
 
@@ -37,6 +41,10 @@ agentpm install @zack/support-agent@0.1.0
 That writes:
 
 - the installed agent under `.agentpm/agents/<namespace>/<name>/<version>`
+- its resolved knowledge packages under `.agentpm/knowledge/<namespace>/<name>/<version>`
+- its resolved memory packages under `.agentpm/memory/<namespace>/<name>/<version>`
+- its resolved profile packages under `.agentpm/profiles/<namespace>/<name>/<version>`
+- its resolved loop package under `.agentpm/loops/<namespace>/<name>/<version>`
 - its resolved skills under `.agentpm/skills/<namespace>/<name>/<version>`
 - its resolved tools under `.agentpm/tools/<namespace>/<name>/<version>`
 
@@ -50,6 +58,46 @@ That writes:
 
 - the installed skill under `.agentpm/skills/<namespace>/<name>/<version>`
 - its resolved tools under `.agentpm/tools/<namespace>/<name>/<version>`
+
+You can also install a published knowledge package directly:
+
+```bash
+agentpm install @zack/python-docs@0.1.0
+```
+
+That writes:
+
+- the installed knowledge package under `.agentpm/knowledge/<namespace>/<name>/<version>`
+
+You can also install a published memory blueprint package directly:
+
+```bash
+agentpm install @zack/profile-memory@0.1.0
+```
+
+That writes:
+
+- the installed memory package under `.agentpm/memory/<namespace>/<name>/<version>`
+
+You can also install a published profile package directly:
+
+```bash
+agentpm install @zack/support-style@0.1.0
+```
+
+That writes:
+
+- the installed profile package under `.agentpm/profiles/<namespace>/<name>/<version>`
+
+You can also install a published loop package directly:
+
+```bash
+agentpm install @zack/incident-response-loop@1.0.0
+```
+
+That writes:
+
+- the installed loop package under `.agentpm/loops/<namespace>/<name>/<version>`
 
 ## 2) Install the Python SDK
 
@@ -194,7 +242,10 @@ What `load_agent()` returns:
 
 - the installed agent manifest
 - the installed agent root path
-- `resolvedKnowledge`, which are the exact Knowledge package refs represented in `agent.lock`
+- `resolvedKnowledge`, which are the exact knowledge package refs represented in `agent.lock`
+- `resolvedMemory`, which are the exact memory package refs represented in `agent.lock`
+- `resolvedProfiles`, which are the exact profile package refs represented in `agent.lock`
+- `resolvedLoop`, which is the exact singular loop ref represented in `agent.lock`
 - reserved refs (`knowledge`, `memory`, `profiles`) from the lockfile metadata path
 - `resolvedTools`, which are the exact tool package refs represented in `agent.lock`
 - `resolvedSkills`, which are the exact skill package refs represented in `agent.lock`
@@ -204,6 +255,10 @@ Compatibility note:
 - `resolvedKnowledge` is populated from the modern first-class `root.knowledge` entries in `agent.lock`.
 - `reserved.knowledge` is legacy pass-through metadata from older lockfile shapes. For current installs, treat `resolvedKnowledge` as authoritative and expect `reserved.knowledge` to usually be empty.
 - If your workspace still has an older lockfile shape where Knowledge refs only exist under `reserved.knowledge`, rerun `agentpm install` to rewrite the lockfile.
+- `resolvedLoop` is populated from the modern first-class `root.loop` entry in `agent.lock`.
+- `resolvedProfiles` is populated from the modern first-class `root.profiles` entries in `agent.lock`.
+- `reserved.profiles` is legacy pass-through metadata from older lockfile shapes. For current installs, treat `resolvedProfiles` as authoritative and expect `reserved.profiles` to usually be empty.
+- `manifest["loop"]` and `manifest["bindings"]` preserve the authored declarative metadata from the installed `agent.json`.
 
 What it does **not** do:
 
@@ -235,7 +290,7 @@ print(skill["resolvedTools"])
 
 `load_skill()` returns an inspectable Skill object. Skills are not runnable SDK objects by themselves.
 
-## 7) Loading an installed Knowledge package
+## 7) Loading an installed knowledge package
 
 Use `load_knowledge()` when you want metadata for a registry-installed Knowledge package plus the canonical package-relative paths it declares.
 
@@ -252,7 +307,75 @@ print(knowledge["vectorsPath"])
 print(knowledge["indexPaths"])
 ```
 
-`load_knowledge()` returns an inspectable Knowledge object. Knowledge packages are not runnable SDK objects by themselves.
+`load_knowledge()` returns an inspectable knowledge object. Knowledge packages are not runnable SDK objects by themselves.
+
+## 8) Loading an installed memory blueprint package
+
+Use `load_memory()` when you want authored memory blueprint metadata, parsed build metadata, the persisted contract index, and on-demand access to resolved contracts.
+
+```py
+from agentpm import load_memory, load_memory_contract
+
+memory = load_memory("@zack/profile-memory@0.1.0")
+contract = load_memory_contract(
+    memory,
+    space="profile",
+    record_type="user_preference",
+)
+
+print(memory["memory"]["spaces"])
+print(memory["build"])
+print(memory["contractIndex"])
+print(memory["contracts"])
+print(contract)
+```
+
+`load_memory()` returns an inspectable memory object. Memory packages are not runnable SDK objects by themselves and do not provide live record CRUD behavior.
+
+## 9) Loading an installed instruction profile package
+
+Use `load_profile()` when you want authored Instruction Profile metadata from an installed registry package.
+
+```py
+from agentpm import load_profile
+
+profile = load_profile("@zack/support-style@0.1.0")
+
+print(profile["profile"]["identity"]["role"])
+print(profile["profile"]["objectives"])
+print(profile["profile"]["communication"])
+```
+
+`load_profile()` returns an inspectable profile object containing:
+
+- the installed profile manifest
+- the installed package root path
+- parsed authored `profile` metadata
+
+It does not compile prompts, interpret README content as instructions, enforce constraints, or execute runtime behavior.
+
+## 10) Loading an installed loop package
+
+Use `load_loop()` when you want authored Loop metadata from an installed registry package.
+
+```py
+from agentpm import load_loop
+
+loop = load_loop("@zack/incident-response-loop@1.0.0")
+
+print(loop["loop"]["entry_phase"])
+print(loop["loop"]["phases"])
+print(loop["loop"]["transitions"])
+print(loop["loop"]["error_policy"])
+```
+
+`load_loop()` returns an inspectable Loop object containing:
+
+- the installed loop manifest
+- the installed package root path
+- parsed authored `loop` metadata
+
+It does not execute the graph, choose a model, resolve Agent phase bindings, validate Memory selectors against installed blueprints, start MCP, or read `consumer_context.file`. Use `HarnessClient` when you want the SDK to host `agentpm harness --machine`.
 
 ### `load()` stays tool-only
 
@@ -264,9 +387,18 @@ load("@zack/incident-commander@0.1.0")
 
 load("@zack/python-docs@0.1.0")
 # raises: use load_knowledge("@zack/python-docs@0.1.0") instead
+
+load("@zack/profile-memory@0.1.0")
+# raises: use load_memory("@zack/profile-memory@0.1.0") instead
+
+load("@zack/support-style@0.1.0")
+# raises: use load_profile("@zack/support-style@0.1.0") instead
+
+load("@zack/incident-response-loop@1.0.0")
+# raises: use load_loop("@zack/incident-response-loop@1.0.0") instead
 ```
 
-## 8) Execution contract (how tools must behave)
+## 11) Execution contract (how tools must behave)
 
 For a tool to work with the SDK, it must follow this process protocol:
 - **STDIN**: SDK writes one JSON object (tool **inputs**) to the subprocess **stdin**.
@@ -276,7 +408,7 @@ For a tool to work with the SDK, it must follow this process protocol:
 
 (The full rationale and Node example are on the **Node SDK** page; the contract is identical here.)
 
-## 9) What load() enforces for safety
+## 12) What load() enforces for safety
 
 - **Interpreter allow-list**
     - Allowed: `node`, `nodejs`, `python`, `python3`, or versioned like `python3.11`.
@@ -290,7 +422,7 @@ For a tool to work with the SDK, it must follow this process protocol:
 - **Environment merging**
     - Merges manifest `entrypoint.env` + `env` argument + safe base env.
 
-## 9) How the subprocess is spawned (high level)
+## 13) How the subprocess is spawned (high level)
 
 - **Working dir (`cwd`)**: `(tool_root / entrypoint.cwd or ".")`.
 - **Isolated run dirs**: per-call temp `run/` folder with dedicated `HOME` and `TMPDIR`.
@@ -303,7 +435,7 @@ For a tool to work with the SDK, it must follow this process protocol:
     If your tool needs more memory, you can add your own flag in entrypoint.args (e.g., --max-old-space-size=512 for Node).
 </Callout>
 
-## 10) Troubleshooting
+## 14) Troubleshooting
 
 - **Interpreter not found**
     - Ensure `node`/`python` is on `PATH`. The error message prints the PATH searched.
@@ -323,7 +455,7 @@ For a tool to work with the SDK, it must follow this process protocol:
     - `load_skill()` uses the installed skill directory **and** the `agent.lock` root entry together. If the lockfile is missing the skill root, reinstall it.
 
 
-## 11) Best practices
+## 15) Best practices
 
 - **Define strong IO schemas** so agents construct correct arguments.
 - **Keep logs off stdout**; stdout is reserved for the final JSON.

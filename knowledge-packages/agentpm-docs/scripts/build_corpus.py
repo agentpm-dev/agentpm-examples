@@ -30,6 +30,8 @@ PROVENANCE_PATH = ROOT / "knowledge" / "provenance" / "sources-manifest.json"
 CHUNK_SIZE = 1200
 CHUNK_OVERLAP = 150
 CHUNKING_STRATEGY = "langchain-markdown-headers-plus-recursive-character"
+PACKAGE_VERSION = "0.1.1"
+BUILDER_VERSION = "2026-09-27"
 
 FRONTMATTER_RE = re.compile(r"\A---\n.*?\n---\n+", re.DOTALL)
 
@@ -210,7 +212,7 @@ def write_provenance(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "package": "@zack/agentpm-docs",
-        "version": "0.1.0",
+        "version": PACKAGE_VERSION,
         "source_root": "agentpm-api/docs/v0.1",
         "copied_source_root": "knowledge/source-docs/v0.1",
         "chunking": {
@@ -220,7 +222,7 @@ def write_provenance(path: Path, rows: list[dict]) -> None:
         },
         "builder": {
             "name": "agentpm-examples-agentpm-docs-pipeline",
-            "version": "2026-07-12",
+            "version": BUILDER_VERSION,
         },
         "sources": rows,
     }

@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "mcp-bridge-model",
+    "model": "deterministic-mcp-bridge"
+  },
+  "providers": {
+    "models": {
+      "mcp-bridge-model": {
+        "implementation": {
+          "type": "process",
+          "command": "node",
+          "args": [
+            "runtime/model-provider.mjs"
+          ],
+          "cwd": ".",
+          "request_timeout_ms": 120000
+        }
+      }
+    }
+  },
+  "scopes": {
+    "user": "mcp-bridge-user"
+  },
+  "mcp": {
+    "imports": {
+      "bridge-search": {
+        "transport": "http",
+        "url": "http://127.0.0.1:18241/mcp",
+        "headers": {
+          "Authorization": {
+            "env": "MCP_BRIDGE_AUTHORIZATION"
+          },
+          "X-AgentPM-Workspace": {
+            "value": "Harness MCP Bridge"
+          }
+        },
+        "scope": {
+          "mode": "phases",
+          "phases": [
+            "act"
+          ]
+        },
+        "tools": [
+          "lookup"
+        ]
+      }
+    },
+    "exports": {
+      "enabled": true,
+      "host": "127.0.0.1"
+    }
+  },
+  "approvals": {
+    "controller": {
+      "implementation": {
+        "type": "process",
+        "command": "node",
+        "args": [
+          "runtime/approval-controller.mjs"
+        ],
+        "cwd": ".",
+        "request_timeout_ms": 120000
+      }
+    }
+  },
+  "runtime": {
+    "limits": {
+      "max_steps": 8,
+      "max_model_calls_per_phase": 8,
+      "max_actions_per_phase": 4
+    }
+  },
+  "trace": {
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "Harness MCP Bridge",
+      "subtitle": "MCP export/import bridge"
+    }
+  }
+}

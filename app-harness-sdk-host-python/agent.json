@@ -1,0 +1,15 @@
+{
+  "description": "Generated from harness-sdk-host-python@0.1.0.",
+  "kind": "agent",
+  "knowledge": [],
+  "loop": {
+    "name": "@zack/react-loop",
+    "version": "0.1.0"
+  },
+  "memory": [],
+  "name": "app-harness-sdk-host-python",
+  "profiles": [],
+  "skills": [],
+  "tools": [],
+  "version": "0.1.0"
+}

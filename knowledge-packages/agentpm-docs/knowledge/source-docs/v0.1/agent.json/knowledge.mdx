@@ -3,7 +3,7 @@ title: Knowledge
 section: agent.json
 order: 16
 description: Author prepared context packages for direct context loading or local vector retrieval.
-next: agent.json/agents
+next: agent.json/memory
 ---
 
 # Knowledge
@@ -363,6 +363,15 @@ or:
 ```
 
 Embedding command adapters receive compact JSON on stdin and must emit vector JSON on stdout. See [`agentpm knowledge`](/docs/v0.1/cli/knowledge) for the exact command contract.
+
+## Harness readiness
+
+When Harness exposes installed Knowledge to a model, it treats Knowledge as its own semantic surface rather than as a tool call.
+
+- Context Knowledge is advertised as an inventory of declared documents. Harness loads one requested declared document on demand and rejects undeclared paths.
+- Vector Knowledge is advertised only when the installed chunks, sources, vector file, index metadata, and build provenance describe one coherent generated corpus.
+- If vector artifacts are coherent but Harness cannot produce a compatible query vector for the exact provider/model/dimensions/normalization space, the Knowledge surface is marked unavailable with an explicit readiness reason.
+- Explicit custom KnowledgeRuntime mappings are routed only to the configured runtime. Harness does not silently fall back to local retrieval for packages mapped to a custom runtime.
 
 ## Security and authorship guidance
 

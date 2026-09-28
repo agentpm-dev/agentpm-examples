@@ -1,0 +1,94 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "harness-provider-lab",
+  "version": "0.1.0",
+  "description": "AgentPM Harness lab for process-hosted model, embedding, KnowledgeRuntime, and MemoryRuntime providers.",
+  "template": {
+    "display_name": "Harness Provider Lab",
+    "use_case": "harness-provider-lab",
+    "execution_surfaces": [
+      "agentpm-run"
+    ],
+    "stack": [
+      "node",
+      "workspace"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "harness-provider-lab"
+      },
+      {
+        "name": "workspace_label",
+        "description": "Human-readable label shown in the generated README, Harness config, and terminal output.",
+        "required": true,
+        "default": "Harness Provider Lab"
+      },
+      {
+        "name": "default_user_scope",
+        "description": "Default user scope used by agentpm.harness.json.",
+        "required": true,
+        "default": "provider-lab-user"
+      }
+    ],
+    "dependencies": {
+      "tools": [],
+      "knowledge": [
+        {
+          "name": "@zack/agentpm-docs",
+          "version": "0.1.1"
+        },
+        {
+          "name": "@zack/devwork-maintainer-guide",
+          "version": "0.1.0"
+        }
+      ],
+      "memory": [
+        {
+          "name": "@zack/support-customer-state",
+          "version": "0.1.0"
+        }
+      ],
+      "agents": [],
+      "loop": "@zack/react-loop@0.1.0"
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.local.example .env.local"
+      },
+      {
+        "label": "Install Node dependencies",
+        "command": "pnpm install"
+      },
+      {
+        "label": "Configure local Agent bindings",
+        "command": "pnpm setup:bindings"
+      },
+      {
+        "label": "Check Harness readiness",
+        "command": "agentpm harness --json"
+      },
+      {
+        "label": "Open the Harness TUI",
+        "command": "agentpm harness"
+      },
+      {
+        "label": "Run one provider-lab prompt",
+        "command": "pnpm run harness:headless -- \"Use the provider lab to verify every configured provider bridge.\""
+      },
+      {
+        "label": "Run scaffold tests",
+        "command": "pnpm test"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

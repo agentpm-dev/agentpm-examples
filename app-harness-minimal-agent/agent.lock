@@ -1,0 +1,71 @@
+{
+  "generated": "2026-09-27T17:04:03.216448Z",
+  "lockfile_version": 3,
+  "packages": {
+    "agent:@zack/devwork-copilot@0.1.6": {
+      "integrity": "15a16150b7be09620301b3b584127c3cf7b16edaa6caf8a7828af9f90d7d6ca0",
+      "kind": "agent",
+      "name": "@zack/devwork-copilot",
+      "version": "0.1.6"
+    },
+    "knowledge:@zack/devwork-maintainer-guide@0.1.0": {
+      "integrity": "47e267e55f8e4b866a5c882091d13121feb64006e3217d3da3f2be0d8d02bf52",
+      "kind": "knowledge",
+      "name": "@zack/devwork-maintainer-guide",
+      "version": "0.1.0"
+    },
+    "loop:@zack/devwork-triage-loop@0.1.0": {
+      "integrity": "8c7b9edce0019fdc23c35e880902a2634a2fd576e2d127e65680e8ba3496cafb",
+      "kind": "loop",
+      "name": "@zack/devwork-triage-loop",
+      "version": "0.1.0"
+    },
+    "memory:@zack/devwork-maintainer-state@0.1.0": {
+      "integrity": "ccde00c37fabd03ab6f8c143d947b7941503748b3bbd3b3a754df849f467bc37",
+      "kind": "memory",
+      "name": "@zack/devwork-maintainer-state",
+      "version": "0.1.0"
+    },
+    "profile:@zack/devwork-maintainer-style@0.1.0": {
+      "integrity": "66a516af6f018b8a50d6ebe9bfac16d1c00c10a8ebfc56810d0e437982829164",
+      "kind": "profile",
+      "name": "@zack/devwork-maintainer-style",
+      "version": "0.1.0"
+    },
+    "skill:@zack/issue-triage-playbook@0.1.0": {
+      "integrity": "eef04a5b31ca7c474a05fb3f326d147aefa00ecc3bbbdd90ea1934022952a231",
+      "kind": "skill",
+      "name": "@zack/issue-triage-playbook",
+      "version": "0.1.0"
+    },
+    "tool:@zack/github-issues@0.1.1": {
+      "integrity": "b04c929385df7ceb78ab459f9c2104006f286d57f372fc1afa8ec77db00e8935",
+      "kind": "tool",
+      "name": "@zack/github-issues",
+      "version": "0.1.1"
+    }
+  },
+  "roots": {
+    "agent:@zack/devwork-copilot@0.1.6": {
+      "knowledge": [
+        "knowledge:@zack/devwork-maintainer-guide@0.1.0"
+      ],
+      "loop": "loop:@zack/devwork-triage-loop@0.1.0",
+      "memory": [
+        "memory:@zack/devwork-maintainer-state@0.1.0"
+      ],
+      "profiles": [
+        "profile:@zack/devwork-maintainer-style@0.1.0"
+      ],
+      "skills": [
+        "skill:@zack/issue-triage-playbook@0.1.0"
+      ],
+      "tools": []
+    },
+    "local:agent": {
+      "name": "app-harness-minimal-agent",
+      "tools": [],
+      "version": "0.1.0"
+    }
+  }
+}

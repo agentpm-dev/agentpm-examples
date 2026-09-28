@@ -1,22 +1,22 @@
 ---
 title: Agents
 section: agent.json
-order: 17
-description: Compose tools, skills, and knowledge behind a single agent manifest.
+order: 20
+description: Compose tools, skills, knowledge, memory, profiles, and an optional loop behind a single agent manifest.
 next: agent.json/templates
 ---
 
 # Agents
 
-Compose tools, skills, and knowledge behind a single agent manifest.
+Compose tools, skills, knowledge, memory, profiles, and an optional loop behind a single agent manifest.
 
 ## What is an “agent”?
 
-An `agent` is a composition layer: it declares **which tools, skills, and knowledge packages it can use**. The agent manifest doesn’t execute code itself. It is a **package artifact** that enumerates package dependencies, prompt examples, and future reserved references so the CLI and SDKs can resolve, install, and expose the graph to your agent runtime.
+An `agent` is a composition layer: it declares **which tools, skills, knowledge packages, memory blueprints, instruction profiles, and optional Loop package it can use**. The agent manifest doesn’t execute code itself. It is a **package artifact** that enumerates package dependencies, optional orchestration metadata, and prompt examples so the CLI and SDKs can resolve, install, and expose the graph to your agent runtime.
 - **Defines capability surface** by listing the packages the agent may use.
 - **Drives deterministic installs** via `agent.lock` (package identity + integrity + relationships).
 - **Keeps host/runtime lightweight**: each tool runs in a **managed subprocess** with its own dependencies.
-- **Preserves future composition metadata** for `memory` and `profiles`, while treating `skills` and `knowledge` as first-class resolved package dependencies.
+- **Treats tools, skills, knowledge, memory, profiles, and loops as first-class resolved package dependencies**.
 
 ## Scaffold an agent
 
@@ -46,7 +46,7 @@ Generated skeleton (`agent.json`):
 ```
 
 <Callout type="info" title="Note">
-  Add tools to `tools[]`, skills to `skills[]`, and knowledge packages to `knowledge[]` when needed, then run `agentpm install` to resolve and download artifacts.
+  Add tools to `tools[]`, skills to `skills[]`, knowledge packages to `knowledge[]`, memory blueprints to `memory[]`, instruction profiles to `profiles[]`, and an optional loop through `loop` when needed, then run `agentpm install` to resolve and download artifacts.
 </Callout>
 
 ## Field reference (overview)
@@ -62,8 +62,10 @@ Generated skeleton (`agent.json`):
 | `tools`       | array     | **yes**  | Array of tool refs: string or `{name, version}`; may be empty (`[]`) |
 | `skills`      | array     | no       | Array of skill refs: string or `{name, version}`               |
 | `knowledge`   | array     | no       | Array of knowledge refs: string or `{name, version}`                    |
-| `memory`      | array     | no       | Reserved future refs. Validated and preserved, but not resolved today. |
-| `profiles`    | array     | no       | Reserved future refs. Validated and preserved, but not resolved today. |
+| `memory`      | array     | no       | Array of memory refs: string or `{name, version}` |
+| `profiles`    | array     | no       | Array of profile refs: string or `{name, version}` |
+| `loop`        | string or object | no | Singular loop ref: string or `{name, version}` |
+| `bindings`    | object    | no       | Optional global, phase, MCP, and consumer-context binding metadata |
 | `examples`    | array     | no       | Inline prompt examples `{ title, prompt }`.                    |
 | `readme`      | string    | no       | Path to README file. Will automatically look for README.md if not specified.        |
 | `license`     | object    | no       | `{ spdx: "license spdx", file: "Path to LICENSE file" }`                            |
@@ -123,16 +125,170 @@ Agents may also declare first-class knowledge dependencies:
 
 Knowledge dependencies are resolved and locked during install just like tool and skill dependencies.
 
-## Installing tools, skills, and knowledge for an agent
+## Declaring memory
 
-Once `tools[]`, `skills[]`, and/or `knowledge[]` are declared, run:
+Agents may also declare first-class memory dependencies:
+
+```json
+{
+  "memory": [
+    "@zack/profile-memory@0.1.0",
+    { "name": "@zack/history-memory", "version": "^0.1.0" }
+  ]
+}
+```
+
+Memory dependencies are resolved and locked during install just like tool, skill, and knowledge dependencies.
+
+## Declaring profiles
+
+Agents may also declare first-class profile dependencies:
+
+```json
+{
+  "profiles": [
+    "@zack/support-style@0.1.0",
+    { "name": "@zack/incident-voice", "version": "^0.1.0" }
+  ]
+}
+```
+
+Profile dependencies are resolved and locked during install just like tool, skill, knowledge, and memory dependencies.
+
+## Declaring a loop
+
+Agents may declare at most one direct loop dependency:
+
+```json
+{
+  "loop": "@zack/incident-response-loop@1.0.0"
+}
+```
+
+Object form is also supported:
+
+```json
+{
+  "loop": {
+    "name": "@zack/incident-response-loop",
+    "version": "^1.0.0"
+  }
+}
+```
+
+Loop dependencies are resolved and locked during install like other first-class package dependencies, but they remain metadata only. Installing a loop does not execute the graph.
+
+## Bindings
+
+Agents may optionally declare authored `bindings` metadata describing how already-declared package dependencies participate globally, within named loop phases, across named MCP surfaces, or through a consumer-owned context file.
+
+Example:
+
+```json
+{
+  "bindings": {
+    "consumer_context": {
+      "file": "runtime/customer-context.json"
+    },
+    "global": {
+      "tools": ["@zack/ticket-reader"],
+      "knowledge": ["@zack/support-playbook"],
+      "profiles": ["@zack/support-style"],
+      "memory": [
+        {
+          "package": "@zack/support-customer-state",
+          "spaces": ["customer_state"]
+        }
+      ]
+    },
+    "phases": {
+      "respond": {
+        "skills": ["@zack/support-response-checklist"],
+        "memory": [
+          {
+            "package": "@zack/support-customer-state",
+            "operations": ["refresh_customer_state"]
+          }
+        ]
+      }
+    },
+    "mcp": [
+      {
+        "id": "support-tools",
+        "tools": ["@zack/ticket-reader", "@zack/crm-lookup"]
+      }
+    ]
+  }
+}
+```
+
+Binding package identities are versionless by design. Versions remain owned by the top-level dependency fields and `agent.lock`.
+
+AgentPM validates that bound package identities are declared in the matching top-level dependency collection, but it does **not** resolve phase names against the installed Loop or validate Memory spaces/operations against Memory Blueprint contents during lint.
+
+Global and phase bindings are additive intent metadata. AgentPM does not calculate or enforce effective runtime availability from them.
+
+### Memory bindings
+
+Memory bindings identify:
+
+- a versionless memory package identity in `package`
+- one or more `spaces`
+- one or more `operations`
+- or both `spaces` and `operations`
+
+Operations retain their Memory Blueprint-defined triggers and contract semantics. Binding an operation does not redefine when it runs or how it behaves.
+
+### MCP bindings
+
+`bindings.mcp` names inspectable MCP Tool surfaces:
+
+- `id`
+- `tools`
+
+It does **not** define:
+
+- host
+- port
+- transport
+- process execution
+- auth
+
+Those runtime concerns belong to the consuming harness or host application.
+
+### Consumer context
+
+`bindings.consumer_context.file` is:
+
+- author-chosen
+- workspace-relative
+- optional
+- consumer-owned
+
+The file may or may not exist at runtime. AgentPM validates only the safe relative path shape; it does not package or read the file.
+
+### Loop access versus bindings
+
+Loop `access` metadata and Agent `bindings` describe different things:
+
+- Loop `access` says what kind of activity a phase is intended to allow
+- Agent `bindings` say which installed package identities are meant to participate globally or in a named phase
+
+AgentPM does not reject conflicts between them during lint, publish, or install. A runtime may choose how to interpret that authored metadata later.
+
+## Installing tools, skills, knowledge, memory, profiles, and loops for an agent
+
+Once `tools[]`, `skills[]`, `knowledge[]`, `memory[]`, `profiles[]`, and/or `loop` are declared, run:
 ```bash
 agentpm install
 ```
-- Resolves tool, skill, and knowledge versions.
+- Resolves tool, skill, knowledge, memory, profile, and loop versions.
 - Downloads tool artifacts and prepares them under: `.agentpm/tools/<namespace>/<name>/<version>`
 - Downloads skill artifacts and prepares them under: `.agentpm/skills/<namespace>/<name>/<version>`
 - Downloads knowledge artifacts and prepares them under: `.agentpm/knowledge/<namespace>/<name>/<version>`
+- Downloads memory artifacts and prepares them under: `.agentpm/memory/<namespace>/<name>/<version>`
+- Downloads profile artifacts and prepares them under: `.agentpm/profiles/<namespace>/<name>/<version>`
+- Downloads loop artifacts and prepares them under: `.agentpm/loops/<namespace>/<name>/<version>`
 - Populates/updates the **lockfile** `agent.lock` with package identity, integrity, and dependency relationships.
 - Uses the download cache at `.agentpm/cache` (use `--refresh` to bypass).
 
@@ -154,6 +310,21 @@ agentpm install @zack/python-docs@0.1.0
 # writes or updates knowledge[] for a direct Knowledge install, then installs
 ```
 
+```bash
+agentpm install @zack/profile-memory@0.1.0
+# writes or updates memory[] for a direct Memory install, then installs
+```
+
+```bash
+agentpm install @zack/support-style@0.1.0
+# writes or updates profiles[] for a direct Profile install, then installs
+```
+
+```bash
+agentpm install @zack/incident-response-loop@1.0.0
+# writes or updates loop for a direct Loop install, then installs
+```
+
 ## Direct package install vs manifest-driven install
 
 AgentPM supports two different install workflows for agents:
@@ -165,11 +336,14 @@ agentpm install
 ```
 
 - reads the local `agent.json`
-- resolves the local manifest's `tools`, `skills`, and `knowledge`
+- resolves the local manifest's `tools`, `skills`, `knowledge`, `memory`, `profiles`, and `loop`
 - writes a `local:agent` root into `agent.lock`
 - installs tools into `.agentpm/tools/...`
 - installs skills into `.agentpm/skills/...`
 - installs knowledge into `.agentpm/knowledge/...`
+- installs memory into `.agentpm/memory/...`
+- installs profiles into `.agentpm/profiles/...`
+- installs loops into `.agentpm/loops/...`
 - does **not** write the local manifest under `.agentpm/agents`
 
 ### Direct package install
@@ -180,10 +354,13 @@ agentpm install @zack/support-agent@0.1.0
 
 - resolves the requested package by identity
 - if the package is an agent, installs the agent artifact into `.agentpm/agents/...`
-- reads the installed agent manifest and resolves its tool, skill, and knowledge dependencies
+- reads the installed agent manifest and resolves its tool, skill, knowledge, memory, profile, and loop dependencies
 - installs those tools into `.agentpm/tools/...`
 - installs those skills into `.agentpm/skills/...`
 - installs those knowledge packages into `.agentpm/knowledge/...`
+- installs those memory packages into `.agentpm/memory/...`
+- installs those profile packages into `.agentpm/profiles/...`
+- installs that loop package into `.agentpm/loops/...`
 - writes an `agent:@namespace/name@version` root into `agent.lock`
 
 ## Lockfile (high level)
@@ -198,6 +375,9 @@ At a high level it contains:
   - keys like `tool:@zack/summarize@0.1.2`
   - keys like `skill:@zack/incident-commander@0.1.0`
   - keys like `knowledge:@zack/python-docs@0.1.0`
+  - keys like `memory:@zack/profile-memory@0.1.0`
+  - keys like `profile:@zack/support-style@0.1.0`
+  - keys like `loop:@zack/incident-response-loop@1.0.0`
   - keys like `agent:@zack/support-agent@0.1.0`
 - `roots`
   - `local:agent` for local manifest installs
@@ -239,5 +419,5 @@ agentpm install --frozen --quiet
 - **Evolve safely**: Bump the agent’s `version` when you change its tool set or operational contract.
 
 <Callout type="info" title="Dependency scope">
-  Agents resolve `tools[]`, `skills[]`, and `knowledge[]`. `memory` and `profiles` remain preserved future-facing metadata only.
+  Agents resolve `tools[]`, `skills[]`, `knowledge[]`, `memory[]`, `profiles[]`, and optional singular `loop`. Bindings are preserved as authored metadata only.
 </Callout>

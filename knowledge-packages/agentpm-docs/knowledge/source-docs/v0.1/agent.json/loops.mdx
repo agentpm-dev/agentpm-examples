@@ -1,0 +1,397 @@
+---
+title: Loops
+section: agent.json
+order: 19
+description: Author portable Loop packages that define phases, outcomes, transitions, checkpoints, and error policy.
+next: agent.json/agents
+---
+
+# Loops
+
+Author portable Loop packages that define phases, outcomes, transitions, checkpoints, and error policy.
+
+## What is a Loop?
+
+A `kind: "loop"` package is a **declarative orchestration contract**. It describes:
+
+- the phases an agent run may move through
+- the valid outcomes each phase can emit
+- the transitions between phases and terminal targets
+- optional access intent for tools, knowledge, and memory
+- optional checkpoints, limits, and failure policy
+
+A Loop is metadata only. It does **not** execute the graph, choose a model, compile prompts, start MCP servers, read consumer context, or manage a live runtime.
+
+<Callout type="info" title="Runtime boundary">
+  AgentPM validates, publishes, installs, displays, and loads Loop packages as authored orchestration metadata. `agentpm harness` can interpret that metadata when running an installed Agent, but the Loop package itself does not execute anything.
+</Callout>
+
+## When to use a Loop
+
+Choose **Loop** when the reusable artifact is:
+
+- an investigate → review → respond cycle
+- a bounded planner/executor/reviewer structure
+- an approval or escalation flow
+- a portable orchestration graph you want to inspect, compare, version, and install separately from agent runtime code
+
+Choose an **Agent** when you want to compose tools, skills, knowledge, memory, profiles, and an optional Loop into a single package.
+
+## Scaffold a Loop
+
+```bash
+agentpm init --kind loop --name incident-response-loop --description "Portable incident triage and response loop"
+```
+
+Generated starter layout:
+
+```text
+incident-response-loop/
+  agent.json
+  README.md
+```
+
+Example starter manifest:
+
+```json
+{
+  "kind": "loop",
+  "name": "incident-response-loop",
+  "version": "0.1.0",
+  "description": "Portable incident triage and response loop",
+  "readme": "README.md",
+  "loop": {
+    "archetype": "investigate_review_respond",
+    "entry_phase": "assess",
+    "phases": [
+      {
+        "id": "assess",
+        "objective": "Assess the request and decide whether work should proceed.",
+        "outcomes": [
+          {
+            "id": "proceed",
+            "description": "The work should move forward."
+          },
+          {
+            "id": "handoff",
+            "description": "The work should be handed off."
+          }
+        ]
+      },
+      {
+        "id": "execute",
+        "objective": "Perform the active work for the request."
+      },
+      {
+        "id": "review",
+        "objective": "Review whether the work is complete or needs another pass.",
+        "outcomes": [
+          {
+            "id": "needs-more-work",
+            "description": "Another execution pass is required."
+          },
+          {
+            "id": "ready",
+            "description": "The work is complete and ready to end."
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      { "from": "assess", "on": "proceed", "to": "execute" },
+      { "from": "assess", "on": "handoff", "to": "$handoff" },
+      { "from": "execute", "on": "complete", "to": "review" },
+      { "from": "review", "on": "needs-more-work", "to": "execute" },
+      { "from": "review", "on": "ready", "to": "$end" }
+    ]
+  }
+}
+```
+
+## Field reference
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `$schema` | string | no | Optional schema URI |
+| `kind` | enum | **yes** | Must be `"loop"` |
+| `name` | string | **yes** | Package name |
+| `version` | semver | **yes** | Package version |
+| `description` | string | **yes** | Registry/package summary |
+| `readme` | string | no | Optional README path |
+| `license` | object | no | Optional SPDX/license metadata |
+| `loop.archetype` | string | no | Open-ended descriptive label |
+| `loop.entry_phase` | string | **yes** | Must reference a declared phase ID |
+| `loop.limits.max_steps` | integer | no | Optional positive step cap |
+| `loop.phases` | array | **yes** | One or more declared phases |
+| `loop.transitions` | array | **yes** | One or more transitions |
+| `loop.checkpoints` | array | no | Optional approval checkpoints |
+| `loop.error_policy` | object | no | Optional tool/phase failure handling metadata |
+
+## Stable identifiers
+
+Loop phase IDs, explicit outcome IDs, checkpoint IDs, and MCP binding IDs use lowercase kebab-case with a 64-character maximum:
+
+```text
+^[a-z](?:[a-z0-9]|-(?=[a-z0-9])){0,63}$
+```
+
+Examples:
+
+- `triage`
+- `needs-more-evidence`
+- `approve-response`
+
+## Phases and outcomes
+
+Each phase requires:
+
+- `id`
+- `objective`
+
+Optional phase metadata:
+
+- `access.tools`
+- `access.knowledge`
+- `access.memory.read`
+- `access.memory.write`
+- `outcomes`
+
+### Scope tools deliberately
+
+Do not bind investigative Tools into a phase whose objective is to answer from prior phase results unless re-verification is genuinely wanted.
+
+Validation with smaller/faster models showed that they may re-run retrieval simply because the capability remains available. In repeated two-phase runs with a Tool returning no useful result, `gpt-4o-mini` and `claude-haiku-4-5-20251001` sometimes re-ran the same investigation even when the response phase had enough prior output to answer. Setting `access.tools: false` in the response phase eliminated that rework and the phase answered correctly from the prior output.
+
+The effect is tier-sensitive, not universal. The same scenario with identical Tool availability produced zero cross-phase rework across 12 runs on `gpt-5.6` and `claude-opus-5`. Treat this as authoring guidance for capability design, especially for smaller/faster models or expensive verification paths, not as a Harness deficiency.
+
+There is intentionally no lint rule for this. A linter cannot know whether re-verification was intended from the phase objective text alone, and judging authored intent would create false warnings. Keep the decision explicit in phase authoring.
+
+### Implicit `complete`
+
+If a phase omits `outcomes`, it has exactly one implicit outcome:
+
+- `complete`
+
+If a phase declares `outcomes`, the valid outcome set becomes exactly those authored outcome IDs. `complete` is only valid if you explicitly author it.
+
+## Transitions and terminal targets
+
+Each transition contains exactly:
+
+- `from`
+- `on`
+- `to`
+
+Terminal targets are standardized:
+
+- `$end`
+- `$abort`
+- `$handoff`
+
+There is no expression language, condition callback, or embedded executable logic in a Loop transition.
+
+## Checkpoints
+
+Checkpoints are optional approval metadata.
+
+Each checkpoint requires:
+
+- `id`
+- `type: "approval"`
+- `before_phase`
+- `on_reject`
+
+`on_reject` may point to:
+
+- a declared phase
+- `$end`
+- `$abort`
+- `$handoff`
+
+Multiple approval checkpoints may target the same `before_phase`. Compatible runtimes evaluate matching checkpoints in the authored `loop.checkpoints` order before entering that phase.
+
+## Limits and error policy
+
+Optional loop-wide limits currently support:
+
+- `limits.max_steps`
+
+Optional error policy supports:
+
+- `error_policy.tool_failure`
+- `error_policy.phase_failure`
+
+Tool failures may:
+
+- `retry`
+- `fail_phase`
+- `abort`
+- `handoff`
+
+If `retry` is used, the policy also includes:
+
+- `max_retries`
+- `on_exhausted`
+
+Phase failures may:
+
+- `abort`
+- `handoff`
+
+## Full example
+
+```json
+{
+  "kind": "loop",
+  "name": "incident-response-loop",
+  "version": "1.0.0",
+  "description": "A bounded triage, investigation, review, and response loop with approval and escalation paths.",
+  "readme": "README.md",
+  "license": {
+    "spdx": "Apache-2.0"
+  },
+  "loop": {
+    "archetype": "investigate_review_respond",
+    "entry_phase": "triage",
+    "limits": {
+      "max_steps": 16
+    },
+    "phases": [
+      {
+        "id": "triage",
+        "objective": "Assess the incident and determine whether investigation should proceed.",
+        "access": {
+          "tools": false,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": false
+          }
+        },
+        "outcomes": [
+          {
+            "id": "proceed",
+            "description": "The incident has enough information to begin investigation."
+          },
+          {
+            "id": "cannot-proceed",
+            "description": "The incident cannot be investigated safely or meaningfully."
+          }
+        ]
+      },
+      {
+        "id": "investigate",
+        "objective": "Gather evidence, test hypotheses, and update the working understanding of the incident.",
+        "access": {
+          "tools": true,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        }
+      },
+      {
+        "id": "review",
+        "objective": "Evaluate the evidence and decide whether more investigation, escalation, or response is appropriate.",
+        "access": {
+          "tools": false,
+          "knowledge": true,
+          "memory": {
+            "read": true,
+            "write": false
+          }
+        },
+        "outcomes": [
+          {
+            "id": "needs-more-evidence",
+            "description": "Important questions remain and another investigation cycle is required."
+          },
+          {
+            "id": "ready",
+            "description": "The evidence is sufficient to prepare the incident response."
+          },
+          {
+            "id": "escalate",
+            "description": "The incident requires an external actor or system to take over."
+          }
+        ]
+      },
+      {
+        "id": "respond",
+        "objective": "Produce and deliver the final incident response using the reviewed evidence.",
+        "access": {
+          "tools": true,
+          "knowledge": false,
+          "memory": {
+            "read": true,
+            "write": true
+          }
+        }
+      }
+    ],
+    "transitions": [
+      { "from": "triage", "on": "proceed", "to": "investigate" },
+      { "from": "triage", "on": "cannot-proceed", "to": "$abort" },
+      { "from": "investigate", "on": "complete", "to": "review" },
+      { "from": "review", "on": "needs-more-evidence", "to": "investigate" },
+      { "from": "review", "on": "ready", "to": "respond" },
+      { "from": "review", "on": "escalate", "to": "$handoff" },
+      { "from": "respond", "on": "complete", "to": "$end" }
+    ],
+    "checkpoints": [
+      {
+        "id": "approve-response",
+        "type": "approval",
+        "before_phase": "respond",
+        "on_reject": "review"
+      }
+    ],
+    "error_policy": {
+      "tool_failure": {
+        "action": "retry",
+        "max_retries": 2,
+        "on_exhausted": "fail_phase"
+      },
+      "phase_failure": {
+        "action": "abort"
+      }
+    }
+  }
+}
+```
+
+## Package boundaries
+
+Loop packages do **not** declare package dependencies.
+
+That means a Loop manifest must not contain:
+
+- `tools`
+- `skills`
+- `knowledge`
+- `memory`
+- `profiles`
+- `loop`
+- `agents`
+- `bindings`
+
+Loops are consumed by:
+
+- Agents through top-level singular `loop`
+- Templates through singular `template.dependencies.loop`
+- SDKs through `loadLoop()` / `load_loop()` as metadata-only loaders
+
+## Runtime concerns deliberately absent here
+
+Loop packages do **not** define:
+
+- model or provider selection
+- prompt assembly
+- effective package availability in a given phase
+- MCP host/port/transport/process configuration
+- consumer-context file contents
+- approval UI, controller routing, or resume mechanics
+- live memory-store behavior
+
+Those concerns belong to the consuming runtime or AgentPM Harness, not to the Loop package contract itself.

@@ -1,18 +1,18 @@
 ---
 title: Package Discovery
 section: SDKs
-order: 21
-description: Where the SDK looks for installed tools, skills, and installed agents on disk.
+order: 22
+description: Where the SDK looks for installed tools, skills, knowledge, memory, profiles, loops, and installed agents on disk.
 next: security/mfa
 ---
 
 # Package Discovery
 
-Where the SDK looks for installed tools, skills, and installed agents on disk.
+Where the SDK looks for installed tools, skills, knowledge, memory, profiles, loops, and installed agents on disk.
 
 ## Goal
 
-Understand the resolution order and on-disk layout so you can control where tools, skills, and installed agents are loaded from.
+Understand the resolution order and on-disk layout so you can control where installed tools, agents, skills, knowledge packages, memory blueprints, instruction profiles, and loops are loaded from.
 
 ## Resolution order
 
@@ -42,6 +42,42 @@ For installed skill packages, the SDK searches in this order:
 You can also override per call:
 - Node: `loadSkill(spec, { skillDirOverride: "/path/to/skills" })`
 - Python: `load_skill(spec, skill_dir_override="/path/to/skills")`
+
+For installed knowledge packages, the SDK searches in this order:
+1. **`AGENTPM_KNOWLEDGE_DIR` (env var)** – Highest priority override for installed knowledge packages.
+2. **Project-local**: `./.agentpm/knowledge`
+3. **User-local**: `~/.agentpm/knowledge`
+
+You can also override per call:
+- Node: `loadKnowledge(spec, { knowledgeDirOverride: "/path/to/knowledge" })`
+- Python: `load_knowledge(spec, knowledge_dir_override="/path/to/knowledge")`
+
+For installed memory blueprint packages, the SDK searches in this order:
+1. **`AGENTPM_MEMORY_DIR` (env var)** – Highest priority override for installed memory packages.
+2. **Project-local**: `./.agentpm/memory`
+3. **User-local**: `~/.agentpm/memory`
+
+You can also override per call:
+- Node: `loadMemory(spec, { memoryDirOverride: "/path/to/memory" })`
+- Python: `load_memory(spec, memory_dir_override="/path/to/memory")`
+
+For installed profile packages, the SDK searches in this order:
+1. **`AGENTPM_PROFILE_DIR` (env var)** – Highest priority override for installed profiles.
+2. **Project-local**: `./.agentpm/profiles`
+3. **User-local**: `~/.agentpm/profiles`
+
+You can also override per call:
+- Node: `loadProfile(spec, { profileDirOverride: "/path/to/profiles" })`
+- Python: `load_profile(spec, profile_dir_override="/path/to/profiles")`
+
+For installed loop packages, the SDK searches in this order:
+1. **`AGENTPM_LOOP_DIR` (env var)** – Highest priority override for installed loops.
+2. **Project-local**: `./.agentpm/loops`
+3. **User-local**: `~/.agentpm/loops`
+
+You can also override per call:
+- Node: `loadLoop(spec, { loopDirOverride: "/path/to/loops" })`
+- Python: `load_loop(spec, loop_dir_override="/path/to/loops")`
 
 ## Directory layout
 
@@ -87,3 +123,69 @@ Installed registry skill packages live under the parallel `skills` layout:
 ```
 
 - `loadSkill()` / `load_skill()` resolve from the installed skill directory plus the matching root entry in `agent.lock`.
+
+Installed registry knowledge packages live under the parallel `knowledge` layout:
+
+```bash
+.agentpm/
+  knowledge/
+    @zack/python-docs/
+      0.1.0/
+        agent.json
+        knowledge/...
+```
+
+- `loadKnowledge()` / `load_knowledge()` resolve directly from the installed knowledge directory.
+- `loadAgent()` / `load_agent()` surface resolved knowledge relationships from the matching `agent.lock` root entry.
+
+Installed registry memory blueprint packages live under the parallel `memory` layout:
+
+```bash
+.agentpm/
+  memory/
+    @zack/profile-memory/
+      0.1.0/
+        agent.json
+        memory/
+          build.json
+          contracts/
+```
+
+- `loadMemory()` / `load_memory()` resolve directly from the installed memory directory.
+- `loadAgent()` / `load_agent()` surface resolved memory relationships from the matching `agent.lock` root entry.
+
+Installed registry profile packages live under the parallel `profiles` layout:
+
+```bash
+.agentpm/
+  profiles/
+    @zack/support-style/
+      0.1.0/
+        agent.json
+        README.md
+```
+
+- `loadProfile()` / `load_profile()` resolve directly from the installed profile directory.
+- `loadAgent()` / `load_agent()` surface resolved profile relationships from the matching `agent.lock` root entry.
+
+Installed registry loop packages live under the parallel `loops` layout:
+
+```bash
+.agentpm/
+  loops/
+    @zack/incident-response-loop/
+      1.0.0/
+        agent.json
+        README.md
+```
+
+- `loadLoop()` / `load_loop()` resolve directly from the installed loop directory.
+- `loadAgent()` / `load_agent()` surface singular resolved loop relationships from the matching `agent.lock` root entry when present.
+
+## Not included here
+
+Templates are not SDK-loadable package artifacts today.
+
+- The CLI can install and expand Templates through `agentpm new`.
+- The Node and Python SDKs do not provide `loadTemplate()` / `load_template()`.
+- This page therefore covers the full installed-package discovery model for the package kinds the SDKs can actually load.

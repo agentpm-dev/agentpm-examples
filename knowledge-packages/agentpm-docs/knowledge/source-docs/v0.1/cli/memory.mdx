@@ -1,0 +1,183 @@
+---
+title: memory
+section: CLI
+order: 15
+description: Build and inspect local or installed Memory Blueprint packages and verify their generated contract state.
+next: cli/whoami
+---
+
+# memory
+
+Build and inspect `kind: "memory"` packages.
+
+## Overview
+
+`agentpm memory` is the CLI surface for Memory Blueprints. It currently supports:
+
+- `agentpm memory build` to validate a blueprint and generate resolved contracts
+- `agentpm memory inspect` to inspect a local or installed Memory package without rewriting it
+
+The command group is **diagnostic and packaging-oriented**. It does not create a live store, bind a blueprint to a backend, persist records, execute lifecycle operations, or evaluate triggers.
+
+## Commands
+
+### Build
+
+```bash
+agentpm memory build [PATH] [--manifest <path>]
+```
+
+Use build when you want AgentPM to:
+
+- validate the authored blueprint and referenced source schemas
+- generate one resolved contract for every declared space-and-record-type pairing
+- write `memory/contracts/index.json`
+- write `memory/build.json`
+
+Typical flow:
+
+```bash
+agentpm lint --strict
+agentpm memory build
+agentpm publish --dry-run
+```
+
+### Inspect
+
+```bash
+agentpm memory inspect <PATH_OR_PACKAGE> [--json]
+```
+
+Target resolution order:
+
+1. existing local directory
+2. explicit local `agent.json`
+3. installed Memory package reference such as `@namespace/name@range`
+
+Accepted installed-package forms:
+
+- `@namespace/name`
+- `@namespace/name@0.1.0`
+- `@namespace/name@^0.1`
+- `memory:@namespace/name@0.1.0`
+
+`inspect` is read-only. It never rebuilds or repairs package state.
+
+## Build outputs
+
+A successful build writes:
+
+```text
+memory/
+  build.json
+  contracts/
+    index.json
+    <space>.<record_type>.schema.json
+```
+
+### `memory/contracts/index.json`
+
+The contract index inventories the generated contracts and includes, per entry:
+
+- `space`
+- `record_type`
+- `schema_version`
+- `model`
+- `source_schema`
+- generated `path`
+- generated contract hash
+
+### `memory/build.json`
+
+The build metadata records portable authored-input and generated-output hashes so AgentPM can detect:
+
+- never-built state
+- stale authored input
+- missing generated output
+- modified generated output
+- unsupported metadata
+- inconsistent metadata
+
+## Example: build a blueprint
+
+```bash
+agentpm init --kind memory --name conversation-continuity --description "Durable memory contract for a support assistant"
+cd conversation-continuity
+agentpm lint --strict
+agentpm memory build
+```
+
+Sample result:
+
+```text
+Memory build: conversation-continuity@0.1.0
+Scopes: 1
+Record types: 1
+Spaces: 1
+Operations: 0
+Contracts written: 1
+Output: memory/contracts
+```
+
+## Example: inspect a local package
+
+```bash
+agentpm memory inspect .
+```
+
+Typical text output includes:
+
+- package identity and paths
+- normalized build status such as `fresh`, `not_built`, `stale`, `invalid`, or `unsupported`
+- authored scopes, record types, spaces, and lifecycle operations
+- generated contract inventory
+- structured mismatch details when generated output is stale or malformed
+
+Machine-readable output:
+
+```bash
+agentpm memory inspect . --json
+```
+
+## Publish readiness
+
+`agentpm publish` does **not** build Memory output for you. A Memory package must already have fresh generated files.
+
+If authored inputs changed since the last build:
+
+```bash
+agentpm memory build
+```
+
+Then try publish again:
+
+```bash
+agentpm publish --dry-run
+```
+
+## Common failure cases
+
+### Not built yet
+
+```text
+Memory Blueprint is not built.
+Run:
+agentpm memory build
+```
+
+### Authored inputs changed
+
+`inspect` reports a stale state and identifies the changed source schema, manifest, or generated file where possible.
+
+### Modified or missing generated output
+
+`inspect` reports an invalid state and lists the affected generated files without rewriting them.
+
+## SDK boundary
+
+Memory Blueprints become useful to SDK consumers after install:
+
+- Node: `loadMemory()` and `loadMemoryContract()`
+- Python: `load_memory()` and `load_memory_contract()`
+
+Those SDK calls are **metadata and contract loaders only**. They do not provide live record CRUD or a hosted memory runtime.

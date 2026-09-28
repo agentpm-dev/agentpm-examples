@@ -1,0 +1,158 @@
+---
+title: Harness Protocols
+section: Advanced
+order: 28
+description: Public machine, process-service, Tool machine, Knowledge query, and MCP machine integration surfaces used by Harness.
+next: advanced/harness-providers
+---
+
+# Harness Protocols
+
+Harness exposes stable process boundaries so clients and providers can integrate without using the official SDKs.
+
+## Harness Machine Protocol
+
+`agentpm harness --machine` speaks newline-delimited UTF-8 JSON on stdout/stdin.
+
+```json
+{
+  "protocol": "agentpm-harness-machine",
+  "version": 1,
+  "kind": "request",
+  "id": "req-1",
+  "method": "start_run",
+  "payload": {
+    "input": "Summarize the incident."
+  }
+}
+```
+
+Machine stdout is protocol-only. Human prose belongs in structured result payloads, reports, traces, or stderr diagnostics.
+
+Required message families:
+
+- client requests: initialize, preflight, start Run, cancel Run, invoke external Memory operation, shutdown
+- Harness events: the same stable events written to trace, subject to subscription/content policy
+- host-service requests: Hook/model/embedding/Knowledge/Memory/approval calls for configured `type: "host"` implementations
+- host-service responses: correlated typed success/error responses
+- terminal responses: structured Run/preflight results and report references
+
+A machine Session permits at most one active Run. A `start_run` request while another Run is active returns a structured busy/active-Run error and leaves the existing Run untouched.
+
+## Common Process-Service Protocol
+
+Configured `type: "process"` providers use the `agentpm-service` newline-delimited JSON protocol over persistent stdin/stdout. Human diagnostics from the child process belong on stderr.
+
+Request envelope:
+
+```json
+{
+  "protocol": "agentpm-service",
+  "version": 1,
+  "kind": "request",
+  "id": "req-123",
+  "service": "knowledge",
+  "method": "retrieve",
+  "payload": {}
+}
+```
+
+Response envelope:
+
+```json
+{
+  "protocol": "agentpm-service",
+  "version": 1,
+  "kind": "response",
+  "id": "req-123",
+  "service": "knowledge",
+  "result": {}
+}
+```
+
+Errors are typed response frames with the same `id`. Events may use `kind: "event"`, but an event can never replace a required response.
+
+Harness initializes every process service with Session/workspace-safe metadata, requested role/registry ID, protocol version, and role-specific initialization data. The service must return its role and live capability advertisement. A process that reports the wrong role, incompatible protocol version, or insufficient capabilities is unavailable during preflight.
+
+Minimum roles:
+
+| Role | Minimum methods |
+| --- | --- |
+| `model` | `initialize`, `generate` |
+| `embedding` | `initialize`, `embed` |
+| `hook` | `initialize`, `invoke` |
+| `knowledge` | `initialize`, `retrieve` |
+| `memory` | `initialize`, read/write/count/state/batch/lifecycle primitives |
+| `approval` | `initialize`, `request_approval` |
+
+## `agentpm run --machine`
+
+Harness direct Tool calls use the public Tool machine boundary instead of a generic service provider.
+
+```bash
+agentpm run @zack/echo-json --machine --input '{"message":"hello"}'
+```
+
+Success:
+
+```json
+{
+  "schema_version": 1,
+  "status": "success",
+  "tool": {
+    "package": "@zack/echo-json",
+    "version": "0.1.0"
+  },
+  "output": {
+    "message": "hello"
+  }
+}
+```
+
+Failure:
+
+```json
+{
+  "schema_version": 1,
+  "status": "error",
+  "error": {
+    "category": "runtime",
+    "message": "..."
+  }
+}
+```
+
+The Tool package, runner, timeout, and output validation are the same as plain `agentpm run`; machine mode only changes stdout framing.
+
+## Knowledge Query Machine Behavior
+
+Harness local vector Knowledge retrieval uses the same public Knowledge query semantics:
+
+```bash
+agentpm knowledge query @zack/python-docs "How does auth work?" \
+  --embedding-command 'python3 scripts/embed.py' \
+  --top-k 3 \
+  --json \
+  --include-text
+```
+
+AgentPM validates the built Knowledge manifest, local index metadata, vector length, optional provider/model/dimension metadata, and freshness before returning results. There is no silent fallback to a configured external provider or local vector search when an explicit runtime mapping is unavailable.
+
+## `agentpm serve --mcp --machine`
+
+Outward MCP export uses the public MCP serving surface:
+
+```bash
+agentpm serve --mcp --machine
+```
+
+Machine mode emits lifecycle and call events on stdout while the HTTP MCP server handles `initialize`, `tools/list`, and `tools/call`. This is the contract Harness-managed MCP exports build on; imported MCP servers still speak MCP directly rather than `agentpm-service`.
+
+## Protocol Stability Rules
+
+- Preserve opaque IDs exactly.
+- Treat protocol versions as compatibility gates.
+- Do not infer request identity from line ordering.
+- Do not place secrets in initialization payloads when they were projected through environment variables.
+- Return typed unsupported-capability errors instead of claiming readiness for unsupported behavior.
+- Never substitute a different local runtime silently for an explicitly configured process/host runtime.

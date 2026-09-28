@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.env.local
+.agentpm-state/
+reports/*.json
+reports/*.jsonl
+reports/*.txt
+
+!.env.local.example
+!reports/.gitkeep

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "ollama",
+    "model": "{{ ollama_model }}"
+  },
+  "scopes": {
+    "user": "{{ default_user_scope }}",
+    "repository": "{{ default_repository_scope }}"
+  },
+  "runtime": {
+    "state_dir": ".agentpm-state-ollama"
+  },
+  "trace": {
+    "enabled": true,
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "{{ workspace_label }}",
+      "subtitle": "Minimal Harness Agent · Ollama",
+      "accent": "#22C55E"
+    }
+  }
+}

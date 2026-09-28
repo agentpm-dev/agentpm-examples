@@ -3,7 +3,7 @@ title: serve
 section: CLI
 order: 11
 description: Start a local HTTP MCP server that exposes the tools pinned in agent.lock.
-next: cli/export
+next: cli/harness
 ---
 
 # serve
@@ -24,7 +24,7 @@ Start a local HTTP MCP server for installed AgentPM tools.
 
 ### Command synopsis
 ```bash
-agentpm serve --mcp [--host <HOST>] [--port <PORT>] [--tool <PACKAGE_REF> ...] [--tools <PACKAGE_REFS>]
+agentpm serve --mcp [--host <HOST>] [--port <PORT>] [--tool <PACKAGE_REF> ...] [--tools <PACKAGE_REFS>] [--machine]
 ```
 
 ### Arguments
@@ -33,6 +33,7 @@ agentpm serve --mcp [--host <HOST>] [--port <PORT>] [--tool <PACKAGE_REF> ...] [
 - **`--port <PORT>`**. Port to bind. Default: `7331`.
 - **`--tool <PACKAGE_REF>`**. Restrict exposure to a specific locked package ref. Repeatable.
 - **`--tools <PACKAGE_REFS>`**. Restrict exposure to a comma-separated list of locked package refs.
+- **`--machine`**. Emit JSONL lifecycle and Tool-call events on stdout.
 
 ## Examples
 
@@ -56,6 +57,11 @@ agentpm serve --mcp --tool @zack/echo-json
 agentpm serve --mcp --tools @zack/echo-json,@zack/slack-post-message
 ```
 
+### Emit readiness and call events for a host process
+```bash
+agentpm serve --mcp --machine --port 0
+```
+
 ## Behavior
 
 - By default, the server exposes every tool pinned in `agent.lock`.
@@ -64,6 +70,7 @@ agentpm serve --mcp --tools @zack/echo-json,@zack/slack-post-message
 - Tool descriptions come from manifest `description`.
 - Tool input metadata comes from manifest `inputs` when present.
 - Tool calls execute through the shared AgentPM runner rather than a separate MCP-specific execution path.
+- With `--machine`, stdout is reserved for JSONL lifecycle and call events. The first `ready` event includes the selected endpoint and normalized MCP Tool names.
 
 ## HTTP endpoints
 

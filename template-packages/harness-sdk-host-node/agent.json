@@ -1,0 +1,70 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "harness-sdk-host-node",
+  "version": "0.1.0",
+  "description": "Node SDK starter that runs AgentPM Harness through a hosted model, Hook, and approval controller.",
+  "template": {
+    "display_name": "Harness SDK Host Node",
+    "use_case": "harness-sdk-host",
+    "execution_surfaces": [
+      "node-sdk"
+    ],
+    "stack": [
+      "node",
+      "workspace"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "harness-sdk-host-node"
+      },
+      {
+        "name": "workspace_label",
+        "description": "Human-readable label shown in the generated README, Harness config, and terminal output.",
+        "required": true,
+        "default": "Harness SDK Host Node"
+      },
+      {
+        "name": "default_user_scope",
+        "description": "Default user scope supplied by the SDK client when it launches Harness.",
+        "required": true,
+        "default": "node-sdk-user"
+      }
+    ],
+    "dependencies": {
+      "tools": [],
+      "agents": [],
+      "loop": "@zack/react-loop@0.1.0"
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.local.example .env.local"
+      },
+      {
+        "label": "Install Node dependencies",
+        "command": "pnpm install"
+      },
+      {
+        "label": "Run the SDK-hosted Harness example",
+        "command": "pnpm dev -- \"Use the SDK-hosted Harness example to inspect this generated workspace.\""
+      },
+      {
+        "label": "Run scaffold tests",
+        "command": "pnpm test"
+      },
+      {
+        "label": "Check SDK-hosted Harness readiness",
+        "command": "pnpm dev -- --preflight-only"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

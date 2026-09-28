@@ -1,0 +1,78 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "kind": "template",
+  "name": "harness-mcp-bridge",
+  "version": "0.1.0",
+  "description": "AgentPM Harness starter showing Harness-managed MCP exports and scoped runtime MCP imports in one workspace.",
+  "template": {
+    "display_name": "Harness MCP Bridge",
+    "use_case": "harness-mcp-bridge",
+    "execution_surfaces": [
+      "agentpm-run"
+    ],
+    "stack": [
+      "node",
+      "mcp",
+      "workspace"
+    ],
+    "files_root": "template",
+    "variables": [
+      {
+        "name": "project_name",
+        "description": "Generated project name. Generation-time only; do not use for API keys, tokens, passwords, or runtime secrets.",
+        "required": true,
+        "default": "harness-mcp-bridge"
+      },
+      {
+        "name": "workspace_label",
+        "description": "Human-readable label shown in the generated README, Harness config, and terminal output.",
+        "required": true,
+        "default": "Harness MCP Bridge"
+      }
+    ],
+    "dependencies": {
+      "tools": [
+        {
+          "name": "@zack/csv-query",
+          "version": "0.1.4"
+        },
+        {
+          "name": "@zack/json-transform",
+          "version": "0.1.1"
+        }
+      ],
+      "agents": [],
+      "loop": "@zack/react-loop@0.1.0"
+    },
+    "entrypoints": [
+      {
+        "label": "Create local env file",
+        "command": "cp .env.local.example .env.local"
+      },
+      {
+        "label": "Install Node dependencies",
+        "command": "pnpm install"
+      },
+      {
+        "label": "Configure Agent MCP export bindings",
+        "command": "pnpm setup:bindings"
+      },
+      {
+        "label": "Check Harness readiness with the local MCP import server",
+        "command": "pnpm harness:json"
+      },
+      {
+        "label": "Run one MCP-import-backed prompt",
+        "command": "pnpm run harness:headless -- \"Use the MCP bridge to verify the imported lookup tool.\""
+      },
+      {
+        "label": "Run scaffold tests",
+        "command": "pnpm test"
+      }
+    ]
+  },
+  "readme": "README.md",
+  "license": {
+    "spdx": "MIT"
+  }
+}

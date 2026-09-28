@@ -1,0 +1,14 @@
+{
+  "name": "{{ project_name }}",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup:bindings": "node scripts/configure-agent-bindings.mjs",
+    "mcp:server": "node runtime/local-mcp-server.mjs",
+    "harness:json": "node scripts/run-with-mcp-server.mjs -- agentpm harness --json",
+    "harness:headless": "node scripts/run-headless.mjs",
+    "test": "node --test tests/*.mjs"
+  },
+  "devDependencies": {}
+}

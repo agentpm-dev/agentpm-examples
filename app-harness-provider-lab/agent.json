@@ -1,0 +1,47 @@
+{
+  "description": "Generated from harness-provider-lab@0.1.0.",
+  "kind": "agent",
+  "knowledge": [
+    {
+      "name": "@zack/agentpm-docs",
+      "version": "0.1.1"
+    },
+    {
+      "name": "@zack/devwork-maintainer-guide",
+      "version": "0.1.0"
+    }
+  ],
+  "loop": {
+    "name": "@zack/react-loop",
+    "version": "0.1.0"
+  },
+  "memory": [
+    {
+      "name": "@zack/support-customer-state",
+      "version": "0.1.0"
+    }
+  ],
+  "name": "app-harness-provider-lab",
+  "profiles": [],
+  "skills": [],
+  "tools": [],
+  "version": "0.1.0",
+  "bindings": {
+    "phases": {
+      "reason": {
+        "knowledge": [
+          "@zack/agentpm-docs",
+          "@zack/devwork-maintainer-guide"
+        ],
+        "memory": [
+          {
+            "package": "@zack/support-customer-state",
+            "spaces": [
+              "customer_state"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

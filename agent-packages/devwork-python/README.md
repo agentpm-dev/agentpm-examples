@@ -20,11 +20,10 @@ It includes a Profile for:
 It includes authored bindings for:
 - a shared maintainer behavior profile
 - maintainer-state cleanup as a global Memory capability
-- phase-scoped Knowledge, Skill, Tool, and Memory surfaces
+- phase-scoped Knowledge, Skill, and Memory surfaces
 - a maintainer-specific consumer-context filename
 
-And it keeps direct agent-level tools for:
-- summarizing issue queues and maintainer context
+Tool capability enters through the packaged `issue-triage-playbook` Skill, which depends on the published `@zack/github-issues` Tool.
 
 Example prompts:
 - Review the latest GitHub issues for a repository, group them by theme, and summarize the highest-priority work.

@@ -1,0 +1,35 @@
+{
+  "generated": "2026-09-28T00:44:21.788240Z",
+  "lockfile_version": 3,
+  "packages": {
+    "loop:@zack/react-loop@0.1.0": {
+      "integrity": "6f5b639b35a617c3a9cea3195da89c616df94766c897b28b1ecf62679b44d828",
+      "kind": "loop",
+      "name": "@zack/react-loop",
+      "version": "0.1.0"
+    },
+    "tool:@zack/csv-query@0.1.4": {
+      "integrity": "908e9f963a91d7ce24d61f6c7c5e339d36a658f2c7e806589cfbc01b45f760c2",
+      "kind": "tool",
+      "name": "@zack/csv-query",
+      "version": "0.1.4"
+    },
+    "tool:@zack/json-transform@0.1.1": {
+      "integrity": "9307c32f2b7effa1109aec15c728932d835c4fdb86a98f5efbe4e325a8acf50a",
+      "kind": "tool",
+      "name": "@zack/json-transform",
+      "version": "0.1.1"
+    }
+  },
+  "roots": {
+    "local:agent": {
+      "loop": "loop:@zack/react-loop@0.1.0",
+      "name": "app-harness-mcp-bridge",
+      "tools": [
+        "tool:@zack/csv-query@0.1.4",
+        "tool:@zack/json-transform@0.1.1"
+      ],
+      "version": "0.1.0"
+    }
+  }
+}

@@ -2,13 +2,13 @@
 title: publish
 section: CLI
 order: 9
-description: Validate and package your tool, skill, knowledge, agent, or template, then upload the signed artifact to the registry.
+description: Validate and package your tool, skill, knowledge, memory, profile, loop, agent, or template, then upload the signed artifact to the registry.
 next: cli/run
 ---
 
 # publish
 
-Validate and package your tool, skill, knowledge, agent, or template, then upload the signed artifact to the registry.
+Validate and package your tool, skill, knowledge, memory, profile, loop, agent, or template, then upload the signed artifact to the registry.
 
 ## Overview
 
@@ -21,6 +21,16 @@ agentpm knowledge build
 ```
 
 Publish validates that the current files still match the build-derived metadata and local index metadata. It does not rewrite `agent.json` or regenerate the index during publish.
+
+For `kind: "memory"`, publish also performs a build-readiness check first. The package must already be prepared with:
+
+```bash
+agentpm memory build
+```
+
+Publish validates that the current authored files still match `memory/build.json`, `memory/contracts/index.json`, and every indexed generated contract. It does not rebuild contracts or rewrite generated files during publish.
+
+For `kind: "loop"`, publish performs normal schema + semantic validation only. There is no Loop build step and no generated package-specific metadata to refresh during publish.
 
 ### Command synopsis
 ```bash
@@ -57,7 +67,7 @@ You **must be logged in** to publish. Any of these methods work:
 - **Logged-in session**: run `agentpm login` once to create a local token file
 
 PAT scopes:
-- `packages:publish` can publish tools, skills, knowledge packages, agents, and templates
+- `packages:publish` can publish tools, skills, knowledge packages, memory packages, instruction profiles, loops, agents, and templates
 - `tools:publish` is still temporarily accepted for tool packages only
 
 ## Namespace required
@@ -156,7 +166,7 @@ Artifacts are written to:
 
 ### Shared package contents
 
-Tool, skill, knowledge, agent, and template packages can include:
+Tool, skill, knowledge, memory, profile, loop, agent, and template packages can include:
 
 - `agent.json` — your manifest (exactly as validated)
 - README content when you provide it through the existing README metadata/content flow
@@ -200,6 +210,21 @@ Agent packages do **not** require:
 - `outputs`
 - `files`
 
+### Loop packages
+
+For `kind: "loop"`, the archive contains only common manifest-declared package files:
+
+- `agent.json`
+- optional declared `readme`
+- optional declared `license.file`
+
+Loop packages:
+
+- do not have a build step
+- do not include generated metadata
+- do not package executable entrypoints
+- do not declare package dependencies
+
 ### Template packages
 
 For `kind: "template"`, the archive contains:
@@ -235,25 +260,59 @@ Vector mode packages contain:
 - all files under the declared default `agentpm-local` index path
 - optional `knowledge.provenance.sources_manifest_path` when present
 
-Important publish behavior for Knowledge:
+Important publish behavior for knowledge:
 
 - publish validates that `agentpm knowledge build` has already been run
 - publish fails if build-derived metadata is missing or stale
 - publish does not regenerate `knowledge/indexes/default`
 - publish does not mutate `agent.json`
 
+### Memory packages
+
+For `kind: "memory"`, the archive contains:
+
+- `agent.json`
+- every declared `memory.record_types.*.schema`
+- `memory/build.json`
+- `memory/contracts/index.json`
+- every indexed generated resolved contract
+
+Important publish behavior for memory:
+
+- publish validates that `agentpm memory build` has already been run
+- publish fails if authored inputs are stale or generated output is missing, modified, unsupported, or inconsistent
+- publish does not regenerate contracts
+- publish does not mutate `agent.json`
+
+### Profile packages
+
+For `kind: "profile"`, the archive contains:
+
+- `agent.json`
+- optional `readme` file when declared
+- optional `license.file` when declared
+
+Important publish behavior for profiles:
+
+- Profile packages do not have a build step
+- Profile packages do not contain generated output
+- publish rejects Profile manifests that attempt to declare package dependencies
+
 ## Typical workflow
 
 1. Finish your manifest.
    - tools: inputs/outputs, entrypoint, files, optional README/license metadata, env vars, version
-   - agents: tools, examples, optional README/license metadata, version
+   - agents: tools, skills, knowledge, memory, profiles, examples, optional README/license metadata, version
    - skills: `skill.entrypoint`, optional references/scripts/compatibility, optional README/license metadata, version
    - knowledge: declared context documents or vector corpus paths, optional provenance metadata, version
+   - memory: authored scopes/record types/spaces plus fresh generated contracts and build metadata
+   - profiles: authored `profile` metadata plus optional README/license metadata
    - templates: `template` metadata, declared `files_root`, optional README/license metadata, version
 2. Run local checks:
 ```bash
 agentpm lint --strict
 agentpm knowledge build   # for kind="knowledge"
+agentpm memory build      # for kind="memory"
 agentpm publish --dry-run
 ```
 3. Commit changes (including updated version).

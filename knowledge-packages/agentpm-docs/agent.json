@@ -9,10 +9,10 @@
       "strategy": "langchain-markdown-headers-plus-recursive-character"
     },
     "corpus": {
-      "chunk_count": 459,
+      "chunk_count": 615,
       "chunks_path": "knowledge/chunks.jsonl",
-      "content_hash": "sha256:d534741b4adec099106540f3a81285335eaccd089e8b94c96bec20981e044378",
-      "source_count": 37,
+      "content_hash": "sha256:ad4791eac0657a76c0f6b52d31d1066d451e50b15f88fb4fa618b48172c6d5e3",
+      "source_count": 46,
       "sources_path": "knowledge/sources.jsonl"
     },
     "embedding": {
@@ -22,8 +22,8 @@
       "model": "text-embedding-3-small",
       "normalized": true,
       "provider": "openai",
-      "vector_count": 459,
-      "vectors_hash": "sha256:8ebfaaf536f0235961680caff907dac07370b52a38b5c5d2e81e8371300a743f",
+      "vector_count": 615,
+      "vectors_hash": "sha256:66f6747e488ac861343d330a1304ffdf088c7e9c31bffeb124f2839961415a0e",
       "vectors_path": "knowledge/embeddings/default.f32"
     },
     "indexes": [
@@ -39,9 +39,9 @@
     "provenance": {
       "builder": {
         "name": "agentpm-examples-agentpm-docs-pipeline",
-        "version": "2026-07-12"
+        "version": "2026-09-27"
       },
-      "generated_at": "2026-07-12T00:00:00Z",
+      "generated_at": "2026-09-27T00:00:00Z",
       "sources_manifest_path": "knowledge/provenance/sources-manifest.json"
     },
     "retrieval": {
@@ -56,5 +56,5 @@
   },
   "name": "agentpm-docs",
   "readme": "README.md",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

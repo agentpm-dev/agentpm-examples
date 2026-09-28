@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "openai",
+    "model": "{{ openai_model }}"
+  },
+  "providers": {
+    "embeddings": {
+      "local-openai-embeddings": {
+        "implementation": {
+          "type": "process",
+          "command": "node",
+          "args": [
+            "runtime/openai-embedding-provider.mjs"
+          ],
+          "cwd": ".",
+          "env": [
+            "OPENAI_API_KEY",
+            "OPENAI_EMBEDDING_BASE_URL"
+          ],
+          "request_timeout_ms": 120000
+        }
+      }
+    }
+  },
+  "scopes": {
+    "user": "{{ default_user_scope }}"
+  },
+  "knowledge": {
+    "embedding_matches": [
+      {
+        "match": {
+          "provider": "openai",
+          "model": "text-embedding-3-small",
+          "dimensions": 1536,
+          "normalized": true
+        },
+        "embedding_provider": "local-openai-embeddings"
+      }
+    ]
+  },
+  "trace": {
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "{{ workspace_label }}",
+      "subtitle": "Embedding provider host"
+    }
+  }
+}

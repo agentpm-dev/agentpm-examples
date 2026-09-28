@@ -1,0 +1,29 @@
+{
+  "description": "Generated from harness-embedding-provider@0.1.0.",
+  "kind": "agent",
+  "knowledge": [
+    {
+      "name": "@zack/agentpm-docs",
+      "version": "0.1.1"
+    }
+  ],
+  "loop": {
+    "name": "@zack/react-loop",
+    "version": "0.1.0"
+  },
+  "memory": [],
+  "name": "app-harness-embedding-provider",
+  "profiles": [],
+  "skills": [],
+  "tools": [],
+  "version": "0.1.0",
+  "bindings": {
+    "phases": {
+      "reason": {
+        "knowledge": [
+          "@zack/agentpm-docs"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "description": "Generated from harness-mcp-bridge@0.1.0.",
+  "kind": "agent",
+  "knowledge": [],
+  "loop": {
+    "name": "@zack/react-loop",
+    "version": "0.1.0"
+  },
+  "memory": [],
+  "name": "app-harness-mcp-bridge",
+  "profiles": [],
+  "skills": [],
+  "tools": [
+    {
+      "name": "@zack/csv-query",
+      "version": "0.1.4"
+    },
+    {
+      "name": "@zack/json-transform",
+      "version": "0.1.1"
+    }
+  ],
+  "version": "0.1.0",
+  "bindings": {
+    "mcp": [
+      {
+        "id": "authored-tools",
+        "tools": [
+          "@zack/csv-query",
+          "@zack/json-transform"
+        ]
+      }
+    ]
+  }
+}

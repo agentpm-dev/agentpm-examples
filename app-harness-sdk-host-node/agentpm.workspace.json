@@ -1,0 +1,14 @@
+{
+  "manifests": [
+    "agent.json"
+  ],
+  "package_roots": {
+    "agents": [],
+    "knowledge": [],
+    "memory": [],
+    "profiles": [],
+    "skills": [],
+    "tools": []
+  },
+  "schema_version": 1
+}

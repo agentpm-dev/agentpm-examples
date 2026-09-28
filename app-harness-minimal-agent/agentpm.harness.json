@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "scopes": {
+    "user": "local-maintainer",
+    "repository": "agentpm-dev/agentpm-examples"
+  },
+  "runtime": {
+    "state_dir": ".agentpm-state"
+  },
+  "trace": {
+    "enabled": true,
+    "level": "normal",
+    "content": "redacted"
+  },
+  "ui": {
+    "branding": {
+      "name": "Minimal Harness Agent",
+      "subtitle": "Minimal Harness Agent",
+      "accent": "#0EA5E9"
+    }
+  }
+}
