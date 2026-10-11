@@ -2,13 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "template",
   "name": "harness-minimal-agent",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Minimal AgentPM Harness starter that installs one published Agent package and runs it through the reference Harness TUI or headless CLI.",
   "template": {
     "display_name": "Minimal Harness Agent",
     "use_case": "harness-start",
     "execution_surfaces": [
-      "agentpm-run"
+      "agentpm-harness"
     ],
     "stack": [
       "workspace",

@@ -2,13 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "template",
   "name": "harness-mcp-bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AgentPM Harness starter showing Harness-managed MCP exports and scoped runtime MCP imports in one workspace.",
   "template": {
     "display_name": "Harness MCP Bridge",
     "use_case": "harness-mcp-bridge",
     "execution_surfaces": [
-      "agentpm-run"
+      "agentpm-harness"
     ],
     "stack": [
       "node",
