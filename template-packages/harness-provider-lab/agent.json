@@ -2,13 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "template",
   "name": "harness-provider-lab",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AgentPM Harness lab for process-hosted model, embedding, KnowledgeRuntime, and MemoryRuntime providers.",
   "template": {
     "display_name": "Harness Provider Lab",
     "use_case": "harness-provider-lab",
     "execution_surfaces": [
-      "agentpm-run"
+      "agentpm-harness"
     ],
     "stack": [
       "node",

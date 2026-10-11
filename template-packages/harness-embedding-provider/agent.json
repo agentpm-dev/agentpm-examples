@@ -2,13 +2,14 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "template",
   "name": "harness-embedding-provider",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AgentPM Harness starter that hosts a local embedding provider for the published AgentPM docs Knowledge package.",
   "template": {
     "display_name": "Harness Embedding Provider",
     "use_case": "harness-embedding-provider",
     "execution_surfaces": [
-      "node-sdk"
+      "node-sdk",
+      "agentpm-harness"
     ],
     "stack": [
       "node",
