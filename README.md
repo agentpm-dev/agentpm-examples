@@ -39,6 +39,7 @@ Each tool is intentionally simple to highlight integration, not performance.
     - [`tools-python/markdown-chunk`](tools-python/markdown-chunk/)
     - [`tools-python/sentiment-analysis`](tools-python/sentiment-analysis/)
     - [`tools-python/csv-query`](tools-python/csv-query/)
+    - [`tools-python/validate-order`](tools-python/validate-order/): Pydantic validation with managed Python dependency installation
     - [`tools-python/json-transform`](tools-python/json-transform/)
     - [`tools-python/table-extract`](tools-python/table-extract/)
     

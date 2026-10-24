@@ -1,36 +1,76 @@
-## summarize-text
+# summarize-text
 
-### What it does
-Summarizes input text to a target length using OpenAI.
+Summarize text to a target word budget using OpenAI's `gpt-4o-mini`. The Tool
+reads one JSON object from stdin and writes one JSON object to stdout. Its
+existing `ok`/`summary` and `ok`/`error` interface is unchanged.
 
-### AgentPM manifest
-See `agent.json` in this folder. It declares:
-- `"kind": "tool"`, `"runtime": { "type": "python", "version": "3.11" }`
-- `"entrypoint": { "command": "python", "args": ["-u", "summarize_text/__main__.py"] }`
-- JSON Schema for **inputs** and **outputs**
+Version **0.1.9** declares `openai>=1.51.0,<2` in `agent.json`, keeping the OpenAI 1.x
+interface. The prepared `agent.lock` records the complete exact dependency set,
+including native dependencies such as `pydantic-core` and `jiter`. Consumers
+need a CLI with managed Python Tool environments and Python 3.11 or newer.
+The entrypoint is `python -u -m summarize_text`, run from the Tool's root directory.
 
-### Quirks
-- Requires `OPENAI_API_KEY`.
+## Develop and Test
 
-> Entrypoint reads JSON from **stdin** and prints a single JSON object to **stdout**.
+From this directory:
 
-### Setup & run
 ```bash
-# install deps (uv)
-uv sync --directory tools-python/summarize-text
+uv sync
+uv run python -m unittest discover -s tests -p 'test_*.py'
+```
 
-uv add --directory tools-python/summarize-text python-dotenv
-uv add --directory tools-python/summarize-text "python-dotenv[cli]"
+Tests use a local HTTP mock transport with the real OpenAI client and import
+the native Pydantic extension. They make no network requests or paid model calls.
+The developer's `.venv` is separate from consumers' AgentPM-managed environments.
+`python-dotenv[cli]` is a development convenience, not a Tool runtime dependency.
 
-# run with env
-uv run --directory tools-python/summarize-text \
-python -m dotenv -f .env.local run -- \
-python -m summarize_text <<'JSON'
+For a real model call, put `OPENAI_API_KEY` in your ignored `.env.local`:
+
+```bash
+uv run python -m dotenv -f .env.local run -- python -m summarize_text <<'JSON'
 {"text":"Alan Turing was a computer scientist","max_words":60}
 JSON
 ```
 
-### Vendor Dependencies before publishing
+This makes a paid API request. Successful output has the form
+`{"ok":true,"summary":"..."}`. A missing API key returns a structured
+`INPUT_MISSING_API_KEY` value error with exit code zero, as before.
+
+## Prepare and Publish
+
+Keep `pyproject.toml` and `agent.json` runtime requirements in agreement. Do not
+vendor dependencies into `summarize_text/_vendor`; remove any old ignored copy
+from your local working directory before packaging this version. The Tool now
+imports dependencies from the interpreter's environment.
+
+Use a CLI that supports managed Python Tool dependencies:
+
 ```bash
-uv pip install --target tools-python/summarize-text/summarize_text/_vendor "openai>=1.51.0"
+agentpm lint --strict
+# Only refresh intentionally when changing the reviewed dependency state.
+agentpm publish --dry-run --refresh-python
+git diff -- agent.json agent.lock
+# Review the dependency state, then publish to a namespace you own.
+agentpm publish --namespace your-namespace
 ```
+
+Review and commit the portable `agent.lock` with the source; no local environment
+paths belong in it. Publication
+reuses this recorded resolution instead of resolving again.
+
+## Consumer Use
+
+With a suitable Python selected, use the namespace where the Tool was published
+(the commands below use `@zack`):
+
+```bash
+agentpm install @zack/summarize-text@0.1.9
+export OPENAI_API_KEY='your-key'
+agentpm run @zack/summarize-text@0.1.9 --input '{"text":"Alan Turing was a computer scientist","max_words":60}'
+```
+
+If `python` is absent or too old, set `AGENTPM_PYTHON` to an absolute Python 3.11+
+executable before install and run. AgentPM installs exact hash-verified wheels
+into `.agentpm/runtimes/python/` and runs the Tool with that Python automatically.
+No consumer `uv sync`, manual pip install or global OpenAI package is required.
+Harness Tool calls use the same environment through `agentpm run --machine`.

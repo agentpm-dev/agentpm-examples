@@ -1,10 +1,15 @@
 [project]
 name = "agentpm-examples-summarize-text"
-version = "0.1.0"
+version = "0.1.9"
 requires-python = ">=3.11"
 dependencies = [
-    "openai>=1.51.0",
+    "openai>=1.51.0,<2",
+]
+
+[dependency-groups]
+dev = [
     "python-dotenv[cli]>=1.1.1",
 ]
 
 [tool.uv]
+package = false
