@@ -2,15 +2,20 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "summarize-text",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Summarize long text to a concise abstract.",
-  "files": ["summarize_text/"],
+  "files": ["summarize_text/__init__.py", "summarize_text/__main__.py", "README.md"],
   "entrypoint": {
     "command": "python",
-    "args": ["-u", "summarize_text/__main__.py"],
+    "args": ["-u", "-m", "summarize_text"],
     "timeout_ms": 120000
   },
-  "runtime": { "type": "python", "version": "3.11" },
+  "runtime": {
+    "type": "python",
+    "version": "3.11",
+    "dependencies": ["openai>=1.51.0,<2"]
+  },
+  "readme": "README.md",
   "environment": {
     "vars": {
       "OPENAI_API_KEY": {

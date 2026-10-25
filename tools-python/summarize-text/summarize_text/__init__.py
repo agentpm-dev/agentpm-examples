@@ -2,11 +2,13 @@ import os
 from openai import OpenAI
 from typing import Any
 
+
 class ToolError(Exception):
     def __init__(self, code: str, message: str, details: Any | None = None):
         super().__init__(message)
         self.code = code
         self.details = details
+
 
 def summarize(text: str, max_words: int = 200) -> dict:
     api_key = os.getenv("OPENAI_API_KEY")
@@ -19,7 +21,10 @@ def summarize(text: str, max_words: int = 200) -> dict:
         user = f"Summarize in <= {max_words} words:\n\n{text}"
         resp = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role":"system","content":sys},{"role":"user","content":user}],
+            messages=[
+                {"role": "system", "content": sys},
+                {"role": "user", "content": user},
+            ],
             temperature=0.2,
         )
     except Exception as e:

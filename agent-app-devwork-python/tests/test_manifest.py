@@ -13,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 class ManifestTests(unittest.TestCase):
     def test_app_uses_published_devwork_copilot_agent(self) -> None:
         source = (ROOT / "app" / "tooling.py").read_text(encoding="utf-8")
-        self.assertEqual(AGENT_SPEC, "@zack/devwork-copilot@0.1.5")
-        self.assertIn('load_agent(AGENT_SPEC)', source)
+        self.assertEqual(AGENT_SPEC, "@zack/devwork-copilot@0.1.7")
+        self.assertIn("load_agent(AGENT_SPEC)", source)
         self.assertIn("load_loop", source)
         self.assertIn('loaded_agent.get("resolvedTools", [])', source)
         self.assertIn("load_profile", source)
@@ -23,11 +23,22 @@ class ManifestTests(unittest.TestCase):
         self.assertIn('loaded_agent.get("resolvedLoop")', source)
         self.assertIn('loaded_agent.get("resolvedMemory", [])', source)
         self.assertIn('loaded_agent.get("resolvedProfiles", [])', source)
-        self.assertIn('loaded_skill = load_skill(_spec_from_entry(skill_entry))', source)
+        self.assertIn(
+            "loaded_skill = load_skill(_spec_from_entry(skill_entry))", source
+        )
         self.assertIn('loaded_skill.get("resolvedTools", [])', source)
-        self.assertIn("def load_agent_loop_package(loaded_agent: dict[str, Any]) -> dict[str, Any] | None:", source)
-        self.assertIn("def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:", source)
-        self.assertIn("def load_agent_profile_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:", source)
+        self.assertIn(
+            "def load_agent_loop_package(loaded_agent: dict[str, Any]) -> dict[str, Any] | None:",
+            source,
+        )
+        self.assertIn(
+            "def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:",
+            source,
+        )
+        self.assertIn(
+            "def load_agent_profile_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:",
+            source,
+        )
 
     def test_app_no_longer_requires_local_agent_manifest(self) -> None:
         self.assertFalse((ROOT / "agent.json").exists())

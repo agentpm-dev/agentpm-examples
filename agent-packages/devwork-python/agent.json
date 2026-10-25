@@ -2,10 +2,15 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "agent",
   "name": "devwork-copilot",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions, packaged maintainer-review orchestration, workflow continuity, and a durable maintainer behavior profile.",
   "loop": "@zack/devwork-triage-loop@0.1.0",
-  "tools": [],
+  "tools": [
+    {
+      "name": "@zack/summarize-text",
+      "version": "0.1.9"
+    }
+  ],
   "knowledge": [
     {
       "name": "@zack/devwork-maintainer-guide",
@@ -35,9 +40,7 @@
       "file": "maintainer-context.md"
     },
     "global": {
-      "profiles": [
-        "@zack/devwork-maintainer-style"
-      ],
+      "profiles": ["@zack/devwork-maintainer-style"],
       "memory": [
         {
           "package": "@zack/devwork-maintainer-state",
@@ -51,33 +54,23 @@
     },
     "phases": {
       "inspect-issue": {
-        "skills": [
-          "@zack/issue-triage-playbook"
-        ],
-        "knowledge": [
-          "@zack/devwork-maintainer-guide"
-        ],
+        "tools": ["@zack/summarize-text"],
+        "skills": ["@zack/issue-triage-playbook"],
+        "knowledge": ["@zack/devwork-maintainer-guide"],
         "memory": [
           {
             "package": "@zack/devwork-maintainer-state",
-            "spaces": [
-              "maintainer_profile",
-              "active_work_threads"
-            ]
+            "spaces": ["maintainer_profile", "active_work_threads"]
           }
         ]
       },
       "draft-comment": {
-        "knowledge": [
-          "@zack/devwork-maintainer-guide"
-        ],
+        "tools": ["@zack/summarize-text"],
+        "knowledge": ["@zack/devwork-maintainer-guide"],
         "memory": [
           {
             "package": "@zack/devwork-maintainer-state",
-            "spaces": [
-              "active_work_threads",
-              "follow_up_notes"
-            ]
+            "spaces": ["active_work_threads", "follow_up_notes"]
           }
         ]
       },

@@ -1,15 +1,7 @@
-import sys, json, pathlib
+import json
+import sys
 
-here = pathlib.Path(__file__).resolve().parent
-pkg_root = here.parent
-# ensure "summarize_text" is importable as a package
-sys.path.insert(0, str(pkg_root))
-# vendored pure-Python deps (optional)
-_vendor = here / "_vendor"
-if _vendor.exists():
-    sys.path.insert(0, str(_vendor))
-
-from summarize_text import summarize, ToolError  # absolute import now works
+from . import ToolError, summarize
 
 
 def main():
@@ -25,12 +17,14 @@ def main():
         # value-level error -> exit code 0
         sys.exit(0)
     except Exception as e:
-        sys.stdout.write(json.dumps({
-            "ok": False,
-            "error": {"code": "UNEXPECTED", "message": str(e)}
-        }))
+        sys.stdout.write(
+            json.dumps(
+                {"ok": False, "error": {"code": "UNEXPECTED", "message": str(e)}}
+            )
+        )
         # unexpected/transport error -> non-zero
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

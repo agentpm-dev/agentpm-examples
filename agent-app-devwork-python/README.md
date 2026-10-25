@@ -8,7 +8,7 @@ This app installs the published `devwork-copilot` agent package, loads it with t
 
 Published agent package:
 
-- `@zack/devwork-copilot@0.1.5`
+- `@zack/devwork-copilot@0.1.7`, including `@zack/summarize-text@0.1.9`
 
 Package source:
 
@@ -40,7 +40,7 @@ This example shows a real app that:
 From this app directory, install the published agent package:
 
 ```bash
-agentpm install @zack/devwork-copilot@0.1.5
+agentpm install @zack/devwork-copilot@0.1.7
 ```
 
 That should install:
@@ -52,6 +52,16 @@ That should install:
 - the resolved Profile artifact under `.agentpm/profiles/...`
 - the resolved Skill artifact under `.agentpm/skills/...`
 - the resolved tool artifacts under `.agentpm/tools/...`
+- the summarizer's managed Python environment under `.agentpm/runtimes/python/...`
+
+Use AgentPM CLI **0.1.37 or newer** and Python **3.11 or newer**. The Tool's
+dependencies are provisioned by AgentPM separately from this app's `uv` environment.
+
+The current Python SDK still accepts only lockfile versions 2 and 3 and launches
+Tools directly rather than through the CLI-managed Python environment. Running
+this app against the new version-4 lock is blocked until that SDK compatibility
+work is available. Installing the Agent and running the Tool with `agentpm run`
+work independently of this app startup limitation.
 
 ## Setup
 
@@ -102,12 +112,17 @@ uv run python -m unittest discover -s tests -p 'test_*.py'
 
 ## Example prompts
 
+- `Use summarize-text to summarize this note in 50 words or fewer: The maintainer reproduced the bug and requested a regression test before merging.`
 - `List the open issues in agentpm-dev/agentpm-examples and tell me which one should be handled first.`
 - `Review open issues in agentpm-dev/agentpm-examples and draft a maintainer comment for the most recent one asking whether it is still reproducible.`
 - `Look at issue #18 in agentpm-dev/agentpm-examples and propose a concise follow-up comment, but do not post it yet.`
 - `Comment on issue #18 that it should be resolved now.`
 
 For write requests, the app should stop and ask for `/approve` before executing the GitHub mutation.
+
+For the supplied-text summarization check, confirm the banner shows Agent
+`0.1.7` and Tool `summarize-text@0.1.9`, then look for an actual Tool call and
+`[tool result]` output. This uses the OpenAI API; it does not require a GitHub request.
 
 ## Notes
 
