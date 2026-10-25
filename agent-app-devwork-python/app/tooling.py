@@ -19,19 +19,15 @@ from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
-AGENT_SPEC = "@zack/devwork-copilot@0.1.5"
+AGENT_SPEC = "@zack/devwork-copilot@0.1.7"
 
 
 def collect_string_env() -> dict[str, str]:
-    return {
-        key: value
-        for key, value in os.environ.items()
-        if isinstance(value, str)
-    }
+    return {key: value for key, value in os.environ.items() if isinstance(value, str)}
 
 
 def _spec_from_entry(entry: dict[str, Any]) -> str:
-    return f'{entry["name"]}@{entry["version"]}'
+    return f"{entry['name']}@{entry['version']}"
 
 
 def load_agent_memory_packages(loaded_agent: dict[str, Any]) -> list[dict[str, Any]]:
@@ -126,13 +122,17 @@ def _stringify_result(value: JsonValue, max_chars: int = 8000) -> str:
     else:
         text = json.dumps(value, ensure_ascii=False)
 
-    return text if len(text) <= max_chars else json.dumps(
-        {"truncated": True, "result_preview": text[:max_chars]}, ensure_ascii=False
+    return (
+        text
+        if len(text) <= max_chars
+        else json.dumps(
+            {"truncated": True, "result_preview": text[:max_chars]}, ensure_ascii=False
+        )
     )
 
 
 def _rich_description(meta: dict[str, Any]) -> str:
-    description = meta.get("description") or f'AgentPM tool {meta.get("name", "tool")}'
+    description = meta.get("description") or f"AgentPM tool {meta.get('name', 'tool')}"
     inputs = meta.get("inputs")
     outputs = meta.get("outputs")
     if inputs is not None:
@@ -209,7 +209,9 @@ def load_langchain_tools() -> tuple[
             args_model = build_args_model(tool_name, meta.get("inputs"))
 
             def _invoke_tool(_func=func, _tool_name=tool_name, **kwargs: Any) -> str:
-                payload = {key: value for key, value in kwargs.items() if value is not None}
+                payload = {
+                    key: value for key, value in kwargs.items() if value is not None
+                }
                 try:
                     result = _func(payload)
                 except Exception as exc:

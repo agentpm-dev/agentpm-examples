@@ -7,8 +7,8 @@ existing `ok`/`summary` and `ok`/`error` interface is unchanged.
 Version **0.1.9** declares `openai>=1.51.0,<2` in `agent.json`, keeping the OpenAI 1.x
 interface. The prepared `agent.lock` records the complete exact dependency set,
 including native dependencies such as `pydantic-core` and `jiter`. Consumers
-need a CLI with managed Python Tool environments and Python 3.11 or newer.
-The entrypoint is `python -u -m summarize_text`, run from the Tool's root directory.
+need AgentPM CLI **0.1.37 or newer** and Python **3.11 or newer**.
+AgentPM runs the `summarize_text` Python module from the Tool's root directory.
 
 ## Develop and Test
 
@@ -43,12 +43,12 @@ vendor dependencies into `summarize_text/_vendor`; remove any old ignored copy
 from your local working directory before packaging this version. The Tool now
 imports dependencies from the interpreter's environment.
 
-Use a CLI that supports managed Python Tool dependencies:
+Use AgentPM CLI **0.1.37 or newer**. The checked-in `agent.lock` is already
+prepared for this version; package it without refreshing the reviewed resolution:
 
 ```bash
 agentpm lint --strict
-# Only refresh intentionally when changing the reviewed dependency state.
-agentpm publish --dry-run --refresh-python
+agentpm publish --dry-run
 git diff -- agent.json agent.lock
 # Review the dependency state, then publish to a namespace you own.
 agentpm publish --namespace your-namespace
@@ -56,7 +56,9 @@ agentpm publish --namespace your-namespace
 
 Review and commit the portable `agent.lock` with the source; no local environment
 paths belong in it. Publication
-reuses this recorded resolution instead of resolving again.
+reuses this recorded resolution instead of resolving again. Use
+`agentpm publish --dry-run --refresh-python` only when intentionally updating the
+dependency state, then review and commit the resulting lock before publishing.
 
 ## Consumer Use
 
