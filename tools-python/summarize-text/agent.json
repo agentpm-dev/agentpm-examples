@@ -2,9 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "summarize-text",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Summarize long text to a concise abstract.",
-  "files": ["summarize_text/__init__.py", "summarize_text/__main__.py", "README.md"],
+  "files": [
+    "summarize_text/__init__.py",
+    "summarize_text/__main__.py",
+    "README.md"
+  ],
   "entrypoint": {
     "command": "python",
     "args": ["-u", "-m", "summarize_text"],
@@ -28,7 +32,12 @@
     "type": "object",
     "properties": {
       "text": { "type": "string", "description": "The text to be summarized" },
-      "max_words": { "type": "integer", "minimum": 50, "maximum": 1000, "default": 200 }
+      "max_words": {
+        "type": "integer",
+        "minimum": 50,
+        "maximum": 1000,
+        "default": 200
+      }
     },
     "required": ["text"],
     "additionalProperties": false
@@ -51,9 +60,18 @@
           "error": {
             "type": "object",
             "properties": {
-              "code": { "type": "string", "description": "Stable machine-readable error code (e.g. INPUT_INVALID, FETCH_FAILED)" },
-              "message": { "type": "string", "description": "Human-readable error message" },
-              "details": { "type": "object", "description": "Optional structured context" }
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code (e.g. INPUT_INVALID, FETCH_FAILED)"
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable error message"
+              },
+              "details": {
+                "type": "object",
+                "description": "Optional structured context"
+              }
             },
             "required": ["message"],
             "additionalProperties": true

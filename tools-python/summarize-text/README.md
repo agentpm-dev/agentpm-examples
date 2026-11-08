@@ -4,10 +4,10 @@ Summarize text to a target word budget using OpenAI's `gpt-4o-mini`. The Tool
 reads one JSON object from stdin and writes one JSON object to stdout. Its
 existing `ok`/`summary` and `ok`/`error` interface is unchanged.
 
-Version **0.1.9** declares `openai>=1.51.0,<2` in `agent.json`, keeping the OpenAI 1.x
+Version **0.1.10** declares `openai>=1.51.0,<2` in `agent.json`, keeping the OpenAI 1.x
 interface. The prepared `agent.lock` records the complete exact dependency set,
 including native dependencies such as `pydantic-core` and `jiter`. Consumers
-need AgentPM CLI **0.1.37 or newer** and Python **3.11 or newer**.
+need AgentPM CLI **0.1.40 or newer** and Python **3.11 or newer** for this release format.
 AgentPM runs the `summarize_text` Python module from the Tool's root directory.
 
 ## Develop and Test
@@ -43,7 +43,7 @@ vendor dependencies into `summarize_text/_vendor`; remove any old ignored copy
 from your local working directory before packaging this version. The Tool now
 imports dependencies from the interpreter's environment.
 
-Use AgentPM CLI **0.1.37 or newer**. The checked-in `agent.lock` is already
+Use AgentPM CLI **0.1.41 or newer** for the automated publishing workflow. The checked-in `agent.lock` is already
 prepared for this version; package it without refreshing the reviewed resolution:
 
 ```bash
@@ -66,9 +66,9 @@ With a suitable Python selected, use the namespace where the Tool was published
 (the commands below use `@zack`):
 
 ```bash
-agentpm install @zack/summarize-text@0.1.9
+agentpm install @zack/summarize-text@0.1.10
 export OPENAI_API_KEY='your-key'
-agentpm run @zack/summarize-text@0.1.9 --input '{"text":"Alan Turing was a computer scientist","max_words":60}'
+agentpm run @zack/summarize-text@0.1.10 --input '{"text":"Alan Turing was a computer scientist","max_words":60}'
 ```
 
 If `python` is absent or too old, set `AGENTPM_PYTHON` to an absolute Python 3.11+

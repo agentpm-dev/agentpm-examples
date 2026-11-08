@@ -2,9 +2,9 @@
 
 `devwork-copilot` is a published AgentPM agent package for maintainer and repository review workflows in Python.
 
-Version **0.1.7** adds the exact direct Tool dependency
-`@zack/summarize-text@0.1.9`, which uses AgentPM-managed Python dependencies
-instead of a bundled environment. Use AgentPM CLI **0.1.37 or newer** and a
+Version **0.1.8** pins the exact direct Tool dependency
+`@zack/summarize-text@0.1.10`, which uses AgentPM-managed Python dependencies
+instead of a bundled environment. Use AgentPM CLI **0.1.40 or newer** and a
 Python **3.11+** interpreter for this version.
 
 It includes a Loop for:
@@ -56,8 +56,8 @@ The source code for this agent package can be found [here](https://github.com/ag
 
 ### Prepare and publish
 
-Publish `@zack/summarize-text@0.1.9` first, using its reviewed author lock, before
-publishing this Agent as `@zack/devwork-copilot@0.1.7`. From this directory:
+Publish `@zack/summarize-text@0.1.10` first, using its reviewed author lock, before
+publishing this Agent as `@zack/devwork-copilot@0.1.8`. From this directory:
 
 ```bash
 agentpm lint --strict
@@ -75,9 +75,9 @@ workspace. To update the checked-in Harness example, use
 `app-harness-minimal-agent/` as that workspace:
 
 ```bash
-agentpm install @zack/devwork-copilot@0.1.7
+agentpm install @zack/devwork-copilot@0.1.8
 export OPENAI_API_KEY='your-key'
-agentpm run @zack/summarize-text@0.1.9 --input '{"text":"The maintainer reviewed the bug report, reproduced the problem, and requested a regression test before merging the fix.","max_words":60}'
+agentpm run @zack/summarize-text@0.1.10 --input '{"text":"The maintainer reviewed the bug report, reproduced the problem, and requested a regression test before merging the fix.","max_words":60}'
 agentpm harness --json
 mkdir -p reports
 agentpm harness --headless --input 'During inspection, call summarize-text on this supplied note with a 60-word budget: The maintainer reproduced the bug and requested a regression test before merging. Hand off when the summary is complete.' --report reports/summarizer-check.json
