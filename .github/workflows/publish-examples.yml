@@ -1,0 +1,127 @@
+name: Publish maintained examples
+on:
+  push:
+    tags:
+      - 'summarize-text/v*'
+      - 'devwork-copilot/v*'
+permissions:
+  contents: read
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      name: ${{ steps.select.outputs.name }}
+      version: ${{ steps.select.outputs.version }}
+      package_dir: ${{ steps.select.outputs.package_dir }}
+      ref: ${{ steps.select.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: select
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          AGENTPM_NAMESPACE: ${{ vars.AGENTPM_NAMESPACE }}
+        run: |
+          set -euo pipefail
+          python3 scripts/release_examples.py select "$RELEASE_TAG" "$AGENTPM_NAMESPACE"
+  build:
+    needs: select
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-agentpm
+        with:
+          version: ${{ vars.AGENTPM_CLI_VERSION }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.5'
+          python-version: '3.11'
+      - name: Test Python implementation
+        if: needs.select.outputs.name == 'summarize-text'
+        working-directory: tools-python/summarize-text
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv sync
+          uv run python -m unittest discover -s tests -p 'test_*.py'
+      - name: Build selected package without Registry credentials
+        working-directory: ${{ needs.select.outputs.package_dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          agentpm lint --strict
+          agentpm package --strict --machine --output "$GITHUB_WORKSPACE/package-build"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-build
+          path: package-build/
+          if-no-files-found: error
+  publish:
+    needs: [select, build]
+    runs-on: ubuntu-latest
+    environment: agentpm-publishing
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-agentpm
+        with:
+          version: ${{ vars.AGENTPM_CLI_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-build
+          path: package-build
+      - name: Sign and publish exactly one package
+        shell: bash
+        env:
+          AGENTPM_BASE_URL: ${{ vars.AGENTPM_REGISTRY_URL }}
+          AGENTPM_NAMESPACE: ${{ vars.AGENTPM_NAMESPACE }}
+          AGENTPM_TOKEN: ${{ secrets.AGENTPM_TOKEN }}
+          AGENTPM_SIGNING_KEY_JSON: ${{ secrets.AGENTPM_SIGNING_KEY_JSON }}
+          AGENTPM_KEY_PASSPHRASE: ${{ secrets.AGENTPM_KEY_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$AGENTPM_BASE_URL"
+          test -n "$AGENTPM_TOKEN"
+          test -n "$AGENTPM_SIGNING_KEY_JSON"
+          test -n "$AGENTPM_KEY_PASSPHRASE"
+          umask 077
+          key_file="$RUNNER_TEMP/author-key.json"
+          trap 'rm -f "$key_file"' EXIT
+          printf '%s' "$AGENTPM_SIGNING_KEY_JSON" > "$key_file"
+          agentpm publish --build package-build/package-build.json \
+            --expect-build-target x86_64-unknown-linux-gnu \
+            --namespace "$AGENTPM_NAMESPACE" --sign --key-file "$key_file"
+  verify:
+    needs: [select, publish]
+    runs-on: ubuntu-latest
+    environment: agentpm-publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-agentpm
+        with:
+          version: ${{ vars.AGENTPM_CLI_VERSION }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.5'
+          python-version: '3.11'
+      - name: Install and verify the exact published package in a clean consumer
+        shell: bash
+        env:
+          AGENTPM_BASE_URL: ${{ vars.AGENTPM_REGISTRY_URL }}
+          PACKAGE_REF: ${{ needs.select.outputs.ref }}
+          PACKAGE_NAME: ${{ needs.select.outputs.name }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$AGENTPM_BASE_URL"
+          consumer="$RUNNER_TEMP/consumer"
+          mkdir "$consumer"
+          cd "$consumer"
+          agentpm install "$PACKAGE_REF" --require-signature --require-attestation
+          python "$GITHUB_WORKSPACE/scripts/release_examples.py" verify "$PACKAGE_NAME" "$PACKAGE_REF" "$consumer"

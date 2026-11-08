@@ -76,3 +76,8 @@ executable before install and run. AgentPM installs exact hash-verified wheels
 into `.agentpm/runtimes/python/` and runs the Tool with that Python automatically.
 No consumer `uv sync`, manual pip install or global OpenAI package is required.
 Harness Tool calls use the same environment through `agentpm run --machine`.
+
+## Automated publication
+
+See [publishing from GitHub Actions](https://github.com/agentpm-dev/agentpm-examples/tree/main/publishing) for package-specific release tags,
+encrypted signing keys and clean-consumer verification.

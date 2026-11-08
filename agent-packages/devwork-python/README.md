@@ -96,3 +96,8 @@ and provisions the summarizer's hash-verified Python environment under
 after a successful real Registry install. Keep consumer locks/installed package
 digests from previously published versions intact until the new versions exist;
 do not replace their version strings or invent integrity values by hand.
+
+## Automated publication
+
+See [publishing from GitHub Actions](https://github.com/agentpm-dev/agentpm-examples/tree/main/publishing) for package-specific release tags,
+encrypted signing keys and clean-consumer verification.

@@ -1,0 +1,20 @@
+name: Install a pinned AgentPM CLI
+description: Download an explicit released CLI and verify its release checksum.
+inputs:
+  version:
+    description: Exact CLI version containing package and headless signing support
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - shell: bash
+      env:
+        AGENTPM_CLI_VERSION: ${{ inputs.version }}
+        GH_TOKEN: ${{ github.token }}
+        ACTION_INSTALLER: ${{ github.action_path }}/install.py
+      run: |
+        set -euo pipefail
+        python "$ACTION_INSTALLER"
