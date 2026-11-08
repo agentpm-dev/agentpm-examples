@@ -299,3 +299,8 @@ cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.5 && uv
 cd app-cli-automation-worker && cp .env.example .env.local && agentpm install && bash scripts/run-daily-brief.sh
 cd app-mcp-tool-server && cp .env.example .env.local && agentpm install && set -a && source .env.local && set +a && agentpm serve --mcp
 ```
+
+## Automated publication
+
+See [publishing from GitHub Actions](publishing/README.md) for package-specific release tags,
+encrypted signing keys and clean-consumer verification.

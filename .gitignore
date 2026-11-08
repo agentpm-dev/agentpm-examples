@@ -24,3 +24,7 @@ pub.txt
 
 _vendor/
 target/
+
+# Native publication fixture build output
+publishing/native-release-check/native-helper
+publishing/native-release-check/bin/

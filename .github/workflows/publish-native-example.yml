@@ -1,0 +1,123 @@
+name: Publish native release example
+on:
+  push:
+    tags: ['native-release-check/v*']
+permissions:
+  contents: read
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.select.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: select
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          AGENTPM_NAMESPACE: ${{ vars.AGENTPM_NAMESPACE }}
+        run: |
+          set -euo pipefail
+          python3 scripts/release_examples.py select "$RELEASE_TAG" "$AGENTPM_NAMESPACE"
+  build:
+    needs: select
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: macos-15, target: aarch64-apple-darwin}
+          - {os: macos-15-intel, target: x86_64-apple-darwin}
+          - {os: ubuntu-latest, target: x86_64-unknown-linux-gnu}
+          - {os: windows-latest, target: x86_64-pc-windows-msvc}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-agentpm
+        with:
+          version: ${{ vars.AGENTPM_CLI_VERSION }}
+      - name: Compile on this native runner and package
+        working-directory: publishing/native-release-check
+        shell: bash
+        run: |
+          set -euo pipefail
+          python build.py
+          agentpm lint --strict
+          agentpm package --strict --machine --output "$GITHUB_WORKSPACE/package-build"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.target }}
+          path: package-build/
+          if-no-files-found: error
+  publish:
+    needs: [select, build]
+    runs-on: ubuntu-latest
+    environment: agentpm-publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-agentpm
+        with:
+          version: ${{ vars.AGENTPM_CLI_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: package-*
+          path: builds
+      - name: Validate all builds, sign once and publish atomically
+        shell: bash
+        env:
+          AGENTPM_BASE_URL: ${{ vars.AGENTPM_REGISTRY_URL }}
+          AGENTPM_NAMESPACE: ${{ vars.AGENTPM_NAMESPACE }}
+          AGENTPM_TOKEN: ${{ secrets.AGENTPM_TOKEN }}
+          AGENTPM_SIGNING_KEY_JSON: ${{ secrets.AGENTPM_SIGNING_KEY_JSON }}
+          AGENTPM_KEY_PASSPHRASE: ${{ secrets.AGENTPM_KEY_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$AGENTPM_BASE_URL"
+          test -n "$AGENTPM_TOKEN"
+          test -n "$AGENTPM_SIGNING_KEY_JSON"
+          test -n "$AGENTPM_KEY_PASSPHRASE"
+          umask 077
+          key_file="$RUNNER_TEMP/author-key.json"
+          trap 'rm -f "$key_file"' EXIT
+          printf '%s' "$AGENTPM_SIGNING_KEY_JSON" > "$key_file"
+          agentpm publish \
+            --build builds/package-aarch64-apple-darwin/package-build.json \
+            --build builds/package-x86_64-apple-darwin/package-build.json \
+            --build builds/package-x86_64-unknown-linux-gnu/package-build.json \
+            --build builds/package-x86_64-pc-windows-msvc/package-build.json \
+            --expect-build-target aarch64-apple-darwin \
+            --expect-build-target x86_64-apple-darwin \
+            --expect-build-target x86_64-unknown-linux-gnu \
+            --expect-build-target x86_64-pc-windows-msvc \
+            --namespace "$AGENTPM_NAMESPACE" --sign --key-file "$key_file"
+  verify:
+    needs: [select, publish]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-agentpm
+        with:
+          version: ${{ vars.AGENTPM_CLI_VERSION }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.5'
+          python-version: '3.11'
+      - shell: bash
+        env:
+          AGENTPM_BASE_URL: ${{ vars.AGENTPM_REGISTRY_URL }}
+          PACKAGE_REF: ${{ needs.select.outputs.ref }}
+        run: |
+          set -euo pipefail
+          test -n "$AGENTPM_BASE_URL"
+          consumer="$(python -c 'import os; from pathlib import Path; p = Path(os.environ["RUNNER_TEMP"]) / "consumer"; p.mkdir(); print(p.as_posix())')"
+          cd "$consumer"
+          agentpm install "$PACKAGE_REF" --require-signature --require-attestation
+          python "$GITHUB_WORKSPACE/scripts/release_examples.py" verify native-release-check "$PACKAGE_REF" "$consumer"

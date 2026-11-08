@@ -1,0 +1,27 @@
+name: Publishing example contracts
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/publish-*.yml'
+      - '.github/workflows/publishing-contracts.yml'
+      - '.github/actions/setup-agentpm/**'
+      - 'scripts/release_examples.py'
+      - 'scripts/test_release_*.py'
+      - 'publishing/**'
+      - 'tools-python/summarize-text/agent.json'
+      - 'agent-packages/devwork-python/agent.json'
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Tag selection and exact Agent dependency contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s scripts -p 'test_release_*.py' -v
