@@ -27,9 +27,11 @@ then adds the native executable directory to PATH.
 
 ## Setup
 
-Use released CLI **0.1.41** or a later compatible version supporting
+Use released CLI **0.1.42** or a later compatible version supporting
 `agentpm package`, `publish --build` and `--key-file`. CLI 0.1.40 predates these
-commands. The following setup configures real production publication, but does
+commands; 0.1.42 also verifies the original `agentpm.tool.signature.v1` author
+signatures used by historical dependencies such as `github-issues@0.1.1`.
+The following setup configures real production publication, but does
 not trigger a release. Configure GitHub before pushing any release tag.
 
 ### 1. Enable the workflows
@@ -50,7 +52,7 @@ Go to **Settings → Secrets and variables → Actions → Variables**, then use
 
 | Name                   | Production example value                                  |
 | ---------------------- | --------------------------------------------------------- |
-| `AGENTPM_CLI_VERSION`  | `0.1.41` (no leading `v`)                                 |
+| `AGENTPM_CLI_VERSION`  | `0.1.42` (no leading `v`)                                 |
 | `AGENTPM_NAMESPACE`    | `zack` (no leading `@`; use your own namespace in a fork) |
 | `AGENTPM_REGISTRY_URL` | `https://api.agentpackagemanager.com`                     |
 
@@ -220,6 +222,24 @@ A failed verification job does **not** undo an already-finalized publication.
 Inspect the failure and publish a corrected new version if necessary. Keep run
 links and exact versions as release evidence. Workflow definitions and local
 fixture tests alone are not evidence of a successful hosted publication.
+
+For `unsupported legacy author statement` on a historical dependency, update
+the repository variable `AGENTPM_CLI_VERSION` to **0.1.42** or a later compatible
+released CLI, then use **Re-run failed jobs**. Updating this repository variable
+takes effect in the rerun without moving the tag. The original
+`agentpm.tool.signature.v1` label is supported for Tool artifacts while keeping
+identity, artifact digest and cryptographic signature verification mandatory.
+An already-published Agent version stays published if consumer verification
+fails; do not replace its tag or weaken the strict verification flags.
+
+An Agent can retain its legacy publication format while depending on a Tool
+that uses the new release format. If finalize returns
+`422 invalid_dependency_access`, check that all declared dependency versions
+exist and are accessible to the publishing account. Registry dependency
+validation must also support new-format Tools; it must not treat this internal
+check as an old client's install request. A fix deployed only to the Registry
+can be retried with **Re-run failed jobs** on the same tagged workflow; no tag
+move or package version change is needed when finalize did not publish.
 
 If a workflow fails during build, including action post-job cleanup, its
 dependent publication job is skipped. Fix and merge the workflow before retrying.
