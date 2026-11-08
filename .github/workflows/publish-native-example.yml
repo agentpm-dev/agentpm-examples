@@ -1,7 +1,7 @@
 name: Publish native release example
 on:
   push:
-    tags: ['native-release-check/v*']
+    tags: ["native-release-check/v*"]
 permissions:
   contents: read
 concurrency:
@@ -28,10 +28,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: macos-15, target: aarch64-apple-darwin}
-          - {os: macos-15-intel, target: x86_64-apple-darwin}
-          - {os: ubuntu-latest, target: x86_64-unknown-linux-gnu}
-          - {os: windows-latest, target: x86_64-pc-windows-msvc}
+          - { os: macos-15, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, target: x86_64-apple-darwin }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -106,10 +106,6 @@ jobs:
       - uses: ./.github/actions/setup-agentpm
         with:
           version: ${{ vars.AGENTPM_CLI_VERSION }}
-      - uses: astral-sh/setup-uv@v6
-        with:
-          version: '0.13.5'
-          python-version: '3.11'
       - shell: bash
         env:
           AGENTPM_BASE_URL: ${{ vars.AGENTPM_REGISTRY_URL }}

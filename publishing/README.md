@@ -148,6 +148,12 @@ key in a private temporary file and removes it when the job exits. Never turn
 on shell tracing around secrets. AgentPM OIDC/keyless trusted publishing remains
 future work; these examples use a PAT.
 
+Only the summarizer's build installs developer uv with `setup-uv`, because it
+runs `uv sync` and its implementation tests. The Agent build does not use uv.
+All clean-consumer jobs use Python 3.11 from the CLI setup action and let
+AgentPM acquire its own pinned resolver and provision Tool dependencies;
+they do not initialize or save a separate `setup-uv` cache.
+
 ## Prepare a maintained release
 
 The next prepared versions are `summarize-text` **0.1.10** and
@@ -214,3 +220,13 @@ A failed verification job does **not** undo an already-finalized publication.
 Inspect the failure and publish a corrected new version if necessary. Keep run
 links and exact versions as release evidence. Workflow definitions and local
 fixture tests alone are not evidence of a successful hosted publication.
+
+If a workflow fails during build, including action post-job cleanup, its
+dependent publication job is skipped. Fix and merge the workflow before retrying.
+GitHub's **Re-run jobs** uses the original tagged commit, so it will not pick up
+workflow fixes merged later. If publication never ran and the package version
+does not exist in the Registry, the maintainer may move that failed attempt's
+tag to the corrected commit; verify those conditions before replacing the tag.
+Never move a tag for an already-published version. Alternatively prepare a new
+package version and matching tag. This applies to action cleanup errors such as
+`setup-uv` trying to save a cache in a job that never used uv.
