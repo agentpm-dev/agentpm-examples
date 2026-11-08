@@ -1,3 +1,6 @@
+#ifdef _WIN32
+#error "Controlled publishing failure: required Windows build"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 

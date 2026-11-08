@@ -2,13 +2,51 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "native-release-check",
-  "version": "0.1.0",
+  "version": "0.0.0-ci-windows-failure.20261108211002-66836",
   "description": "A small native helper demonstrating target-specific package publication.",
-  "runtime": {"type": "python", "version": "3.11"},
-  "entrypoint": {"command": "python", "args": ["tool.py"]},
-  "files": ["tool.py", "bin", "README.md"],
+  "runtime": {
+    "type": "python",
+    "version": "3.11"
+  },
+  "entrypoint": {
+    "command": "python",
+    "args": [
+      "tool.py"
+    ]
+  },
+  "files": [
+    "tool.py",
+    "bin",
+    "README.md"
+  ],
   "readme": "README.md",
-  "license": {"spdx": "MIT"},
-  "inputs": {"type": "object", "properties": {"value": {"type": "integer", "minimum": -1000, "maximum": 1000}}, "required": ["value"], "additionalProperties": false},
-  "outputs": {"type": "object", "properties": {"value": {"type": "integer"}}, "required": ["value"], "additionalProperties": false}
+  "license": {
+    "spdx": "MIT"
+  },
+  "inputs": {
+    "type": "object",
+    "properties": {
+      "value": {
+        "type": "integer",
+        "minimum": -1000,
+        "maximum": 1000
+      }
+    },
+    "required": [
+      "value"
+    ],
+    "additionalProperties": false
+  },
+  "outputs": {
+    "type": "object",
+    "properties": {
+      "value": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "value"
+    ],
+    "additionalProperties": false
+  }
 }
