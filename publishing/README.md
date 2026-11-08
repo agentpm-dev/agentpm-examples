@@ -203,6 +203,13 @@ git push origin native-release-check/v0.1.0
 
 ## What the workflows verify
 
+After the successful publications, follow the
+[controlled failure checks](FAILURE_CHECKS.md) to verify that a mismatched tag
+and a failed required Windows build prevent publication. They use separate test
+tags and an isolated test commit; do not move a published release tag or merge
+the deliberately failing source into main. Record the expected failed workflow
+runs separately from successful release runs.
+
 The build bundle contains an archive and `package-build.json`. Keep them together
 when moving outputs between runners. CI validates archive hashes, embedded
 manifest/Python metadata, package identity, required build hosts and unique
