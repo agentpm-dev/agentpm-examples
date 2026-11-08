@@ -1,12 +1,12 @@
 {
-  "generated": "2026-10-25T03:47:50.395531Z",
+  "generated": "2026-11-08T21:18:12.050355Z",
   "lockfile_version": 4,
   "packages": {
-    "agent:@zack/devwork-copilot@0.1.7": {
-      "integrity": "02438155424d905b374b4d046b0197ae9b78797ed13620affe8e0c76944e222d",
+    "agent:@zack/devwork-copilot@0.1.8": {
+      "integrity": "86c172e7ce98733af704bd269e12207d66111e6b639c1fae60ab6e0a589958c2",
       "kind": "agent",
       "name": "@zack/devwork-copilot",
-      "version": "0.1.7"
+      "version": "0.1.8"
     },
     "knowledge:@zack/devwork-maintainer-guide@0.1.0": {
       "integrity": "47e267e55f8e4b866a5c882091d13121feb64006e3217d3da3f2be0d8d02bf52",
@@ -44,8 +44,8 @@
       "name": "@zack/github-issues",
       "version": "0.1.1"
     },
-    "tool:@zack/summarize-text@0.1.9": {
-      "integrity": "dba646c9bfd8ffdc8d91cf873749893514d393051b99bd779c75c6e6fdedd781",
+    "tool:@zack/summarize-text@0.1.10": {
+      "integrity": "d643446edb10f205b8be5a116885a8dd648b322b72d419c057126b1cc78f31bf",
       "kind": "tool",
       "name": "@zack/summarize-text",
       "python_resolution": {
@@ -297,11 +297,11 @@
         ],
         "type": "agentpm.python-resolution.v1"
       },
-      "version": "0.1.9"
+      "version": "0.1.10"
     }
   },
   "roots": {
-    "agent:@zack/devwork-copilot@0.1.7": {
+    "agent:@zack/devwork-copilot@0.1.8": {
       "knowledge": [
         "knowledge:@zack/devwork-maintainer-guide@0.1.0"
       ],
@@ -316,7 +316,7 @@
         "skill:@zack/issue-triage-playbook@0.1.0"
       ],
       "tools": [
-        "tool:@zack/summarize-text@0.1.9"
+        "tool:@zack/summarize-text@0.1.10"
       ]
     }
   }
