@@ -19,7 +19,7 @@ from pydantic import Field, create_model
 from pydantic.fields import PydanticUndefined
 
 JsonValue = Any
-AGENT_SPEC = "@zack/devwork-copilot@0.1.7"
+AGENT_SPEC = "@zack/devwork-copilot@0.1.8"
 
 
 def collect_string_env() -> dict[str, str]:

@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ManifestTests(unittest.TestCase):
     def test_app_uses_published_devwork_copilot_agent(self) -> None:
         source = (ROOT / "app" / "tooling.py").read_text(encoding="utf-8")
-        self.assertEqual(AGENT_SPEC, "@zack/devwork-copilot@0.1.7")
+        self.assertEqual(AGENT_SPEC, "@zack/devwork-copilot@0.1.8")
         self.assertIn("load_agent(AGENT_SPEC)", source)
         self.assertIn("load_loop", source)
         self.assertIn('loaded_agent.get("resolvedTools", [])', source)

@@ -2,17 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "template",
   "name": "research-assistant-node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node SDK starter for an interactive local research assistant built on AgentPM-installed tools.",
   "template": {
     "display_name": "Node Research Assistant",
     "use_case": "research",
-    "execution_surfaces": [
-      "node-sdk"
-    ],
-    "stack": [
-      "node"
-    ],
+    "execution_surfaces": ["node-sdk"],
+    "stack": ["node"],
     "files_root": "template",
     "variables": [
       {

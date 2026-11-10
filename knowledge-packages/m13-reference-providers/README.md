@@ -55,31 +55,20 @@ Use the built `knowledge.corpus.content_hash` value from `agent.json` as `AGENTP
 
 Do not use the `Vectors hash` shown by `agentpm knowledge inspect`; that identifies the vector artifact bytes, not the corpus identity used for provider attestation.
 
-## Local SDK before publish
+## SDK setup
 
-These providers are written against the real public SDK packages. While Milestone 13 is still unpublished, the published npm package may not yet include `serveKnowledgeRuntimeProcess`. From this directory, build and link the sibling SDK checkout for local pre-publish testing:
-
-```bash
-cd ../../../agentpm-sdk-node
-pnpm build
-
-cd ../agentpm-examples/knowledge-packages/m13-reference-providers
-pnpm link ../../../agentpm-sdk-node
-```
-
-The published Python package may also not yet include `serve_knowledge_runtime_process`. From this directory, run Python provider commands with the sibling SDK checkout injected by `uv`:
-
-```bash
-uv run --with-editable ../../../agentpm-sdk-python python providers/python/pinecone_runtime.py
-uv run --with-editable ../../../agentpm-sdk-python --extra pgvector python providers/python/pgvector_runtime.py
-```
-
-After the SDK release that includes `serveKnowledgeRuntimeProcess` is published, remove the local link and install normally:
+Use the published Python and Node SDK **0.1.17 or newer**, which include the
+KnowledgeRuntime process helpers. Use AgentPM CLI **0.1.43 or newer** for the Harness
+workspace. From this provider directory, install the dependencies:
 
 ```bash
 pnpm install
-uv sync
+uv sync --upgrade-package agentpm
 ```
+
+The explicitly named `*.local-dev.agentpm.harness.json` configs and historical
+manual-testing commands still select a sibling SDK checkout for SDK development.
+Use the commands below for published-SDK provider execution.
 
 ## Harness workspace
 
@@ -150,7 +139,7 @@ Run the Python process provider:
 uv run python providers/python/pinecone_runtime.py
 ```
 
-If you are testing before the SDK release containing `serve_knowledge_runtime_process` is published, use the local Python SDK override command from [Local SDK before publish](#local-sdk-before-publish) instead.
+The published SDK includes `serve_knowledge_runtime_process`; install it using the [SDK setup](#sdk-setup) steps above.
 
 Use the Pinecone configs in `harness-configs/` for full Harness runs.
 
@@ -179,7 +168,7 @@ Run the Python process provider:
 uv run python providers/python/pgvector_runtime.py
 ```
 
-If you are testing before the SDK release containing `serve_knowledge_runtime_process` is published, use the local Python SDK override command from [Local SDK before publish](#local-sdk-before-publish) instead.
+The published SDK includes `serve_knowledge_runtime_process`; install it using the [SDK setup](#sdk-setup) steps above.
 
 Use the pgvector configs in `harness-configs/` for full Harness runs. Add `PGVECTOR_TABLE` to the matching config `env` only if you used a non-default table name.
 
@@ -189,7 +178,7 @@ Mocked mapping tests do not require OpenAI, Pinecone, or PostgreSQL:
 
 ```bash
 pnpm test:node
-uv run pytest
+uv run --extra test --extra pgvector pytest
 ```
 
 Live provider tests are intentionally environment-gated; run them only after preparing external infrastructure.

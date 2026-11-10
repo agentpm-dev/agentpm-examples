@@ -15,6 +15,13 @@ Template source:
 
 - [`template-packages/harness-embedding-provider`](../template-packages/harness-embedding-provider)
 
+## SDK and CLI prerequisites
+
+Use AgentPM SDK **0.1.17 or newer** and install AgentPM CLI **0.1.43 or newer**
+on PATH (or set `AGENTPM` to its executable). Every SDK Tool call delegates to
+the CLI, including legacy Python and Node Tools. Install the CLI in container
+images and CI jobs that run this app.
+
 ## Package Shape
 
 This template does not install a published Agent package. `agentpm new` creates the root `agent.json` locally in the generated workspace. That local Agent depends on:

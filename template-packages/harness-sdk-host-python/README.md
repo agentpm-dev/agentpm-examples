@@ -22,3 +22,9 @@ cp .env.local.example .env.local
 uv sync
 uv run python -m app.main
 ```
+
+## SDK compatibility update
+
+Version **0.1.1** generates apps with SDK **0.1.17+** and requires AgentPM CLI
+**0.1.43+** on PATH (or configured through `AGENTPM`). Publish this version to
+make the updated scaffold available through `agentpm new`.

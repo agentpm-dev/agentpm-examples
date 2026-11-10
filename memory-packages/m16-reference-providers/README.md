@@ -25,26 +25,20 @@ export AGENTPM_MEMORY_PACKAGE=@zack/m16-reference-memory
 export AGENTPM_MEMORY_VERSION=0.1.0
 ```
 
-## Local SDK before publish
+## SDK setup
 
-These providers are written against the real public SDK packages. While Milestone 16 is still unpublished, the published npm package may not yet include `serveMemoryRuntimeProcess`. From this directory, build and link the sibling SDK checkout for local pre-publish testing:
-
-```bash
-cd ../../../agentpm-sdk-node
-pnpm build
-
-cd ../agentpm-examples/memory-packages/m16-reference-providers
-pnpm link ../../../agentpm-sdk-node
-```
-
-The published Python package may also not yet include `serve_memory_runtime_process`. The provider commands below use the sibling SDK checkout through `uv --with-editable` for local pre-publish testing.
-
-After the SDK release that includes the MemoryRuntime process helpers is published, remove the local link and install normally:
+Use the published Python and Node SDK **0.1.17 or newer**, which include the
+MemoryRuntime process helpers. Use AgentPM CLI **0.1.43 or newer** for the Harness
+workspace. From this provider directory, install the dependencies:
 
 ```bash
 pnpm install
-uv sync
+uv sync --upgrade-package agentpm
 ```
+
+The explicitly named `*.local-dev.agentpm.harness.json` configs and historical
+manual-testing commands still select a sibling SDK checkout for SDK development.
+Use the commands below for published-SDK provider execution.
 
 ## Capability advertisement
 
@@ -70,12 +64,12 @@ To launch a provider process directly from this directory after the service env 
 
 ```bash
 export AGENTPM_MEMORY_RUNTIME_ID=pgvector-memory-reference
-uv run --with-editable ../../../agentpm-sdk-python --extra pgvector python providers/python/pgvector_runtime.py
+uv run --extra pgvector python providers/python/pgvector_runtime.py
 ```
 
 ```bash
 export AGENTPM_MEMORY_RUNTIME_ID=redis-memory-reference
-uv run --with-editable ../../../agentpm-sdk-python --extra redis python providers/python/redis_runtime.py
+uv run --extra redis python providers/python/redis_runtime.py
 ```
 
 The `harness-workspace/` directory is a local agent workspace for end-to-end Harness checks. It contains:
@@ -96,12 +90,12 @@ python3 scripts/prepare_workspace.py
 
 Harness config examples live in `harness-configs/`:
 
-| Config                                          | Runtime                                                        |
-| ----------------------------------------------- | -------------------------------------------------------------- |
-| `pgvector-node.agentpm.harness.json`            | PostgreSQL/pgvector Node provider with published/local SDK     |
-| `pgvector-python.local-dev.agentpm.harness.json` | PostgreSQL/pgvector Python provider with sibling SDK checkout  |
-| `redis-node.agentpm.harness.json`               | Redis Node provider with published/local SDK                   |
-| `redis-python.local-dev.agentpm.harness.json`   | Redis Python provider with sibling SDK checkout                |
+| Config                                           | Runtime                                                       |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| `pgvector-node.agentpm.harness.json`             | PostgreSQL/pgvector Node provider with published/local SDK    |
+| `pgvector-python.local-dev.agentpm.harness.json` | PostgreSQL/pgvector Python provider with sibling SDK checkout |
+| `redis-node.agentpm.harness.json`                | Redis Node provider with published/local SDK                  |
+| `redis-python.local-dev.agentpm.harness.json`    | Redis Python provider with sibling SDK checkout               |
 
 Harness projects only the variable names listed in each runtime `env` array from the Harness process environment into the provider process. Do not put literal secret values in `agentpm.harness.json`.
 
@@ -145,9 +139,9 @@ For pre-publish Python SDK verification:
 
 ```bash
 export AGENTPM_M16_LIVE_PROVIDER_COMMAND=uv
-export AGENTPM_M16_LIVE_PROVIDER_ARGS_JSON='["run","--with-editable","../../../agentpm-sdk-python","--extra","pgvector","python","providers/python/pgvector_runtime.py"]'
+export AGENTPM_M16_LIVE_PROVIDER_ARGS_JSON='["run","--extra","pgvector","python","providers/python/pgvector_runtime.py"]'
 pnpm test:node
 
-export AGENTPM_M16_LIVE_PROVIDER_ARGS_JSON='["run","--with-editable","../../../agentpm-sdk-python","--extra","redis","python","providers/python/redis_runtime.py"]'
+export AGENTPM_M16_LIVE_PROVIDER_ARGS_JSON='["run","--extra","redis","python","providers/python/redis_runtime.py"]'
 pnpm test:node
 ```

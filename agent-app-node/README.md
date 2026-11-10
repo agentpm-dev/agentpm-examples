@@ -1,24 +1,35 @@
 ## Node Agent
 
-### What it does
-A **LangChain (Node)** agent that loads tools from AgentPM and orchestrates a “research assistant” flow:
-1) Scrape Wikipedia
-2) Summarize (OpenAI)
-3) Translate (OpenAI)
-4) Sentiment
-5) Resize first image
+### SDK and CLI prerequisites
 
+Use AgentPM SDK **0.1.17 or newer** and install AgentPM CLI **0.1.43 or newer**
+on PATH (or set `AGENTPM` to its executable). Every SDK Tool call delegates to
+the CLI, including legacy Python and Node Tools. Install the CLI in container
+images and CI jobs that run this app.
+
+### What it does
+
+A **LangChain (Node)** agent that loads tools from AgentPM and orchestrates a “research assistant” flow:
+
+1. Scrape Wikipedia
+2. Summarize (OpenAI)
+3. Translate (OpenAI)
+4. Sentiment
+5. Resize first image
 
 ### Key differences vs Python agent
+
 - Uses **OpenAI Tools Agent** (function calling) + **StructuredTool** wrappers.
 - Tool **schemas are dynamic**: converts each tool’s `meta.inputs` (JSON Schema) → **Zod** at runtime so the LLM always emits valid JSON args.
 
 ### AgentPM & tools
+
 - `"kind": "agent"`
 - Tools are **installed via AgentPM** and loaded dynamically in code (see `agent.json` and `src/main.ts`).
-- Tools are loaded and run via the Node SDK `"@agentpm/sdk": "^0.1.2",`
+- Tools are loaded and run via the Node SDK `"@agentpm/sdk": "^0.1.17"`
 
 Example install:
+
 ```bash
 agentpm install @zack/wikipedia-scrape@0.1.1
 agentpm install @zack/summarize-text@0.1.3
@@ -26,18 +37,22 @@ agentpm install @zack/translate-text@0.1.0
 agentpm install @zack/sentiment-analysis@0.1.1
 agentpm install @zack/resize-image@0.1.4
 ```
+
 or
+
 ```bash
 # tools already defined in agent.json
 agentpm install
 ```
 
 ### Quirks
+
 - Requires `@langchain/core@^0.2`, `langchain@^0.2`, `@langchain/openai@^0.3`, and `zod`.
-- The SDK runner streams child output, detects first JSON, and applies a **graceful TERM→KILL** if the child doesn’t exit quickly.
-- Python tool subprocesses are run with `-u` (unbuffered) to reduce lag.
+- Tool calls use `agentpm run --machine`; the CLI owns subprocess execution,
+  JSON output handling and timeouts.
 
 ### Setup & run
+
 ```bash
 pnpm --dir agent-app-node install
 
@@ -50,7 +65,8 @@ pnpm --dir agent-app-node exec dotenv -e .env.local -- pnpm  dev
 ```
 
 ### Example output
-```text
+
+````text
 Loading tools from AgentPM…
 🔗 Agent start (b2064983-168f-4d38-bf3f-559e54f8911f)
 🔗 Agent start (b2064983-168f-4d38-bf3f-559e54f8911f)
@@ -86,4 +102,4 @@ Human: Given this Wikipedia URL, scrape it, summarize in <= 150 words, translate
   "sentiment_label": "negative",
   "resized_image_base64_prefix": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCE.../2Q=="
 }
-```
+````
