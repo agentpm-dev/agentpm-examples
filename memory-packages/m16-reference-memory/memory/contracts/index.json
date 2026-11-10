@@ -5,7 +5,7 @@
       "path": "memory/contracts/current_note.note.schema.json",
       "record_type": "note",
       "schema_version": "1.0.0",
-      "sha256": "sha256:6e6039a581b89f3d6ce13901211ec5abae16c0f1b45cb28afb0f7d18f3fc027f",
+      "sha256": "sha256:7a779bea0f4f8bf2cdcf566a299f09e5e674dda4c41ddcb036b7216f313531d1",
       "source_schema": "schemas/note.schema.json",
       "space": "current_note"
     },
@@ -14,7 +14,7 @@
       "path": "memory/contracts/events.event.schema.json",
       "record_type": "event",
       "schema_version": "1.0.0",
-      "sha256": "sha256:e360d5d9462683e3de48441d1a0adc747e1409fa0296c9dd6d4d66e36899ccd8",
+      "sha256": "sha256:6380b453ff8d9f06f50ca3aafdff60d5e30d464f3c253224fcd14aeb34e1ad05",
       "source_schema": "schemas/event.schema.json",
       "space": "events"
     },
@@ -23,7 +23,7 @@
       "path": "memory/contracts/notes.note.schema.json",
       "record_type": "note",
       "schema_version": "1.0.0",
-      "sha256": "sha256:4d32fb6d470200275bb6c5bc6b97bb025d0d5a6284907fff909dec3a823b781d",
+      "sha256": "sha256:ffabaac1e2349dfb56c43a87181070b67b9b77b193d78fbd7d334fb3ff056e5a",
       "source_schema": "schemas/note.schema.json",
       "space": "notes"
     },
@@ -32,7 +32,7 @@
       "path": "memory/contracts/summaries.summary.schema.json",
       "record_type": "summary",
       "schema_version": "1.0.0",
-      "sha256": "sha256:447efa40f8e6eed606542e56bf9604338e4fbf743fbfde3a757d56883f16c637",
+      "sha256": "sha256:17419264f8ef5bb35d34c32dc9d470dcaee4d73f2e841488140fb21aed1be348",
       "source_schema": "schemas/summary.schema.json",
       "space": "summaries"
     }
