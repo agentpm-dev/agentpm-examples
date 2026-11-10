@@ -8,7 +8,7 @@ This app installs the published `devwork-copilot` agent package, loads it with t
 
 Published agent package:
 
-- `@zack/devwork-copilot@0.1.7`, including `@zack/summarize-text@0.1.9`
+- `@zack/devwork-copilot@0.1.8`, including `@zack/summarize-text@0.1.9`
 
 Package source:
 
@@ -40,7 +40,7 @@ This example shows a real app that:
 From this app directory, install the published agent package:
 
 ```bash
-agentpm install @zack/devwork-copilot@0.1.7
+agentpm install @zack/devwork-copilot@0.1.8
 ```
 
 That should install:
@@ -54,14 +54,14 @@ That should install:
 - the resolved tool artifacts under `.agentpm/tools/...`
 - the summarizer's managed Python environment under `.agentpm/runtimes/python/...`
 
-Use AgentPM CLI **0.1.37 or newer** and Python **3.11 or newer**. The Tool's
+Use AgentPM CLI **0.1.43 or newer** and Python **3.11 or newer**. The Tool's
 dependencies are provisioned by AgentPM separately from this app's `uv` environment.
 
-The current Python SDK still accepts only lockfile versions 2 and 3 and launches
-Tools directly rather than through the CLI-managed Python environment. Running
-this app against the new version-4 lock is blocked until that SDK compatibility
-work is available. Installing the Agent and running the Tool with `agentpm run`
-work independently of this app startup limitation.
+Python SDK **0.1.17+** reads this real v4 consumer lock and invokes all Tools
+through `agentpm run --machine`, including the summarizer's managed environment.
+It never rewrites the lock or installs dependencies during a Tool call. If
+runtime state is missing, run `agentpm install` explicitly with the selected
+Python; use `--refresh` for damaged packages. Older SDKs cannot run this lock.
 
 ## Setup
 
@@ -71,7 +71,7 @@ From this app directory:
 uv sync
 ```
 
-This example requires `agentpm>=0.1.12` so the Python SDK can load installed Knowledge, Loop, Memory, and Profile packages with `load_knowledge(...)`, `load_loop(...)`, `load_memory(...)`, and `load_profile(...)`.
+This example requires `agentpm>=0.1.17` so the Python SDK can load installed Knowledge, Loop, Memory, and Profile packages with `load_knowledge(...)`, `load_loop(...)`, `load_memory(...)`, and `load_profile(...)`.
 
 ## Environment
 
@@ -136,3 +136,18 @@ For the supplied-text summarization check, confirm the banner shows Agent
 - The current published agent package also brings in `devwork-maintainer-state`, and the banner prints its installed Memory Blueprint metadata so you can confirm the Memory dependency was resolved correctly.
 - The current published agent package also brings in `devwork-maintainer-style`, and the banner prints its installed Instruction Profile metadata so you can confirm the Profile dependency was resolved correctly.
 - The current published agent package also includes authored bindings, and the banner summarizes those bindings so you can see how the packaged agent scoped its context surfaces.
+
+## SDK smoke without a model request
+
+After installing `@zack/devwork-copilot@0.1.8` in this app or a clean consumer:
+
+```bash
+uv run python -m app.sdk_smoke /absolute/path/to/consumer
+```
+
+The smoke loads the installed Agent and Skill-transitive Tool references from
+the real lock, then calls summarize-text through the SDK. It overrides the model
+key with an empty value and expects the Tool's `INPUT_MISSING_API_KEY` result.
+This imports the actual installed Python dependencies without making a model
+request. The normal app still uses your credentials for real summarization.
+No lock version or integrity value should be hand-edited.

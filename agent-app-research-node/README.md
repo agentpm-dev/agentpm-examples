@@ -102,3 +102,28 @@ pnpm start
 - The current local app manifest depends on `@zack/research-brief-playbook@0.1.0` plus a direct `@zack/translate-text` tool.
 - If you later edit `agent.json`, rerun `agentpm install` to regenerate `agent.lock`.
 - This app keeps conversational history across prompts until you run `/reset`.
+
+## Calling a managed Python Tool from Node
+
+Use Node SDK **0.1.17+** and AgentPM CLI **0.1.43+**. Every Tool call goes
+through `agentpm run --machine`; CLI install provisions Python dependencies.
+The app's normal Node Tool calls use the same bridge.
+
+To verify installed Agent composition and a Python Tool without a model request,
+install the published Agent in a separate consumer directory:
+
+```bash
+mkdir -p /tmp/agentpm-node-sdk-consumer
+cd /tmp/agentpm-node-sdk-consumer
+agentpm install @zack/devwork-copilot@0.1.8 --require-signature --require-attestation
+cd /absolute/path/to/agentpm-examples/agent-app-research-node
+pnpm install
+pnpm sdk:smoke /tmp/agentpm-node-sdk-consumer
+```
+
+The smoke reads the real v4 lock, loads the installed Agent and Skill Tool refs,
+and calls summarize-text through the SDK with an explicitly empty model key.
+The expected Tool result is `INPUT_MISSING_API_KEY`; dependencies are imported
+but no model request occurs. This does not alter this app's authored manifest
+or invent lock integrity values. Reinstall explicitly if the managed runtime
+is missing/stale; SDK calls never provision it.
