@@ -5,8 +5,7 @@ the native `pydantic-core` wheel. This demonstrates the full Python dependency
 flow: author development, portable resolution, installation and execution.
 It uses no API key, LLM or external service at runtime.
 
-This example requires an AgentPM CLI containing Milestone 11C for managed
-consumer environments. It is source code for a publishable Tool, not a claim
+Use AgentPM CLI **0.1.43+** for managed consumer environments. It is source code for a publishable Tool, not a claim
 that `validate-order` is already published in any particular namespace.
 
 ## Develop the Tool
@@ -26,13 +25,8 @@ Keep `pyproject.toml` and `agent.json` dependency declarations in agreement.
 
 ## Prepare and Publish
 
-Use your rebuilt CLI, matching local schema, dev Registry and a namespace you
-own when testing unreleased 11C code. The shorthand commands below assume those
-are already selected; the public schema/released CLI may lag your working tree.
-For working-tree checks, add `--schema /absolute/path/to/agentpm/schemas/agentpm.manifest.schema.json`
-to lint/publish, and put `--base-url http://127.0.0.1:5000` before the subcommand
-when using the local Registry. Use the rebuilt executable's path in place of
-`agentpm` until that code is released.
+Use the released CLI and a namespace you own. Prepare the portable dependency
+resolution before live publication:
 
 ```bash
 agentpm lint --strict
@@ -50,10 +44,10 @@ The CLI validates lock contents/freshness, rather than enforcing a Git commit.
 ## Use the Published Tool
 
 In a different project with a suitable Python installed, replace the namespace
-below with the one where you actually published version 0.1.0:
+below with the one where you actually published version 0.1.1:
 
 ```bash
-export ORDER_TOOL='@your-namespace/validate-order@0.1.0'
+export ORDER_TOOL='@your-namespace/validate-order@0.1.1'
 agentpm install "$ORDER_TOOL"
 agentpm run "$ORDER_TOOL" --input '{"quantity":2,"unit_price":4.5}'
 ```

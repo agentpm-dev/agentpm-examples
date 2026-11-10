@@ -1,6 +1,6 @@
-# Harness M13 KnowledgeRuntime reference providers
+# KnowledgeRuntime reference providers
 
-Reference process providers for Harness Milestone 13:
+Reference process providers for AgentPM Harness:
 
 - Pinecone full `KnowledgeRuntime`
 - PostgreSQL/pgvector full `KnowledgeRuntime`
