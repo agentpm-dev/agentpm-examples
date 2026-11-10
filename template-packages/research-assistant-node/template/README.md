@@ -2,6 +2,13 @@
 
 Interactive local research assistant built on the AgentPM Node SDK.
 
+## SDK and CLI prerequisites
+
+Use AgentPM SDK **0.1.17 or newer** and install AgentPM CLI **0.1.43 or newer**
+on PATH (or set `AGENTPM` to its executable). Every SDK Tool call delegates to
+the CLI, including legacy Python and Node Tools. Install the CLI in container
+images and CI jobs that run this app.
+
 ## What it does
 
 This app loads the tools declared in the generated `agent.json`, then runs an interactive research workflow against real installed AgentPM packages.

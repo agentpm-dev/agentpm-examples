@@ -2,17 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "template",
   "name": "support-assistant-workspace",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Multi-agent workspace starter that combines one published agent root, a support loop, support knowledge, support memory, one published support instruction profile, and local generated agent manifests.",
   "template": {
     "display_name": "Support Assistant Workspace",
     "use_case": "internal-support",
-    "execution_surfaces": [
-      "python-sdk"
-    ],
-    "stack": [
-      "python"
-    ],
+    "execution_surfaces": ["python-sdk"],
+    "stack": ["python"],
     "files_root": "template",
     "variables": [
       {

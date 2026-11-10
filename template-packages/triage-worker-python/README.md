@@ -10,6 +10,12 @@ It generates a local project that:
 - reads that agent's direct `resolvedTools`, then loads the published Skills from `resolvedSkills` and each Skill's `resolvedTools` at runtime
 - separately loads the extra direct tool from the generated local manifest
 
+## SDK compatibility update
+
+Version **0.1.3** generates apps with SDK **0.1.17+** and requires AgentPM CLI
+**0.1.43+** on PATH (or configured through `AGENTPM`). Publish this version to
+make the updated scaffold available through `agentpm new`.
+
 ## Runtime story
 
 The intended flow for this template is:

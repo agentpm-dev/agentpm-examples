@@ -4,6 +4,12 @@
 
 Generated apps use a local root `agent.json`. The local Agent depends on the published `@zack/react-loop@0.1.0` Loop and the refreshed published `@zack/agentpm-docs@0.1.1` Knowledge package, while `agentpm.harness.json` maps that Knowledge package's vector embedding spec to the Node host provider in `src/main.ts`.
 
+## SDK compatibility update
+
+Version **0.1.2** generates apps with SDK **0.1.17+** and requires AgentPM CLI
+**0.1.43+** on PATH (or configured through `AGENTPM`). Publish this version to
+make the updated scaffold available through `agentpm new`.
+
 ## What It Demonstrates
 
 - A Node SDK Harness host with one focused EmbeddingProvider implementation

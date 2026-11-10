@@ -4,6 +4,13 @@ zack-workspace is a multi-agent support workspace generated from the published `
 
 This template is about workspace structure first, not built-in recursive orchestration.
 
+## SDK and CLI prerequisites
+
+Use AgentPM SDK **0.1.17 or newer** and install AgentPM CLI **0.1.43 or newer**
+on PATH (or set `AGENTPM` to its executable). Every SDK Tool call delegates to
+the CLI, including legacy Python and Node Tools. Install the CLI in container
+images and CI jobs that run this app.
+
 ## What this workspace shows
 
 The generated project includes three different role shapes:

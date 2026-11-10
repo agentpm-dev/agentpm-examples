@@ -2,17 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "template",
   "name": "triage-worker-python",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Python SDK starter for a local triage worker that combines a published AgentPM agent with one extra direct tool.",
   "template": {
     "display_name": "Python Triage Worker",
     "use_case": "team-ops",
-    "execution_surfaces": [
-      "python-sdk"
-    ],
-    "stack": [
-      "python"
-    ],
+    "execution_surfaces": ["python-sdk"],
+    "stack": ["python"],
     "files_root": "template",
     "variables": [
       {

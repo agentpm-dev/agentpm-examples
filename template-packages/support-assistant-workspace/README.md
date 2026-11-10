@@ -15,6 +15,12 @@ It generates a local project that:
 - includes a small Python entrypoint plus `pyproject.toml` for the workspace example
 - gives users a structured starting point for future app-level orchestration without pretending AgentPM already has recursive agent orchestration semantics
 
+## SDK compatibility update
+
+Version **0.1.8** generates apps with SDK **0.1.17+** and requires AgentPM CLI
+**0.1.43+** on PATH (or configured through `AGENTPM`). Publish this version to
+make the updated scaffold available through `agentpm new`.
+
 ## Workspace shape
 
 The generated project includes:

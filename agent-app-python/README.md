@@ -1,19 +1,30 @@
 ## Python Agent
 
+### SDK and CLI prerequisites
+
+Use AgentPM SDK **0.1.17 or newer** and install AgentPM CLI **0.1.43 or newer**
+on PATH (or set `AGENTPM` to its executable). Every SDK Tool call delegates to
+the CLI, including legacy Python and Node Tools. Install the CLI in container
+images and CI jobs that run this app.
+
 ### What it does
+
 A **LangChain (Python)** agent that loads tools from AgentPM and orchestrates a “research assistant” flow:
-1) Scrape Wikipedia
-2) Summarize (OpenAI)
-3) Translate (OpenAI)
-4) Sentiment
-5) Resize first image
+
+1. Scrape Wikipedia
+2. Summarize (OpenAI)
+3. Translate (OpenAI)
+4. Sentiment
+5. Resize first image
 
 ### AgentPM & tools
+
 - `"kind": "agent"`
 - Tools are **installed via AgentPM** and loaded dynamically in code (see `agent.json` and `app/main.py`).
-- Tools are loaded and run via the Python SDK `"agentpm>=0.1.1"`
+- Tools are loaded and run via the Python SDK `"agentpm>=0.1.17"`
 
 Example install:
+
 ```bash
 agentpm install @zack/wikipedia-scrape@0.1.1
 agentpm install @zack/summarize-text@0.1.3
@@ -21,18 +32,22 @@ agentpm install @zack/translate-text@0.1.0
 agentpm install @zack/sentiment-analysis@0.1.1
 agentpm install @zack/resize-image@0.1.4
 ```
+
 or
+
 ```bash
 # tools already defined in agent.json
 agentpm install
 ```
 
 ### Quirks
+
 - Uses the standard ReAct agent. LLM may shorten very long intermediate text; acceptable for demo purposes.
-- The SDK runner streams child output, detects first JSON, and applies a **graceful TERM→KILL** if the child doesn’t exit quickly.
-- Python tool subprocesses are run with `-u` (unbuffered) to reduce lag.
+- Tool calls use `agentpm run --machine`; the CLI owns subprocess execution,
+  JSON output handling and timeouts.
 
 ### Setup & run
+
 ```bash
 uv sync --directory agent-app-python
 # Put OPENAI_API_KEY into agent-app-python/.env.local
@@ -42,6 +57,7 @@ python -m app.main
 ```
 
 ### Example output
+
 ```text
 Loading tools from AgentPM…
 
@@ -51,54 +67,54 @@ Loading tools from AgentPM…
 > Entering new AgentExecutor chain...
 I will start by scraping the provided Wikipedia URL to gather the necessary information about Alan Turing.
 
-Action: wikipedia-scrape  
-Action Input: {"url":"https://en.wikipedia.org/wiki/Alan_Turing"}  
+Action: wikipedia-scrape
+Action Input: {"url":"https://en.wikipedia.org/wiki/Alan_Turing"}
 {
-    'ok': True, 
-    'title': 'Alan Turing', 
+    'ok': True,
+    'title': 'Alan Turing',
     'text': 'Alan Mathison Turing ...',
     'images': ['https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alan_turing_header.jpg/250px-Alan_turing_header.jpg', ...]
-} 
+}
 
 I have successfully scraped the Wikipedia page for Alan Turing. Now, I will summarize the text to create a concise abstract of 150 words or less.
 
-Action: summarize-text  
+Action: summarize-text
 Action Input: {"text":"Alan Mathison Turing ...'}
 {
-    'ok': True, 
+    'ok': True,
     'summary': "Alan Turing (1912–1954) was a pivotal English mathematician ... of theoretical computer science.'
 }
 
 Now that I have the summary of Alan Turing's life and contributions, I will translate this summary into Spanish. After that, I will perform sentiment analysis on the English summary and resize the first image from the scraped content to 32x32 pixels.
 
-Action: translate-text  
+Action: translate-text
 Action Input: {"text":"Alan Turing (1912–1954) was a pivotal English mathematician ... of theoretical computer science."}
 {
-    'ok': True, 
+    'ok': True,
     'translated': 'Alan Turing (1912–1954) fue un matemático y científico de la computación ... de la ciencia de la computación teórica.'
 }
 
 Now that I have the Spanish translation of the summary, I will proceed to perform sentiment analysis on the English summary. After that, I will resize the first image found in the article to 32x32 pixels.
 
-Action: sentiment-analysis  
+Action: sentiment-analysis
 Action Input: {"text":"Alan Turing (1912–1954) was a pivotal English mathematician ... of theoretical computer science."}
 {
-    'ok': True, 
-    'label': 'negative', 
+    'ok': True,
+    'label': 'negative',
     'scores': {
-        'neg': 0.15, 
-        'neu': 0.797, 
-        'pos': 0.054, 
+        'neg': 0.15,
+        'neu': 0.797,
+        'pos': 0.054,
         'compound': -0.9217
     }
 }
 
 I have completed the sentiment analysis, which indicates a negative sentiment overall. Now, I will resize the first image from the scraped content to 32x32 pixels.
 
-Action: resize-image  
-Action Input: {"url":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alan_turing_header.jpg/250px-Alan_turing_header.jpg","width":32,"height":32}  
+Action: resize-image
+Action Input: {"url":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Alan_turing_header.jpg/250px-Alan_turing_header.jpg","width":32,"height":32}
 {
-    'ok': True, 
+    'ok': True,
     'image_base64_jpeg': '/9j/4AAQSkZJRgABAQAAAQA.../2Q=='
 }
 
@@ -111,9 +127,9 @@ Final Answer: {
   "sentiment": {
     "label": "negative",
     "scores": {
-      'neg': 0.15, 
-        'neu': 0.797, 
-        'pos': 0.054, 
+      'neg': 0.15,
+        'neu': 0.797,
+        'pos': 0.054,
         'compound': -0.9217
     }
   },

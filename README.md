@@ -7,7 +7,9 @@
 ## AgentPM™ Examples Repository
 
 ### What is this?
+
 A mono-repo of concrete examples showing how to:
+
 - Build small **tools** (Node + Python),
 - Publish them to **AgentPM** with an `agent.json` manifest,
 - Load and run them from **agent apps** using several different orchestration styles.
@@ -25,89 +27,105 @@ The current examples repo now shows both sides of the agent workflow:
 
 Each tool is intentionally simple to highlight integration, not performance.
 
+### SDK prerequisites
+
+SDK consumers in this repository require Python `agentpm>=0.1.17` or Node
+`@agentpm/sdk@^0.1.17`, plus AgentPM CLI **0.1.43 or newer** on PATH (or set
+`AGENTPM` to the CLI executable). All SDK Tool calls use the CLI, including
+legacy Python and Node Tools. Containers and CI runners must install the CLI.
+After updating an existing checkout, run `uv sync --upgrade-package agentpm`
+or `pnpm install` in the app to refresh its dependencies; installing a newer
+CLI does not upgrade an older SDK environment.
+
+For the published-SDK checks, use the no-model smoke entrypoints in
+[Python devwork](agent-app-devwork-python/README.md#sdk-smoke-without-a-model-request)
+and [Node research](agent-app-research-node/README.md#calling-a-managed-python-tool-from-node).
+They exercise the published Agent's v4 lock and dependency-bearing summarizer
+through the SDK, with an empty model key and no paid model request.
+
 ### Contents
+
 - **Tools**
-    - [`tools-node/web-page-extract`](tools-node/web-page-extract/)
-    - [`tools-node/wikipedia-scrape`](tools-node/wikipedia-scrape/)
-    - [`tools-node/github-issues`](tools-node/github-issues/)
-    - [`tools-node/robots-aware-crawl`](tools-node/robots-aware-crawl/)
-    - [`tools-node/slack-post-message`](tools-node/slack-post-message/)
-    - [`tools-node/translate-text`](tools-node/translate-text/)
-    - [`tools-node/resize-image`](tools-node/resize-image)
-    - [`tools-python/document-convert`](tools-python/document-convert/)
-    - [`tools-python/summarize-text`](tools-python/summarize-text/)
-    - [`tools-python/markdown-chunk`](tools-python/markdown-chunk/)
-    - [`tools-python/sentiment-analysis`](tools-python/sentiment-analysis/)
-    - [`tools-python/csv-query`](tools-python/csv-query/)
-    - [`tools-python/validate-order`](tools-python/validate-order/): Pydantic validation with managed Python dependency installation
-    - [`tools-python/json-transform`](tools-python/json-transform/)
-    - [`tools-python/table-extract`](tools-python/table-extract/)
-    
+  - [`tools-node/web-page-extract`](tools-node/web-page-extract/)
+  - [`tools-node/wikipedia-scrape`](tools-node/wikipedia-scrape/)
+  - [`tools-node/github-issues`](tools-node/github-issues/)
+  - [`tools-node/robots-aware-crawl`](tools-node/robots-aware-crawl/)
+  - [`tools-node/slack-post-message`](tools-node/slack-post-message/)
+  - [`tools-node/translate-text`](tools-node/translate-text/)
+  - [`tools-node/resize-image`](tools-node/resize-image)
+  - [`tools-python/document-convert`](tools-python/document-convert/)
+  - [`tools-python/summarize-text`](tools-python/summarize-text/)
+  - [`tools-python/markdown-chunk`](tools-python/markdown-chunk/)
+  - [`tools-python/sentiment-analysis`](tools-python/sentiment-analysis/)
+  - [`tools-python/csv-query`](tools-python/csv-query/)
+  - [`tools-python/validate-order`](tools-python/validate-order/): Pydantic validation with managed Python dependency installation
+  - [`tools-python/json-transform`](tools-python/json-transform/)
+  - [`tools-python/table-extract`](tools-python/table-extract/)
 - **Agents**
-    - [`agent-app-research-node`](agent-app-research-node/)
-    - [`agent-app-ops-python`](agent-app-ops-python/)
-    - [`app-harness-minimal-agent`](app-harness-minimal-agent/)
-    - [`app-harness-sdk-host-node`](app-harness-sdk-host-node/)
-    - [`app-harness-sdk-host-python`](app-harness-sdk-host-python/)
-    - [`app-harness-embedding-provider`](app-harness-embedding-provider/)
-    - [`app-harness-provider-lab`](app-harness-provider-lab/)
-    - [`app-harness-mcp-bridge`](app-harness-mcp-bridge/)
-    - [`agent-app-support-assistant-workspace`](agent-app-support-assistant-workspace/)
-    - [`agent-app-devwork-python`](agent-app-devwork-python/)
-    - [`app-cli-automation-worker`](app-cli-automation-worker/)
-    - [`app-mcp-tool-server`](app-mcp-tool-server/)
-    - [`agent-app-python`](agent-app-python/)
-    - [`agent-app-node`](agent-app-node/)
+  - [`agent-app-research-node`](agent-app-research-node/)
+  - [`agent-app-ops-python`](agent-app-ops-python/)
+  - [`app-harness-minimal-agent`](app-harness-minimal-agent/)
+  - [`app-harness-sdk-host-node`](app-harness-sdk-host-node/)
+  - [`app-harness-sdk-host-python`](app-harness-sdk-host-python/)
+  - [`app-harness-embedding-provider`](app-harness-embedding-provider/)
+  - [`app-harness-provider-lab`](app-harness-provider-lab/)
+  - [`app-harness-mcp-bridge`](app-harness-mcp-bridge/)
+  - [`agent-app-support-assistant-workspace`](agent-app-support-assistant-workspace/)
+  - [`agent-app-devwork-python`](agent-app-devwork-python/)
+  - [`app-cli-automation-worker`](app-cli-automation-worker/)
+  - [`app-mcp-tool-server`](app-mcp-tool-server/)
+  - [`agent-app-python`](agent-app-python/)
+  - [`agent-app-node`](agent-app-node/)
 
 - **Agent packages**
-    - [`agent-packages/research-node`](agent-packages/research-node/)
-    - [`agent-packages/ops-python`](agent-packages/ops-python/)
-    - [`agent-packages/devwork-python`](agent-packages/devwork-python/)
+  - [`agent-packages/research-node`](agent-packages/research-node/)
+  - [`agent-packages/ops-python`](agent-packages/ops-python/)
+  - [`agent-packages/devwork-python`](agent-packages/devwork-python/)
 
 - **Knowledge packages**
-    - [`knowledge-packages/support-response-handbook`](knowledge-packages/support-response-handbook/)
-    - [`knowledge-packages/devwork-maintainer-guide`](knowledge-packages/devwork-maintainer-guide/)
-    - [`knowledge-packages/agentpm-docs`](knowledge-packages/agentpm-docs/)
-    - [`knowledge-packages/m13-reference-corpus`](knowledge-packages/m13-reference-corpus/)
-    - [`knowledge-packages/m13-reference-providers`](knowledge-packages/m13-reference-providers/)
+  - [`knowledge-packages/support-response-handbook`](knowledge-packages/support-response-handbook/)
+  - [`knowledge-packages/devwork-maintainer-guide`](knowledge-packages/devwork-maintainer-guide/)
+  - [`knowledge-packages/agentpm-docs`](knowledge-packages/agentpm-docs/)
+  - [`knowledge-packages/m13-reference-corpus`](knowledge-packages/m13-reference-corpus/)
+  - [`knowledge-packages/m13-reference-providers`](knowledge-packages/m13-reference-providers/)
 
 - **Loop packages**
-    - [`loop-packages/react-loop`](loop-packages/react-loop/)
-    - [`loop-packages/support-escalation-loop`](loop-packages/support-escalation-loop/)
-    - [`loop-packages/incident-response-loop`](loop-packages/incident-response-loop/)
-    - [`loop-packages/devwork-triage-loop`](loop-packages/devwork-triage-loop/)
+  - [`loop-packages/react-loop`](loop-packages/react-loop/)
+  - [`loop-packages/support-escalation-loop`](loop-packages/support-escalation-loop/)
+  - [`loop-packages/incident-response-loop`](loop-packages/incident-response-loop/)
+  - [`loop-packages/devwork-triage-loop`](loop-packages/devwork-triage-loop/)
 
 - **Memory packages**
-    - [`memory-packages/support-customer-state`](memory-packages/support-customer-state/)
-    - [`memory-packages/conversation-continuity`](memory-packages/conversation-continuity/)
-    - [`memory-packages/devwork-maintainer-state`](memory-packages/devwork-maintainer-state/)
+  - [`memory-packages/support-customer-state`](memory-packages/support-customer-state/)
+  - [`memory-packages/conversation-continuity`](memory-packages/conversation-continuity/)
+  - [`memory-packages/devwork-maintainer-state`](memory-packages/devwork-maintainer-state/)
 
 - **Profile packages**
-    - [`profile-packages/support-response-style`](profile-packages/support-response-style/)
-    - [`profile-packages/incident-operator-style`](profile-packages/incident-operator-style/)
-    - [`profile-packages/devwork-maintainer-style`](profile-packages/devwork-maintainer-style/)
+  - [`profile-packages/support-response-style`](profile-packages/support-response-style/)
+  - [`profile-packages/incident-operator-style`](profile-packages/incident-operator-style/)
+  - [`profile-packages/devwork-maintainer-style`](profile-packages/devwork-maintainer-style/)
 
 - **Skill packages**
-    - [`skill-packages/incident-handoff-checklist`](skill-packages/incident-handoff-checklist/)
-    - [`skill-packages/slack-status-update`](skill-packages/slack-status-update/)
-    - [`skill-packages/issue-triage-playbook`](skill-packages/issue-triage-playbook/)
-    - [`skill-packages/research-brief-playbook`](skill-packages/research-brief-playbook/)
+  - [`skill-packages/incident-handoff-checklist`](skill-packages/incident-handoff-checklist/)
+  - [`skill-packages/slack-status-update`](skill-packages/slack-status-update/)
+  - [`skill-packages/issue-triage-playbook`](skill-packages/issue-triage-playbook/)
+  - [`skill-packages/research-brief-playbook`](skill-packages/research-brief-playbook/)
 
 - **Workflow templates**
-    - [`template-packages/harness-minimal-agent`](template-packages/harness-minimal-agent/)
-    - [`template-packages/harness-sdk-host-node`](template-packages/harness-sdk-host-node/)
-    - [`template-packages/harness-sdk-host-python`](template-packages/harness-sdk-host-python/)
-    - [`template-packages/harness-embedding-provider`](template-packages/harness-embedding-provider/)
-    - [`template-packages/harness-provider-lab`](template-packages/harness-provider-lab/)
-    - [`template-packages/harness-mcp-bridge`](template-packages/harness-mcp-bridge/)
-    - [`template-packages/research-assistant-node`](template-packages/research-assistant-node/)
-    - [`template-packages/triage-worker-python`](template-packages/triage-worker-python/)
-    - [`template-packages/cli-automation-worker`](template-packages/cli-automation-worker/)
-    - [`template-packages/mcp-tool-server`](template-packages/mcp-tool-server/)
-    - [`template-packages/support-assistant-workspace`](template-packages/support-assistant-workspace/)
+  - [`template-packages/harness-minimal-agent`](template-packages/harness-minimal-agent/)
+  - [`template-packages/harness-sdk-host-node`](template-packages/harness-sdk-host-node/)
+  - [`template-packages/harness-sdk-host-python`](template-packages/harness-sdk-host-python/)
+  - [`template-packages/harness-embedding-provider`](template-packages/harness-embedding-provider/)
+  - [`template-packages/harness-provider-lab`](template-packages/harness-provider-lab/)
+  - [`template-packages/harness-mcp-bridge`](template-packages/harness-mcp-bridge/)
+  - [`template-packages/research-assistant-node`](template-packages/research-assistant-node/)
+  - [`template-packages/triage-worker-python`](template-packages/triage-worker-python/)
+  - [`template-packages/cli-automation-worker`](template-packages/cli-automation-worker/)
+  - [`template-packages/mcp-tool-server`](template-packages/mcp-tool-server/)
+  - [`template-packages/support-assistant-workspace`](template-packages/support-assistant-workspace/)
 
 - **Skill workflow example**
-    - [`skill-workflow-slack-post-message`](skill-workflow-slack-post-message/)
+  - [`skill-workflow-slack-post-message`](skill-workflow-slack-post-message/)
 
 ### Current agent patterns
 
@@ -237,6 +255,7 @@ This repo currently demonstrates:
   - tool examples continue to show direct manifest authoring and publishing with `agent.json`
 
 ### Quick workspace setup
+
 ```bash
 # from repo root
 pnpm -r install                    # installs Node deps for node tools & node apps
@@ -295,7 +314,7 @@ cd tools-python/table-extract && python -m unittest discover -s tests -p 'test_*
 cd agent-app-research-node && pnpm dev
 cd agent-app-ops-python && agentpm install && uv sync && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd agent-app-support-assistant-workspace && cp .env.example .env.local && agentpm install && uv sync && uv run python app/main.py
-cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.5 && uv run python -m dotenv -f .env.local run -- python -m app.main
+cd agent-app-devwork-python && agentpm install @zack/devwork-copilot@0.1.8 && uv run python -m dotenv -f .env.local run -- python -m app.main
 cd app-cli-automation-worker && cp .env.example .env.local && agentpm install && bash scripts/run-daily-brief.sh
 cd app-mcp-tool-server && cp .env.example .env.local && agentpm install && set -a && source .env.local && set +a && agentpm serve --mcp
 ```

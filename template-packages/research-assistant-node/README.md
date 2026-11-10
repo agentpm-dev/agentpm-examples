@@ -9,6 +9,12 @@ It generates a local project that:
 - runs an interactive OpenAI-powered research console
 - keeps the generated `agent.json` editable so users can change the tool set later
 
+## SDK compatibility update
+
+Version **0.1.1** generates apps with SDK **0.1.17+** and requires AgentPM CLI
+**0.1.43+** on PATH (or configured through `AGENTPM`). Publish this version to
+make the updated scaffold available through `agentpm new`.
+
 ## Generated project shape
 
 The scaffold includes:
