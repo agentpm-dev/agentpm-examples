@@ -1,13 +1,13 @@
 {
-  "agentpm_version": "0.1.27",
-  "built_at": "2026-09-11T21:45:45Z",
+  "agentpm_version": "0.1.43",
+  "built_at": "2026-11-10T15:33:33Z",
   "contract_count": 4,
-  "contracts_hash": "sha256:c02ff7286a1b77a731d707da46ff983788a01c19223d09f42119b1d7b3181da4",
-  "contracts_index_hash": "sha256:a5b1ff7e24c391cc3d37ffc890e39a26ea94568c3cc73d1ab562298eaea400c6",
+  "contracts_hash": "sha256:a65ee4e0d9849dd2bbe06a3b319b3c429bf95d4f0edbac2bcc509602e28598ff",
+  "contracts_index_hash": "sha256:e9bfc64664ea6de3c767fca6b53c2db9a054de764d40971bcd4d273cba7bc3c6",
   "format_version": 1,
   "manifest_path": "agent.json",
   "source_contract_inputs_hash": "sha256:d67f3c3da634b2f95ac363505fbc3c6bba41f013742b8009aa9a6c92df5282cc",
-  "source_manifest_hash": "sha256:7e30c692a28aa65e1ac36601bad417e0b33913c6fa5ce5b08d6fd92d0fbbc269",
+  "source_manifest_hash": "sha256:427046a2cd772ef2a44ddd79669aecf26188abc9ca71f60ec6d1a58d4c9b01f5",
   "source_schemas": [
     {
       "path": "schemas/event.schema.json",

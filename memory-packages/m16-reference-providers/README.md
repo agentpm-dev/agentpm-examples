@@ -1,6 +1,6 @@
-# Harness M16 MemoryRuntime reference providers
+# MemoryRuntime reference providers
 
-Reference process providers for Harness Milestone 16:
+Reference process providers for AgentPM Harness:
 
 - PostgreSQL/pgvector `MemoryRuntime`
 - Redis/Redis Stack `MemoryRuntime`
@@ -42,11 +42,11 @@ Use the commands below for published-SDK provider execution.
 
 ## Capability advertisement
 
-The PostgreSQL/pgvector provider advertises the M16 reference primitive record/state/batch capabilities and persists Memory records in `agentpm_memory_records`, lifecycle state in `agentpm_memory_operation_state`, and sequence counters in `agentpm_memory_ordinals`. Direct writes and lifecycle commits run inside PostgreSQL transactions. It omits `semantic` in M16; setting `AGENTPM_MEMORY_PGVECTOR_SEMANTIC=true` fails closed until real embedding storage and cosine ranking are implemented.
+The PostgreSQL/pgvector provider advertises the reference primitive record/state/batch capabilities and persists Memory records in `agentpm_memory_records`, lifecycle state in `agentpm_memory_operation_state`, and sequence counters in `agentpm_memory_ordinals`. Direct writes and lifecycle commits run inside PostgreSQL transactions. It omits `semantic` in these providers; setting `AGENTPM_MEMORY_PGVECTOR_SEMANTIC=true` fails closed until real embedding storage and cosine ranking are implemented.
 
-The Redis provider uses Redis hashes for records, active-set indexes for scoped spaces, string counters for sequence ordinals, and JSON operation-state keys. It advertises durable trigger state, but not `atomic_batches`: `WATCH`/`MULTI` protects against stale writes, but Redis `EXEC` does not roll back earlier queued commands if a later queued command fails. The provider still exposes a happy-path `commit_lifecycle` primitive for smoke coverage; Harness must suppress lifecycle operations that require atomic batches against this provider. It omits `semantic` in M16; setting `AGENTPM_MEMORY_REDIS_STACK=true` fails closed until real Redis Stack vector storage and ranking are implemented. Unsupported capabilities must be omitted so Harness can suppress incompatible spaces/operations during preflight.
+The Redis provider uses Redis hashes for records, active-set indexes for scoped spaces, string counters for sequence ordinals, and JSON operation-state keys. It advertises durable trigger state, but not `atomic_batches`: `WATCH`/`MULTI` protects against stale writes, but Redis `EXEC` does not roll back earlier queued commands if a later queued command fails. The provider still exposes a happy-path `commit_lifecycle` primitive for smoke coverage; Harness must suppress lifecycle operations that require atomic batches against this provider. It omits `semantic` in these providers; setting `AGENTPM_MEMORY_REDIS_STACK=true` fails closed until real Redis Stack vector storage and ranking are implemented. Unsupported capabilities must be omitted so Harness can suppress incompatible spaces/operations during preflight.
 
-The fixed lifecycle failure cooldown remains Harness-owned portable behavior for M16. Providers return typed primitive failures; Harness applies the same operation failure state/backoff regardless of backend.
+The fixed lifecycle failure cooldown remains Harness-owned portable runtime behavior. Providers return typed primitive failures; Harness applies the same operation failure state/backoff regardless of backend.
 
 ## Harness workspace
 
@@ -114,7 +114,7 @@ export APM="${APM:-$(pwd)/../../../../agentpm/target/debug/agentpm}"
   --headless \
   --scope user=m16-user \
   --scope conversation=m16-conversation \
-  --input "Write one M16 reference Memory note about launch readiness, then complete with outcome done."
+  --input "Write one reference Memory note about launch readiness, then complete with outcome done."
 ```
 
 ## Tests

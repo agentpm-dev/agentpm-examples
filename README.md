@@ -323,3 +323,26 @@ cd app-mcp-tool-server && cp .env.example .env.local && agentpm install && set -
 
 See [publishing from GitHub Actions](publishing/README.md) for package-specific release tags,
 encrypted signing keys and clean-consumer verification.
+
+## Python Tool authoring and migration
+
+For new Python Tool versions, declare requirements in `agent.json` under
+`runtime.dependencies`, prepare/review `agent.lock` with
+`agentpm publish --dry-run --refresh-python`, and publish with an explicit
+namespace. The Tool payload is separate from the hash-verified wheels installed
+in the consumer's managed environment. `_vendor` is a legacy/manual strategy;
+copying native distributions from one workstation can break other targets.
+Existing published versions remain valid and do not require a forced republish.
+
+A new Python release has one immutable target inventory: portable source can
+use one `any` artifact even with native dependencies; genuinely native payloads
+need native runner builds. Read the [author/migration guide](https://www.agentpackagemanager.com/docs/v0.1/advanced/python-dependencies),
+[release/signature guide](https://www.agentpackagemanager.com/docs/v0.1/advanced/release-integrity)
+and [CI workflow instructions](publishing/README.md).
+
+Consumer apps (`agent-app-*`) demonstrate package use and are not published Agent
+packages. Update their AgentPM dependencies through `agentpm install`; refresh
+language SDK dependencies through uv/pnpm. Do not hand-edit installed state or
+consumer locks to simulate an update. Templates publish their own versions and
+generate editable app source; republishing a template does not update an existing
+app automatically.

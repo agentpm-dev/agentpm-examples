@@ -47,5 +47,5 @@ npm run build
 ## Example invocation
 
 ```bash
-printf '%s' '{"action":"post_message","channel":"C123456","text":"AgentPM Milestone 2 shipped"}' | node dist/index.js
+printf '%s' '{"action":"post_message","channel":"C123456","text":"The release is available"}' | node dist/index.js
 ```

@@ -2,16 +2,12 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "slack-post-message",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Post or update Slack messages using a compact action surface for agent notifications.",
-  "files": [
-    "dist/"
-  ],
+  "files": ["dist/"],
   "entrypoint": {
     "command": "node",
-    "args": [
-      "dist/index.js"
-    ],
+    "args": ["dist/index.js"],
     "timeout_ms": 30000
   },
   "runtime": {
@@ -36,10 +32,7 @@
     "properties": {
       "action": {
         "type": "string",
-        "enum": [
-          "post_message",
-          "update_message"
-        ],
+        "enum": ["post_message", "update_message"],
         "description": "Slack message action to perform."
       },
       "channel": {
@@ -68,11 +61,7 @@
         }
       }
     },
-    "required": [
-      "action",
-      "channel",
-      "text"
-    ],
+    "required": ["action", "channel", "text"],
     "additionalProperties": false
   },
   "outputs": {
@@ -107,14 +96,7 @@
             "additionalProperties": true
           }
         },
-        "required": [
-          "ok",
-          "action",
-          "channel",
-          "ts",
-          "message",
-          "metadata"
-        ],
+        "required": ["ok", "action", "channel", "ts", "message", "metadata"],
         "additionalProperties": false
       },
       {
@@ -142,17 +124,11 @@
                 "additionalProperties": true
               }
             },
-            "required": [
-              "code",
-              "message"
-            ],
+            "required": ["code", "message"],
             "additionalProperties": true
           }
         },
-        "required": [
-          "ok",
-          "error"
-        ],
+        "required": ["ok", "error"],
         "additionalProperties": false
       }
     ]

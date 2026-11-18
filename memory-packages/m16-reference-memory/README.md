@@ -1,6 +1,6 @@
-# M16 Reference Memory Blueprint
+# Reference Memory Blueprint
 
-Small Memory Blueprint used by the Milestone 16 PostgreSQL/pgvector and Redis reference providers.
+Small Memory Blueprint used by the PostgreSQL/pgvector and Redis reference providers.
 
 It intentionally covers the portability surface the providers must attest:
 

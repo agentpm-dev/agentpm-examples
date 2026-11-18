@@ -2,26 +2,18 @@
   "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/main/schemas/agentpm.manifest.schema.json",
   "kind": "tool",
   "name": "validate-order",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Validate a small order with Pydantic and calculate its rounded total.",
-  "files": [
-    "tool.py",
-    "README.md"
-  ],
+  "files": ["tool.py", "README.md"],
   "entrypoint": {
     "command": "python",
-    "args": [
-      "-u",
-      "tool.py"
-    ],
+    "args": ["-u", "tool.py"],
     "timeout_ms": 30000
   },
   "runtime": {
     "type": "python",
     "version": "3.11",
-    "dependencies": [
-      "pydantic==2.11.7"
-    ]
+    "dependencies": ["pydantic==2.11.7"]
   },
   "inputs": {
     "type": "object",
@@ -37,10 +29,7 @@
         "description": "Positive price per unit."
       }
     },
-    "required": [
-      "quantity",
-      "unit_price"
-    ],
+    "required": ["quantity", "unit_price"],
     "additionalProperties": false
   },
   "outputs": {
@@ -51,9 +40,7 @@
         "description": "Order total rounded to two decimal places."
       }
     },
-    "required": [
-      "total"
-    ],
+    "required": ["total"],
     "additionalProperties": false
   },
   "readme": "README.md",
