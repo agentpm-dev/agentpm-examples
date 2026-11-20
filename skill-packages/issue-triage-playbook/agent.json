@@ -1,13 +1,17 @@
 {
-  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/tags/apds-v1.0.0/standards/agentpm/1.0.0/manifest.schema.json",
+  "standard": {
+    "id": "agentpm",
+    "version": "1.0.0"
+  },
   "kind": "skill",
   "name": "issue-triage-playbook",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Procedural guidance for reviewing issue queues, identifying priority, and drafting follow-through.",
   "tools": [
     {
       "name": "@zack/github-issues",
-      "version": "0.1.1"
+      "version": "0.1.2"
     }
   ],
   "skill": {
@@ -17,9 +21,7 @@
       "references/triage-decision-cues.md",
       "references/examples.md"
     ],
-    "scripts": [
-      "scripts/run.sh"
-    ]
+    "scripts": ["scripts/run.sh"]
   },
   "readme": "README.md",
   "license": {

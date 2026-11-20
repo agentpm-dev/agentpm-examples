@@ -2,7 +2,7 @@
 
 This Skill wraps:
 
-- `@zack/github-issues@0.1.1`
+- `@zack/github-issues@0.1.2`
 
 Core actions:
 

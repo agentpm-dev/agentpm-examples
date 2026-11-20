@@ -2,6 +2,10 @@
 
 Read and update GitHub issues using a compact, agent-friendly action surface.
 
+Version **0.1.2** declares APDS `agentpm / 1.0.0`. Publish with AgentPM CLI
+**0.1.46 or newer**, which includes the declared README in the archive even
+when `files` selects only `dist/`. The Tool API is unchanged.
+
 ## Why install it
 
 Issue triage, follow-up, and status workflows are common agent tasks. This tool packages the GitHub issue surface into a small, normalized contract instead of scattering GitHub API glue throughout every agent app.
@@ -39,13 +43,13 @@ The source code for this tool can be found [here](https://github.com/agentpm-dev
 Test:
 
 ```bash
-npm test
+pnpm test
 ```
 
 Build:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ## Example invocation
@@ -53,3 +57,9 @@ npm run build
 ```bash
 printf '%s' '{"action":"list_issues","owner":"octocat","repo":"Hello-World","state":"open"}' | node dist/index.js
 ```
+
+## Publish
+
+Run `pnpm build`, `agentpm lint --strict` and `agentpm publish --dry-run`
+before publishing a new version. Sign with a trusted key for your namespace.
+Existing immutable releases are not overwritten.
