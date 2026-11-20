@@ -2,7 +2,7 @@
 
 `devwork-copilot` is a published AgentPM agent package for maintainer and repository review workflows in Python.
 
-Version **0.1.8** pins the exact direct Tool dependency
+Version **0.1.10** pins the exact direct Tool dependency
 `@zack/summarize-text@0.1.10`, which uses AgentPM-managed Python dependencies
 instead of a bundled environment. Use AgentPM CLI **0.1.40 or newer** and a
 Python **3.11+** interpreter for this version.
@@ -39,7 +39,7 @@ It can condense supplied issue text or maintainer notes into a requested word
 budget. The final `resolve-or-handoff` phase keeps Tool access disabled.
 
 GitHub capability enters through the packaged `issue-triage-playbook` Skill,
-which depends on the published `@zack/github-issues` Tool.
+version **0.1.1**, which depends on `@zack/github-issues@0.1.2`.
 
 Example prompts:
 
@@ -57,7 +57,9 @@ The source code for this agent package can be found [here](https://github.com/ag
 ### Prepare and publish
 
 Publish `@zack/summarize-text@0.1.10` first, using its reviewed author lock, before
-publishing this Agent as `@zack/devwork-copilot@0.1.8`. From this directory:
+publishing this Agent as `@zack/devwork-copilot@0.1.10`. Also publish
+`@zack/github-issues@0.1.2` and then `@zack/issue-triage-playbook@0.1.1`; the
+Agent pins that corrected Skill dependency. From this directory:
 
 ```bash
 agentpm lint --strict
@@ -75,7 +77,7 @@ workspace. To update the checked-in Harness example, use
 `app-harness-minimal-agent/` as that workspace:
 
 ```bash
-agentpm install @zack/devwork-copilot@0.1.8
+agentpm install @zack/devwork-copilot@0.1.10
 export OPENAI_API_KEY='your-key'
 agentpm run @zack/summarize-text@0.1.10 --input '{"text":"The maintainer reviewed the bug report, reproduced the problem, and requested a regression test before merging the fix.","max_words":60}'
 agentpm harness --json
@@ -96,6 +98,13 @@ and provisions the summarizer's hash-verified Python environment under
 after a successful real Registry install. Keep consumer locks/installed package
 digests from previously published versions intact until the new versions exist;
 do not replace their version strings or invent integrity values by hand.
+
+This version declares APDS **agentpm / 1.0.0**. Use AgentPM CLI **0.1.46 or newer**
+for authoring and declared README/license packaging. Existing published
+versions remain unchanged.
+
+The direct Tool remains pinned to `@zack/summarize-text@0.1.10`; publishing
+this Agent does not update that dependency or any consumer application.
 
 ## Automated publication
 

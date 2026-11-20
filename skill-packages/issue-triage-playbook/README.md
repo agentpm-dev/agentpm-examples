@@ -2,10 +2,16 @@
 
 `issue-triage-playbook` is a publishable AgentPM Skill package for issue review and follow-up workflows.
 
+Version **0.1.1** declares APDS `agentpm / 1.0.0` and pins the corrected
+`@zack/github-issues@0.1.2` archive. Publish that Tool first, then this Skill,
+using AgentPM CLI **0.1.46 or newer**. Existing Skill releases are unchanged.
+
 It depends on:
-- `@zack/github-issues`
+
+- `@zack/github-issues@0.1.2`
 
 Use it for:
+
 - reviewing the current open issue queue
 - deciding which issue needs attention first
 - drafting a follow-up comment before any write action is taken

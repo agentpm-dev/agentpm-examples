@@ -27,7 +27,7 @@ then adds the native executable directory to PATH.
 
 ## Setup
 
-Use released CLI **0.1.42** or a later compatible version supporting
+Use released CLI **0.1.46** or a later compatible version supporting
 `agentpm package`, `publish --build` and `--key-file`. CLI 0.1.40 predates these
 commands; 0.1.42 also verifies the original `agentpm.tool.signature.v1` author
 signatures used by historical dependencies such as `github-issues@0.1.1`.
@@ -52,7 +52,7 @@ Go to **Settings → Secrets and variables → Actions → Variables**, then use
 
 | Name                   | Production example value                                  |
 | ---------------------- | --------------------------------------------------------- |
-| `AGENTPM_CLI_VERSION`  | `0.1.42` (no leading `v`)                                 |
+| `AGENTPM_CLI_VERSION`  | `0.1.46` (no leading `v`)                                 |
 | `AGENTPM_NAMESPACE`    | `zack` (no leading `@`; use your own namespace in a fork) |
 | `AGENTPM_REGISTRY_URL` | `https://api.agentpackagemanager.com`                     |
 
@@ -158,9 +158,19 @@ they do not initialize or save a separate `setup-uv` cache.
 
 ## Prepare a maintained release
 
-The next prepared versions are `summarize-text` **0.1.10** and
-`devwork-copilot` **0.1.8**, which pins `@zack/summarize-text@0.1.10`.
-Publish and verify the Tool first, then publish the Agent. The native example
+The next prepared versions are `summarize-text` **0.1.11** and
+`devwork-copilot` **0.1.10**, which retains its existing pin to
+`@zack/summarize-text@0.1.10`. Both new manifests declare APDS `agentpm / 1.0.0`.
+Use CLI **0.1.46** for these authoring checks and set the repository variable
+`AGENTPM_CLI_VERSION` accordingly before tagging. The native example below has
+not been migrated in this change; prepare a new declared version before trying
+to publish it under the current Registry requirements.
+Publish and verify the Tool first, then publish the Agent. Before the Agent
+release, also publish `tools-node/github-issues` **0.1.2**, then
+`skill-packages/issue-triage-playbook` **0.1.1**, with CLI **0.1.46**; the Agent
+selects that corrected Skill/Tool chain. Use normal signed `agentpm publish`
+for those dependencies; the maintained tag workflow selects only the tagged
+Agent or summarizer, not its dependencies. The native example
 starts at **0.1.0** and can be published independently after its source is merged.
 Existing consumer workspace locks are updated by a real install after
 publication, not by substituting version strings in their installed records.
@@ -176,11 +186,11 @@ agentpm lint --strict
 ```
 
 Review and commit the source, version and lock changes, then push a tag matching
-that version. For example, after preparing version `0.1.10`:
+that version. For example, after preparing version `0.1.11`:
 
 ```bash
-git tag summarize-text/v0.1.10
-git push origin summarize-text/v0.1.10
+git tag summarize-text/v0.1.11
+git push origin summarize-text/v0.1.11
 ```
 
 That command publishes a real version after the environment permits it. Existing
@@ -190,11 +200,12 @@ After the Tool workflow's publication and verification jobs pass, release the
 prepared Agent version:
 
 ```bash
-git tag devwork-copilot/v0.1.8
-git push origin devwork-copilot/v0.1.8
+git tag devwork-copilot/v0.1.10
+git push origin devwork-copilot/v0.1.10
 ```
 
-The four-platform native example has its own tag:
+Historical first-release example for the four-platform native package (do not
+push this already-published tag again):
 
 ```bash
 git tag native-release-check/v0.1.0

@@ -4,7 +4,7 @@ Summarize text to a target word budget using OpenAI's `gpt-4o-mini`. The Tool
 reads one JSON object from stdin and writes one JSON object to stdout. Its
 existing `ok`/`summary` and `ok`/`error` interface is unchanged.
 
-Version **0.1.10** declares `openai>=1.51.0,<2` in `agent.json`, keeping the OpenAI 1.x
+Version **0.1.11** declares `openai>=1.51.0,<2` in `agent.json`, keeping the OpenAI 1.x
 interface. The prepared `agent.lock` records the complete exact dependency set,
 including native dependencies such as `pydantic-core` and `jiter`. Consumers
 need AgentPM CLI **0.1.40 or newer** and Python **3.11 or newer** for this release format.
@@ -43,7 +43,7 @@ vendor dependencies into `summarize_text/_vendor`; remove any old ignored copy
 from your local working directory before packaging this version. The Tool now
 imports dependencies from the interpreter's environment.
 
-Use AgentPM CLI **0.1.41 or newer** for the automated publishing workflow. The checked-in `agent.lock` is already
+Use AgentPM CLI **0.1.45 or newer** for the automated publishing workflow. The checked-in `agent.lock` is already
 prepared for this version; package it without refreshing the reviewed resolution:
 
 ```bash
@@ -66,9 +66,9 @@ With a suitable Python selected, use the namespace where the Tool was published
 (the commands below use `@zack`):
 
 ```bash
-agentpm install @zack/summarize-text@0.1.10
+agentpm install @zack/summarize-text@0.1.11
 export OPENAI_API_KEY='your-key'
-agentpm run @zack/summarize-text@0.1.10 --input '{"text":"Alan Turing was a computer scientist","max_words":60}'
+agentpm run @zack/summarize-text@0.1.11 --input '{"text":"Alan Turing was a computer scientist","max_words":60}'
 ```
 
 If `python` is absent or too old, set `AGENTPM_PYTHON` to an absolute Python 3.11+
@@ -76,6 +76,9 @@ executable before install and run. AgentPM installs exact hash-verified wheels
 into `.agentpm/runtimes/python/` and runs the Tool with that Python automatically.
 No consumer `uv sync`, manual pip install or global OpenAI package is required.
 Harness Tool calls use the same environment through `agentpm run --machine`.
+
+This version declares APDS **agentpm / 1.0.0**. Use AgentPM CLI **0.1.45 or newer**
+for current authoring checks. Existing published versions remain unchanged.
 
 ## Automated publication
 

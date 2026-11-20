@@ -1,8 +1,12 @@
 {
-  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/tags/apds-v1.0.0/standards/agentpm/1.0.0/manifest.schema.json",
+  "standard": {
+    "id": "agentpm",
+    "version": "1.0.0"
+  },
   "kind": "agent",
   "name": "devwork-copilot",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "description": "Interactive GitHub maintainer copilot with explicit approval gates for write actions, packaged maintainer-review orchestration, workflow continuity, and a durable maintainer behavior profile.",
   "loop": "@zack/devwork-triage-loop@0.1.0",
   "tools": [
@@ -32,7 +36,7 @@
   "skills": [
     {
       "name": "@zack/issue-triage-playbook",
-      "version": "0.1.0"
+      "version": "0.1.1"
     }
   ],
   "bindings": {

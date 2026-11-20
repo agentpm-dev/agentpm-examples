@@ -1,17 +1,17 @@
 {
-  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/heads/main/schemas/agentpm.manifest.schema.json",
+  "$schema": "https://raw.githubusercontent.com/agentpm-dev/cli/refs/tags/apds-v1.0.0/standards/agentpm/1.0.0/manifest.schema.json",
+  "standard": {
+    "id": "agentpm",
+    "version": "1.0.0"
+  },
   "kind": "tool",
   "name": "github-issues",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Read and update GitHub issues using a compact, agent-friendly action surface.",
-  "files": [
-    "dist/"
-  ],
+  "files": ["dist/"],
   "entrypoint": {
     "command": "node",
-    "args": [
-      "dist/index.js"
-    ],
+    "args": ["dist/index.js"],
     "timeout_ms": 30000
   },
   "runtime": {
@@ -60,10 +60,7 @@
       },
       "state": {
         "type": "string",
-        "enum": [
-          "open",
-          "closed"
-        ],
+        "enum": ["open", "closed"],
         "description": "Issue state for list or update actions."
       },
       "per_page": {
@@ -90,11 +87,7 @@
         "description": "Issue body or comment body, depending on the action."
       }
     },
-    "required": [
-      "action",
-      "owner",
-      "repo"
-    ],
+    "required": ["action", "owner", "repo"],
     "additionalProperties": false
   },
   "outputs": {
@@ -139,12 +132,7 @@
             "additionalProperties": true
           }
         },
-        "required": [
-          "ok",
-          "action",
-          "repository",
-          "metadata"
-        ],
+        "required": ["ok", "action", "repository", "metadata"],
         "additionalProperties": false
       },
       {
@@ -172,17 +160,11 @@
                 "additionalProperties": true
               }
             },
-            "required": [
-              "code",
-              "message"
-            ],
+            "required": ["code", "message"],
             "additionalProperties": true
           }
         },
-        "required": [
-          "ok",
-          "error"
-        ],
+        "required": ["ok", "error"],
         "additionalProperties": false
       }
     ]
